@@ -1,8 +1,8 @@
 # プロダクトドキュメントマップ (hana-memo)
 
-**最終更新**: 2026-05-22 16:25 (+09:00)
-**最新コマンド**: /flow:feature (D20260522_015, memory) — Priority 1〜5 全 14 対象 設計完了
-**統計**: 機能フォルダ 7 / 横断フォルダ 7 / 改修件数 0 / バグ修正件数 0 / クレーム判定件数 0 / Open 論点 5 件 / Superseded 5 件
+**最終更新**: 2026-05-22 18:30 (+09:00)
+**最新コマンド**: /flow:concept (D20260522_016, BaaS Pivot) — Supabase → Neon + Vercel + Clerk + R2 + Drizzle 全面切替、E2E 自動化方針追補
+**統計**: 機能フォルダ 7 / 横断フォルダ 7 / 改修件数 0 / バグ修正件数 0 / クレーム判定件数 0 / Open 論点 5 件 / Superseded 5 件 / decision 計 119 件
 
 > **このファイルは AI 用エントリポイント**。
 > 目的別に「どこから読めばいいか」「次に何を Read すべきか」を示す。詳細は各 INDEX / 各ファイルを参照。
@@ -32,7 +32,8 @@
 
 - **概念設計 (SoT)**: [./concept.md](./concept.md)
   - 一行で言うと: 散歩中に出会った草花を撮るだけで AI が名前を当て、自分だけの植物発見ノートが育っていく PWA
-  - 現フェーズ: 企画 → MVP 設計完了 → 実装着手前
+  - 現フェーズ: 企画 → MVP 設計完了 → BaaS Pivot 反映済 → 実装着手前
+  - スタック: **Vite + React + TS + Tailwind + Neon (Drizzle) + Clerk + Cloudflare R2 + Vercel Functions + OpenAI gpt-4o-mini + Stripe + Sentry**
   - 最終更新: 2026-05-22
 - **プロジェクト INDEX (フラット一覧)**: [./INDEX.md](./INDEX.md)
 - **実装前準備チェックリスト**: [./PREREQUISITES.md](./PREREQUISITES.md)
@@ -66,11 +67,11 @@
 
 - **AI_LOG インデックス**: [./AI_LOG/INDEX.md](./AI_LOG/INDEX.md)
 - **最新セッション 5 件**:
+  - [D20260522_016_concept_baas_pivot.md](./AI_LOG/D20260522_016_concept_baas_pivot.md) — BaaS Pivot (Supabase → Neon スタック、6 decision)
   - [D20260522_015_feature_memory.md](./AI_LOG/D20260522_015_feature_memory.md) — memory 設計 (6 decision)
   - [D20260522_014_feature_export.md](./AI_LOG/D20260522_014_feature_export.md) — export 設計 ([論点-003] 解決)
   - [D20260522_013_feature_billing.md](./AI_LOG/D20260522_013_feature_billing.md) — billing 設計 (Stripe + §4.6.4.1)
   - [D20260522_012_feature_notebook.md](./AI_LOG/D20260522_012_feature_notebook.md) — notebook 設計 (UGC §4.8.2)
-  - [D20260522_011_feature_capture.md](./AI_LOG/D20260522_011_feature_capture.md) — capture 設計 (UC1 中核)
 - **Open 論点**: 5 件 (concept §8 と同期)
 - **Superseded chain**: 5 件 (論点-002, 003, 004, 006, 007 解決済)
 

@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-22 16:20 (+09:00)
-**総セッション数**: 15
-**総 decision 数**: 113
+**最終更新**: 2026-05-22 18:30 (+09:00)
+**総セッション数**: 16
+**総 decision 数**: 119
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,6 +14,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260522_016_concept_baas_pivot.md](./D20260522_016_concept_baas_pivot.md) | 2026-05-22 | /flow:concept (UPDATE) | BaaS Pivot 全体 | D20260522-114〜119 | 完了 |
 | [D20260522_015_feature_memory.md](./D20260522_015_feature_memory.md) | 2026-05-22 | /flow:feature | memory | D20260522-108〜113 | 完了 |
 | [D20260522_014_feature_export.md](./D20260522_014_feature_export.md) | 2026-05-22 | /flow:feature | export | D20260522-102〜107 | 完了 |
 | [D20260522_013_feature_billing.md](./D20260522_013_feature_billing.md) | 2026-05-22 | /flow:feature | billing | D20260522-095〜101 | 完了 |
@@ -34,6 +35,12 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260522-119 | /flow:concept (UPDATE) | BaaS Pivot Q5 | 横断 4 + concept + PREREQUISITES 中心 update | auto-recommended | D20260522_016_concept_baas_pivot.md |
+| D20260522-118 | /flow:concept (UPDATE) | BaaS Pivot Q4 | Storage = R2 Vercel Function Presigned URL | auto-recommended | D20260522_016_concept_baas_pivot.md |
+| D20260522-117 | /flow:concept (UPDATE) | BaaS Pivot Q3 | Auth = Clerk Guest Users β + linkIdentity | auto-recommended | D20260522_016_concept_baas_pivot.md |
+| D20260522-116 | /flow:concept (UPDATE) | BaaS Pivot Q2 | Edge Functions → Vercel Functions (Node 20) | auto-recommended | D20260522_016_concept_baas_pivot.md |
+| D20260522-115 | /flow:concept (UPDATE) | BaaS Pivot Q1 | Realtime 廃止 → poll fallback | auto-recommended | D20260522_016_concept_baas_pivot.md |
+| D20260522-114 | /flow:concept (UPDATE) | BaaS Pivot 採用 | Supabase → Neon + Vercel + Clerk + R2 + Drizzle | auto-recommended | D20260522_016_concept_baas_pivot.md |
 | D20260522-113 | /flow:feature | memory Step 6 | E2E 生成 | auto-recommended | D20260522_015_feature_memory.md |
 | D20260522-111 | /flow:feature | memory Q2 (論点-002 解決) | アプリ内バッジのみ、Push なし | auto-recommended | D20260522_015_feature_memory.md |
 | D20260522-110 | /flow:feature | memory Q1 | 同月日 ±15 日範囲 | auto-recommended | D20260522_015_feature_memory.md |

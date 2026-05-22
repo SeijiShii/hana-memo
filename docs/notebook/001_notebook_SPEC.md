@@ -5,6 +5,8 @@
 > **最終更新**: 2026-05-22
 > **入力アーティファクト**: `../concept.md` §1.1 UC2, §4.8.2, `../capture/001_capture_SPEC.md`
 
+> **2026-05-22 BaaS Pivot 反映**: 本 SPEC 内で Supabase 関連の表現 (例: `supabase.from(...).insert`、Supabase Storage、Edge Function、Anonymous Auth、RLS `auth.uid()`) は **Neon (Drizzle ORM) + Clerk (Guest Users + linkIdentity) + Cloudflare R2 (Presigned URL) + Vercel Functions** に読み替えること。具体的な SDK 呼出と RLS 代替 (Drizzle 層 `where user_id = ctx.userId`) は実装フェーズ `/dev-spec` で再設計する。マッピング詳細は concept.md §6 / `_shared/{auth,db,storage,ai}` SPEC を参照。
+
 ---
 
 ## 1. 詳細 UC
