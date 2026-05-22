@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnp.*
+
+# Build
+dist/
+build/
+.next/
+.vercel/
+.turbo/
+
+# Env / Secrets (perspectives O25)
+.env
+.env.*.local
+.env.local
+.env.*.local.bak
+secrets.*
+*.key
+*.pem
+
+# Exports (revenue CSV 等、PII を含む可能性)
+exports/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs / Caches
+*.log
+.eslintcache
+.parcel-cache
+coverage/
+
+# Test outputs
+playwright-report/
+test-results/
