@@ -27,6 +27,7 @@
 | 公開戦略・ドメインを確認 | [`./concept.md`](./concept.md) §4.7 | `PREREQUISITES.md` §3 | MVP は Vercel デフォルト |
 | マーケ戦略を確認 | [`./concept.md`](./concept.md) §4.8 | `notebook/INDEX.md` (UGC 製品内グロース) | charter §2.2 抵触なし |
 | 観点（考慮漏れ）を確認 | `~/.claude/flow-data/perspectives.md` | — | onboard Step 3.6 結果 |
+| 脆弱性レビュー結果を見る | [`./SECURITY_REVIEW_20260523.md`](./SECURITY_REVIEW_20260523.md) | `_shared/{auth,ai,storage,analytics,db}/902_*_IMPL_SECURITY_CHECKLIST.md` | `/flow:secure` L1 + L2、Critical/High は §8 [論点-011]〜[論点-014] |
 
 ## 1. プロダクト全体
 
@@ -67,12 +68,12 @@
 
 - **AI_LOG インデックス**: [./AI_LOG/INDEX.md](./AI_LOG/INDEX.md)
 - **最新セッション 5 件**:
+  - [D20260523_017_secure_product_wide.md](./AI_LOG/D20260523_017_secure_product_wide.md) — `/flow:secure` プロダクト全体 (L1 + L2、Critical 2 / High 2 / Medium 2、18 decision)
   - [D20260522_016_concept_baas_pivot.md](./AI_LOG/D20260522_016_concept_baas_pivot.md) — BaaS Pivot (Supabase → Neon スタック、6 decision)
   - [D20260522_015_feature_memory.md](./AI_LOG/D20260522_015_feature_memory.md) — memory 設計 (6 decision)
   - [D20260522_014_feature_export.md](./AI_LOG/D20260522_014_feature_export.md) — export 設計 ([論点-003] 解決)
   - [D20260522_013_feature_billing.md](./AI_LOG/D20260522_013_feature_billing.md) — billing 設計 (Stripe + §4.6.4.1)
-  - [D20260522_012_feature_notebook.md](./AI_LOG/D20260522_012_feature_notebook.md) — notebook 設計 (UGC §4.8.2)
-- **Open 論点**: 5 件 (concept §8 と同期)
+- **Open 論点**: 9 件 (concept §8 と同期、論点-011〜014 は /flow:secure 由来)
 - **Superseded chain**: 5 件 (論点-002, 003, 004, 006, 007 解決済)
 
 ## 5. 観点・選好データ（PJ 外部参照）

@@ -108,12 +108,19 @@ COST_STRIPE_PER_TXN_PERCENT=3.6
 | Resend (将来) | お問い合わせ返信 / 撤退告知 | Free (3,000 通/月、ドメイン認証必要) |
 | Clerk Email (代替) | OAuth 関連メール (verification 等) | Clerk Free 枠内 |
 
-## 9. ボット対策 (perspectives O27、公開フォームある時)
+## 9. ボット対策 + レート制限 (perspectives O27、公開 PJ 必須)
 
-| サービス | 用途 | プラン |
-|---|---|---|
-| 自前 device fingerprint (@fingerprintjs/fingerprintjs OSS) | 匿名 SPAM 抑止 | Free (OSS 版) |
-| Cloudflare Turnstile (将来) | お問い合わせフォーム ([論点-009] 解決後) | Free (1M req/月) |
+| サービス | 用途 | プラン | 関連論点 |
+|---|---|---|---|
+| 自前 device fingerprint (@fingerprintjs/fingerprintjs OSS) | 匿名 SPAM 抑止 | Free (OSS 版) | — |
+| Cloudflare Turnstile (将来) | お問い合わせフォーム + AI 同定 5 回目以降 (匿名 user) | Free (1M req/月) | [論点-009], [論点-011] |
+| **Upstash Ratelimit (Redis)** | API エンドポイント別 rate limit (AI 同定 10/min, Storage 20/min, Webhook 100/min, 公開 5/min) | Free (10k req/日) | [論点-011] |
+
+**新規 .env キー (Upstash Ratelimit 採用時、`/flow:secure` [SEC-001] 由来)**:
+- `UPSTASH_REDIS_REST_URL` (Vercel Function only)
+- `UPSTASH_REDIS_REST_TOKEN` (Vercel Function only)
+- `TURNSTILE_SITE_KEY` (frontend、VITE_ プレフィックス必要)
+- `TURNSTILE_SECRET_KEY` (Vercel Function only、検証 API 用)
 
 ## 10. ローカル開発環境準備 (§4.5)
 
@@ -123,7 +130,7 @@ COST_STRIPE_PER_TXN_PERCENT=3.6
 | Vercel CLI | `npm i -g vercel` → `vercel link` |
 | Neon CLI | `npm i -g neonctl` → `neonctl auth` |
 | Drizzle Kit | `npm i drizzle-orm drizzle-kit pg` (deps) |
-| `.env.example` 作成 | 上記 §1 のキー名をダミー値付きで列挙 |
+| `.env.example` 作成 ([論点-012]) | 上記 §1 + §9 のキー名をダミー値付きで列挙、`/flow:secure` [SEC-002] 由来 |
 | `.env.local` 作成 | `.env.example` をコピー、実値を入力、`.gitignore` 確認 |
 | `.gitignore` | `.env*.local`, `.env`, `dist/`, `node_modules/`, `exports/` を含む |
 | Git pre-commit hook | husky + lint-staged (typecheck + eslint)、gitleaks 推奨 |

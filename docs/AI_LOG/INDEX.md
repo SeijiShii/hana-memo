@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-22 18:30 (+09:00)
-**総セッション数**: 16
-**総 decision 数**: 119
+**最終更新**: 2026-05-23 (+09:00)
+**総セッション数**: 17
+**総 decision 数**: 137
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,6 +14,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_017_secure_product_wide.md](./D20260523_017_secure_product_wide.md) | 2026-05-23 | /flow:secure | プロダクト全体 (L1+L2) | D20260523-001〜018 | 完了 |
 | [D20260522_016_concept_baas_pivot.md](./D20260522_016_concept_baas_pivot.md) | 2026-05-22 | /flow:concept (UPDATE) | BaaS Pivot 全体 | D20260522-114〜119 | 完了 |
 | [D20260522_015_feature_memory.md](./D20260522_015_feature_memory.md) | 2026-05-22 | /flow:feature | memory | D20260522-108〜113 | 完了 |
 | [D20260522_014_feature_export.md](./D20260522_014_feature_export.md) | 2026-05-22 | /flow:feature | export | D20260522-102〜107 | 完了 |
@@ -35,6 +36,17 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-018 | /flow:secure | §8 論点登録 | [論点-014] Sentry beforeSend PII スクラブ (High / 法令必須) | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-017 | /flow:secure | §8 論点登録 | [論点-013] AI Vision SSRF 防御強化 (High) | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-016 | /flow:secure | §8 論点登録 | [論点-012] `.env.example` テンプレ作成 (Critical) | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-015 | /flow:secure | §8 論点登録 | [論点-011] レート制限の具体的実装 (Critical) | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-014 | /flow:secure | L2 生成 | O27 → `_shared/db/902_*.md` | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-013 | /flow:secure | L2 生成 | O26 → `_shared/analytics/902_*.md` | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-012 | /flow:secure | L2 生成 | O25 → `_shared/storage/902_*.md` | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-011 | /flow:secure | L2 生成 | O24 → `_shared/ai/902_*.md` | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-010 | /flow:secure | L2 生成 | O23 → `_shared/auth/902_*.md` | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-009 | /flow:secure | L4 deps | SKIP (ロックファイル不在、TDD 着手後再実行) | auto-recommended | D20260523_017_secure_product_wide.md |
+| D20260523-001 | /flow:secure | PJ 性質 | 複数/公開/有償/PII/AI/国内 → O23-O28 全 6 観点 apply | auto-recommended | D20260523_017_secure_product_wide.md |
 | D20260522-119 | /flow:concept (UPDATE) | BaaS Pivot Q5 | 横断 4 + concept + PREREQUISITES 中心 update | auto-recommended | D20260522_016_concept_baas_pivot.md |
 | D20260522-118 | /flow:concept (UPDATE) | BaaS Pivot Q4 | Storage = R2 Vercel Function Presigned URL | auto-recommended | D20260522_016_concept_baas_pivot.md |
 | D20260522-117 | /flow:concept (UPDATE) | BaaS Pivot Q3 | Auth = Clerk Guest Users β + linkIdentity | auto-recommended | D20260522_016_concept_baas_pivot.md |
@@ -72,6 +84,10 @@
 | [論点-008] | _shared/helpers/season 南半球対応 | D20260522_004 | D20260522-035 |
 | [論点-009] | お問い合わせフォーム実装方針 (自前 Resend vs SaaS) | D20260522_006 | D20260522-051 |
 | [論点-010] | 月次集計の規模拡大運用 (BigQuery 連携 等) | D20260522_013 | D20260522-100 |
+| [論点-011] | レート制限の具体的実装 (O27、Critical) | D20260523_017 | D20260523-015 |
+| [論点-012] | `.env.example` テンプレート作成 (O25、Critical) | D20260523_017 | D20260523-016 |
+| [論点-013] | AI Vision の画像 URL 経路 SSRF 防御強化 (O24、High) | D20260523_017 | D20260523-017 |
+| [論点-014] | Sentry beforeSend PII スクラブ実装 (O26、High / 法令必須) | D20260523_017 | D20260523-018 |
 
 ## Superseded chain（旧 Open → 新解決）
 

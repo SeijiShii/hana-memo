@@ -836,6 +836,77 @@ public/               # PWA manifest / icons
 - **判断期限**: α 公開後 (1 ヶ月運用してから判断)
 - **担当**: seiji
 
+### [論点-011] レート制限の具体的実装 (SEC-001、Critical)
+
+- **影響範囲**: §3 NFR / §4.3 / §4.6.2 / `_shared/ai` / `_shared/auth` / `_shared/db` / `billing`
+- **観点 ID**: O27_rate_limit_scope
+- **severity**: Critical
+- **検出根拠**: 全 SPEC を `@upstash/ratelimit` / `rateLimit` / `express-rate-limit` で grep → 0 件。fingerprint + `trial_used_count` 生涯 cap のみで時間単位 rate limit が未設計。AI コスト爆発リスク + Stripe/Clerk Webhook 攻撃面リスク
+- **詰めるべき問い**:
+  1. レート制限の実装手段: Upstash Ratelimit / Vercel Edge Config / Cloudflare WAF のどれを採用するか?
+  2. エンドポイント別の閾値: AI 同定 / Storage URL / Webhook / 公開 API の各 limit
+  3. 匿名 user の AI 同定 5 回目以降に Cloudflare Turnstile を挿入するか?
+- **候補案**:
+  - 案 A (採用): **Upstash Ratelimit (Vercel Function 統合)** — AI 同定 `10/min`、Storage `20/min`、Webhook `100/min`、公開 `5/min` + Turnstile。Turnstile は MVP 未実装、α 運用で発動条件を判断
+  - 案 B (非採用): Cloudflare WAF のみ — 細粒度制御困難 / エンドポイント別設定不可
+  - 案 C (非採用): 自前 (Neon table カウンタ) — Neon コンピュート無料枠を rate limit カウンタで消費するのは本末転倒
+- **推奨**: **案 A 採用**
+- **判断期限**: `/flow:tdd` `_shared/ai` または `capture` 着手前 (TDD 開始直前必須)
+- **担当**: seiji
+- **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-001`
+
+### [論点-012] `.env.example` テンプレート作成 (SEC-002、Critical)
+
+- **影響範囲**: §4.5.3 / `PREREQUISITES.md` / 全 Vercel Function
+- **観点 ID**: O25_secrets_management
+- **severity**: Critical
+- **検出根拠**: `concept.md §4.5.3` で必須キー 13 件 + コスト単価 7 件を明文化済、`.gitignore` も準拠。しかし `<root>/.env.example` 実ファイル不在 → dev 環境再構築時に取りこぼし / クライアント露出可否の混乱リスク
+- **詰めるべき問い**:
+  1. 作成タイミング: 今すぐ / TDD `_shared/db` 着手と同時
+  2. テンプレ内容: concept §4.5.3 全キーをコピー + 各キーに取得手順リンク + クライアント露出可否のコメント
+- **候補案**:
+  - 案 A (採用): **TDD `_shared/db` 着手と同時に作成** (最初の Drizzle migration で `DATABASE_URL` が必須なため、自然なタイミング)
+  - 案 B (非採用): 今すぐ作成 — TDD 着手のキック作業として後者に組込む方がドキュメントと実装の往復が減る
+- **推奨**: **案 A 採用**
+- **判断期限**: `/flow:tdd` `_shared/db` 着手と同時 (= TDD 着手の最初のタスク)
+- **担当**: seiji
+- **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-002`
+
+### [論点-013] AI Vision の画像 URL 経路 SSRF 防御強化 (SEC-003、High)
+
+- **影響範囲**: `_shared/ai` / `_shared/helpers` / `_shared/storage`
+- **観点 ID**: O24_input_validation (SSRF)
+- **severity**: High
+- **検出根拠**: `_shared/ai/001_ai_SPEC.md` は OpenAI Structured Output schema (出力) はあるが、入力側で R2 Presigned URL に限定する allowlist + private IP 拒否ロジックが未明示。将来 user 指定 URL を受け取る経路追加時の SSRF 攻撃面を予防的に塞ぐ
+- **詰めるべき問い**:
+  1. `identifyPlant` の入力契約を `objectKey: string` に固定するか、URL を受け取る可能性を残すか?
+  2. SSRF guard 関数を `_shared/helpers/url.ts` に共通化するか、`_shared/ai` 内に閉じるか?
+- **候補案**:
+  - 案 A (採用): **入力契約を `objectKey: string` に固定 + SSRF guard は `_shared/helpers/url.ts` に共通化** (将来 OGP / Webhook 等の URL 受領経路で再利用)
+  - 案 B (非採用): URL を受け取る経路を許容し guard で防御 — 攻撃面が広く、guard 漏れリスク高
+- **推奨**: **案 A 採用**
+- **判断期限**: `/flow:tdd` `_shared/ai` 着手前
+- **担当**: seiji
+- **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-003`
+
+### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
+
+- **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
+- **観点 ID**: O26_pii_logging (legal_required=true)
+- **severity**: High (法令必須、severity-threshold 除外不可)
+- **検出根拠**: `_shared/analytics/001_analytics_SPEC.md §6.1` で Clerk user id の SHA-256 hash 化は明示されているが、error.message / breadcrumb / Slack 通知文中の email / 位置 / Stripe id / Clerk session token に対するスクラブ機構が未設計。個人情報保護法の委託先漏洩リスク
+- **詰めるべき問い**:
+  1. スクラブ実装: `beforeSend` + `beforeBreadcrumb` の二段、または event 全体に再帰スクラブ?
+  2. スクラブパターン: email / 緯度経度 / Stripe id / Clerk session / Clerk uid raw / カード番号 / 国内電話 (7 種) で十分か?
+  3. Slack Webhook 通知文にも同じスクラブを適用するか?
+- **候補案**:
+  - 案 A (採用): **`scrub<T>(value)` 共通関数を `_shared/analytics/scrubber.ts` に作成、`Sentry.init({ beforeSend, beforeBreadcrumb })` + Slack 通知の両方に適用** (上記 7 パターン)
+  - 案 B (非採用): Sentry の組込み Data Scrubbing 機能 (server-side) のみで対応 — クライアント送信時点で既に PII が含まれており、ネットワーク経路で流出する可能性
+- **推奨**: **案 A 採用**
+- **判断期限**: `/flow:tdd` `_shared/analytics` 着手前 (α 公開前必須)
+- **担当**: seiji
+- **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-004`
+
 ---
 
 ## 9. 法務・コンプライアンス書類
@@ -958,3 +1029,4 @@ staging_exclude_paths: []
 | 2026-05-22 | 認証フローを「匿名スタート + Google OAuth 後リンク」に変更 (charter §1.1 適合、気軽さ最優先)。§1.2 / §3 / §4.1 / §4.3 / §5.1 / §6 / §7 / §8 ([論点-001] 修正 + [論点-006] [論点-007] 新規追加) を更新 | /flow:concept (UPDATE、seiji 指摘) |
 | 2026-05-22 | flow:concept 更新版に追随: §4.7 公開戦略・ドメイン・リバースプロキシ / §4.8 サービス公開周知 / §10 Git リポジトリ・運用 を追加 (旧 §10 → §11 に繰り下げ)。Q12.9 / Q12.10 / Q12.11 / perspectives O22/O29/O31 / charter §1.6 反映 | /flow:concept (UPDATE、コマンド更新の retroactive 適用) |
 | 2026-05-22 | **BaaS Pivot** (charter §0.2 + perspectives O32 連携): Supabase → Neon + Vercel + Clerk + Cloudflare R2 + Drizzle ORM に全面切替。§4.1〜4.3 / §4.5 / §4.6.2-3 / §5 (RLS は Drizzle 層に移行) / §6 / §10.7 を書き換え。理由: Supabase 無料 2 プロジェクト制約はマイクロサービス連発に不適合、Neon は無料 10 DB 並立 (D20260522-114〜119) | /flow:concept (UPDATE、BaaS Pivot) |
+| 2026-05-23 | `/flow:secure` プロダクト全体 L1+L2 実施。検出 6 件 (Critical 2 / High 2 / Medium 2) を [論点-011]〜[論点-014] として §8 に登録。L2 チェックリスト 5 件を `_shared/{auth,ai,storage,analytics,db}/902_*.md` に配置。L4 依存スキャンはロックファイル不在で skip (TDD 着手後に再実行) (D20260523-001〜018) | /flow:secure (プロダクト全体) |
