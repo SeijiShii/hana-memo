@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 10:36 (+09:00)
-**総セッション数**: 25
-**総 decision 数**: 188
+**最終更新**: 2026-05-23 11:05 (+09:00)
+**総セッション数**: 26
+**総 decision 数**: 200
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_026_tdd__shared_db.md](./D20260523_026_tdd__shared_db.md) | 2026-05-23 | /flow:tdd _shared/db | Phase 0 bootstrap + Phase 1-4 (28/28 pass) | D20260523-067〜078 | 完了 |
 | [D20260523_025_auto_continuous.md](./D20260523_025_auto_continuous.md) | 2026-05-23 | /flow:auto | P4 HIT → /flow:tdd (Class B pause) | D20260523-064〜066 | 完了 (Class B pause) |
 | [D20260523_024_revise__shared_analytics_sec_004.md](./D20260523_024_revise__shared_analytics_sec_004.md) | 2026-05-23 | /flow:revise _shared/analytics | sec_004 (High 法令必須) | D20260523-051〜063 | 完了 |
 | [D20260523_023_resume_continuous.md](./D20260523_023_resume_continuous.md) | 2026-05-23 | /flow:resume continuous | Skill auto-invoke 反復 1 | 進行中 (反復ログ) | 進行中 |
@@ -46,6 +47,11 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-078 | /flow:tdd _shared/db | Step Z | Git commit (Backend code + Docs 別) | auto-recommended | D20260523_026_tdd__shared_db.md |
+| D20260523-077 | /flow:tdd _shared/db | Step 9 | INDEX 連動 + §8 [SEC-002] closed + SCENARIO 進行中 (1/14) | auto-recommended | D20260523_026_tdd__shared_db.md |
+| D20260523-075 | /flow:tdd _shared/db | Step 6 | Vitest 28/28 pass | auto-recommended | D20260523_026_tdd__shared_db.md |
+| D20260523-070 | /flow:tdd _shared/db | Step 5 Phase 0 | PJ bootstrap (npm install + .env.example) | auto-recommended | D20260523_026_tdd__shared_db.md |
+| D20260523-067 | /flow:tdd _shared/db | Step 0.3 | 対象=_shared/db フル TDD (Phase 0 同梱) | explicit-choice | D20260523_026_tdd__shared_db.md |
 | D20260523-066 | /flow:auto | Step 6 | Git commit (AI_LOG + INDEX のみ) | auto-recommended | D20260523_025_auto_continuous.md |
 | D20260523-065 | /flow:auto | Step 4.3 | Class B 確認: /flow:tdd manual 起動推奨、loop 保留 | explicit-choice | D20260523_025_auto_continuous.md |
 | D20260523-064 | /flow:auto | Step 1-3 | P4 HIT → auto-pick = /flow:tdd | auto-recommended | D20260523_025_auto_continuous.md |

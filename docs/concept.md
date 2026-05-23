@@ -862,9 +862,9 @@ public/               # PWA manifest / icons
 
 ### [論点-012] `.env.example` テンプレート作成 (SEC-002、Critical)
 
-- **status**: `open` (TDD 着手時処理予定)
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:32 open (`/flow:secure --list-findings` で取り崩し評価、TDD `_shared/db` 着手と同時処理が §8 推奨と一致 = revise/fix セッションを切らず TDD 内で消化)
-- **TDD 着手時 checklist**: `/flow:tdd _shared/db` セッション冒頭で `<root>/.env.example` を §4.5.3 + PREREQUISITES.md §9 由来の全キー (合計約 20 件) で作成 → status=closed に遷移
+- **status**: `closed`
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:32 open (TDD-handoff) → 2026-05-23 11:00 **closed** (`/flow:tdd _shared/db` Phase 0 で `.env.example` 全 20+ キー作成完了、後続コミット参照)
+- **対応**: `<root>/.env.example` 新規 (Server-side 12 + Client-side 3 + Cost rates 7 + Budget 1 = 23 キー)
 - **影響範囲**: §4.5.3 / `PREREQUISITES.md` / 全 Vercel Function
 - **観点 ID**: O25_secrets_management
 - **severity**: Critical
