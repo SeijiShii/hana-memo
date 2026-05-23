@@ -838,6 +838,9 @@ public/               # PWA manifest / icons
 
 ### [論点-011] レート制限の具体的実装 (SEC-001、Critical)
 
+- **status**: `dispatched-to-revise`
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise (`/flow:secure --list-findings` で取り崩し、SCENARIO §5 推奨ルートに従い [SEC-003] と同梱)
+- **dispatch 先**: `docs/_pending/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` (`/flow:revise _shared/ai --resume sec_001-003_rate_limit_ssrf` で対応)
 - **影響範囲**: §3 NFR / §4.3 / §4.6.2 / `_shared/ai` / `_shared/auth` / `_shared/db` / `billing`
 - **観点 ID**: O27_rate_limit_scope
 - **severity**: Critical
@@ -857,6 +860,9 @@ public/               # PWA manifest / icons
 
 ### [論点-012] `.env.example` テンプレート作成 (SEC-002、Critical)
 
+- **status**: `open` (TDD 着手時処理予定)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:32 open (`/flow:secure --list-findings` で取り崩し評価、TDD `_shared/db` 着手と同時処理が §8 推奨と一致 = revise/fix セッションを切らず TDD 内で消化)
+- **TDD 着手時 checklist**: `/flow:tdd _shared/db` セッション冒頭で `<root>/.env.example` を §4.5.3 + PREREQUISITES.md §9 由来の全キー (合計約 20 件) で作成 → status=closed に遷移
 - **影響範囲**: §4.5.3 / `PREREQUISITES.md` / 全 Vercel Function
 - **観点 ID**: O25_secrets_management
 - **severity**: Critical
@@ -874,6 +880,9 @@ public/               # PWA manifest / icons
 
 ### [論点-013] AI Vision の画像 URL 経路 SSRF 防御強化 (SEC-003、High)
 
+- **status**: `dispatched-to-revise`
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise (`/flow:secure --list-findings` で取り崩し、[SEC-001] と同梱して `_shared/ai` 一括 revise)
+- **dispatch 先**: `docs/_pending/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` (`/flow:revise _shared/ai --resume sec_001-003_rate_limit_ssrf` で対応)
 - **影響範囲**: `_shared/ai` / `_shared/helpers` / `_shared/storage`
 - **観点 ID**: O24_input_validation (SSRF)
 - **severity**: High
@@ -891,6 +900,9 @@ public/               # PWA manifest / icons
 
 ### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
 
+- **status**: `dispatched-to-revise`
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise (`/flow:secure --list-findings` 取り崩し、legal_required=true のため accepted-risk 不可、SCENARIO §5 推奨ルートに従い revise セッション dispatch)
+- **dispatch 先**: `docs/_pending/sec_004_sentry_pii_scrub/000_TRIGGER.md` (`/flow:revise _shared/analytics --resume sec_004_sentry_pii_scrub` で対応)
 - **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
 - **観点 ID**: O26_pii_logging (legal_required=true)
 - **severity**: High (法令必須、severity-threshold 除外不可)

@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 09:10 (+09:00)
-**総セッション数**: 18
-**総 decision 数**: 143
+**最終更新**: 2026-05-23 09:35 (+09:00)
+**総セッション数**: 19
+**総 decision 数**: 149
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,6 +14,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_019_secure_list-findings.md](./D20260523_019_secure_list-findings.md) | 2026-05-23 | /flow:secure --list-findings | SEC findings triage (4 件) | D20260523-025〜030 | 完了 |
 | [D20260523_018_scenario_init.md](./D20260523_018_scenario_init.md) | 2026-05-23 | /flow:scenario --init | SCENARIO 初版生成 | D20260523-020〜024 | 完了 |
 | [D20260523_017_secure_product_wide.md](./D20260523_017_secure_product_wide.md) | 2026-05-23 | /flow:secure | プロダクト全体 (L1+L2) | D20260523-001〜018 (+ commit 019) | 完了 |
 | [D20260522_016_concept_baas_pivot.md](./D20260522_016_concept_baas_pivot.md) | 2026-05-22 | /flow:concept (UPDATE) | BaaS Pivot 全体 | D20260522-114〜119 | 完了 |
@@ -37,6 +38,12 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-030 | /flow:secure --list-findings | Step L.6 | Git commit (triage 結果 + 2 seed + §8 更新) | auto-recommended | D20260523_019_secure_list-findings.md |
+| D20260523-029 | /flow:secure --list-findings | Step L.4 | SCENARIO §5 カーソル更新 (3 件 dispatched + 1 件 TDD-handoff) | auto-recommended | D20260523_019_secure_list-findings.md |
+| D20260523-028 | /flow:secure --list-findings | Step L.3 ([SEC-004]) | dispatched-to-revise → _shared/analytics seed (legal_required) | explicit-choice | D20260523_019_secure_list-findings.md |
+| D20260523-027 | /flow:secure --list-findings | Step L.3 ([SEC-002]) | open 維持 + TDD-handoff annotation | explicit-choice | D20260523_019_secure_list-findings.md |
+| D20260523-026 | /flow:secure --list-findings | Step L.3 ([SEC-001+003]) | dispatched-to-revise → _shared/ai bundle seed | explicit-choice | D20260523_019_secure_list-findings.md |
+| D20260523-025 | /flow:secure --list-findings | Step L.1-L.2 | 4 件抽出、severity 順表示 | auto-recommended | D20260523_019_secure_list-findings.md |
 | D20260523-024 | /flow:scenario --init | Git commit | SCENARIO + AI_LOG コミット | auto-recommended | D20260523_018_scenario_init.md |
 | D20260523-023 | /flow:scenario --init | カーソル初期セット | Phase 3 着手前、前提=論点-011〜014 解消 | auto-recommended | D20260523_018_scenario_init.md |
 | D20260523-022 | /flow:scenario --init | §4 分岐ルール初期化 | 9 種の分岐パターン定義 | auto-recommended | D20260523_018_scenario_init.md |
