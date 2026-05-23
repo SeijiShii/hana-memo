@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 09:55 (+09:00)
-**総セッション数**: 22
-**総 decision 数**: 169
+**最終更新**: 2026-05-23 10:10 (+09:00)
+**総セッション数**: 24
+**総 decision 数**: 182
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,6 +14,8 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_024_revise__shared_analytics_sec_004.md](./D20260523_024_revise__shared_analytics_sec_004.md) | 2026-05-23 | /flow:revise _shared/analytics | sec_004 (High 法令必須) | D20260523-051〜063 | 完了 |
+| [D20260523_023_resume_continuous.md](./D20260523_023_resume_continuous.md) | 2026-05-23 | /flow:resume continuous | Skill auto-invoke 反復 1 | 進行中 (反復ログ) | 進行中 |
 | [D20260523_022_revise__shared_ai_sec_001-003.md](./D20260523_022_revise__shared_ai_sec_001-003.md) | 2026-05-23 | /flow:revise _shared/ai | sec_001-003 (Critical+High bundle) | D20260523-038〜050 | 完了 |
 | [D20260523_021_resume_autopick.md](./D20260523_021_resume_autopick.md) | 2026-05-23 | /flow:resume (auto-pick) | P1 → /flow:revise _shared/ai bundle | D20260523-034〜037 | 完了 |
 | [D20260523_020_resume_default.md](./D20260523_020_resume_default.md) | 2026-05-23 | /flow:resume | プロジェクト next-step 推奨 | D20260523-031〜033 | 完了 |
@@ -41,6 +43,10 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-063 | /flow:revise _shared/analytics | Step Z | Git commit (revise 4 文書 + INDEX 連動 + §8 履歴 + seed archive + 法務 TODO) | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
+| D20260523-061 | /flow:revise _shared/analytics | Step 7.5 | seed `_pending/` → `_pending_archive/` 移動 (全 secure revise 完了) | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
+| D20260523-060 | /flow:revise _shared/analytics | Step 7.5 | §8 [論点-014] status 履歴に revise 完了 + 法務 TODO 追記 | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
+| D20260523-051 | /flow:revise _shared/analytics | Step 1.2 | 改修要望 = seed 自動取得 ([SEC-004] 法令必須) | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
 | D20260523-050 | /flow:revise _shared/ai | Step Z | Git commit (revise 4 文書 + INDEX 連動 + §8 履歴 + seed archive) | auto-recommended | D20260523_022_revise__shared_ai_sec_001-003.md |
 | D20260523-048 | /flow:revise _shared/ai | Step 7.5 | seed `_pending/` → `_pending_archive/` 移動 | auto-recommended | D20260523_022_revise__shared_ai_sec_001-003.md |
 | D20260523-047 | /flow:revise _shared/ai | Step 7.5 | §8 [論点-011] [論点-013] status 履歴に revise 完了追記 | auto-recommended | D20260523_022_revise__shared_ai_sec_001-003.md |

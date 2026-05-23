@@ -1,7 +1,7 @@
 # _shared/analytics ドキュメントインデックス
 
-**最終更新**: 2026-05-22 10:02
-**生成元**: /flow:concept (初期化)
+**最終更新**: 2026-05-23 10:10
+**生成元**: /flow:concept (初期化) + /flow:revise (2026-05-23)
 
 <!-- auto-generated-start -->
 
@@ -19,7 +19,7 @@ Sentry + 自前 OpenAI コストログ。
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
-| (なし) |
+| `revise_sec_004_sentry_pii_scrub_20260523/` | revise | sec_004_sentry_pii_scrub | 設計完了 | [SEC-004] Sentry beforeSend PII スクラブ + 7 パターン scrubber (法令必須) | [INDEX](./revise_sec_004_sentry_pii_scrub_20260523/INDEX.md) |
 
 ## 関連
 - 親 concept: `../../concept.md` §1.3.2, §4.6.2, §4.6.3
