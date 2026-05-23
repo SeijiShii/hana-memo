@@ -17,7 +17,7 @@
 | 3 | ❌ | [account](./account/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
-| 4 | ❌ | [billing](./billing/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
+| 4 | ❌ | [billing](./billing/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
 | 5 | ❌ | [export](./export/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
 | 5 | ❌ | [memory](./memory/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 
