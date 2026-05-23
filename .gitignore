@@ -32,6 +32,11 @@ Thumbs.db
 .eslintcache
 .parcel-cache
 coverage/
+.vitest-cache/
+
+# Drizzle / DB
+drizzle/.drizzle_kit_local/
+drizzle/meta/_journal.json.bak
 
 # Test outputs
 playwright-report/
