@@ -35,7 +35,7 @@
 ## 見積もり
 | ファイル | 種別 | 最終更新 |
 |---|---|---|
-| (まだなし。`/flow:estimate` で生成) |
+| [estimates/全体_20260523_hana-memo-mvp.md](./estimates/全体_20260523_hana-memo-mvp.md) | whole (phase=detailed) | 2026-05-23 |
 
 ## AI アクセスガイド
 - プロジェクト全体を理解したい → `concept.md`
