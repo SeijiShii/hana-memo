@@ -91,7 +91,7 @@ last_updated: 2026-05-23T09:07:12+09:00
 - **chosen_type**: auto-recommended
 - **policy**: `~/.claude/flow-data/git-commit-policy.md` §7
 - **対象**: `docs/SCENARIO.md` (NEW), `docs/AI_LOG/D20260523_018_scenario_init.md` (NEW), `docs/AI_LOG/INDEX.md` (UPDATE)
-- **commit hash**: (後で追記)
+- **commit hash**: `0fa99e3`
 - **branch**: `main` (concept §10.2 "main 直 push 可" のため、直前 secure セッションと同様)
 
 ---
