@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 18:07 (+09:00)
-**総セッション数**: 34
-**総 decision 数**: 234
+**最終更新**: 2026-05-23 18:10 (+09:00)
+**総セッション数**: 35
+**総 decision 数**: 236
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_035_tdd_capture.md](./D20260523_035_tdd_capture.md) | 2026-05-23 | /flow:tdd capture | UI 非依存コア (flow/status/note、11 tests) | D20260523-101〜102 | 完了 |
 | [D20260523_034_tdd_account.md](./D20260523_034_tdd_account.md) | 2026-05-23 | /flow:tdd account | UI 非依存コア (settings/deletion、16 tests) | D20260523-099〜100 | 完了 |
 | [D20260523_033_tdd_legal.md](./D20260523_033_tdd_legal.md) | 2026-05-23 | /flow:tdd legal | UI 非依存コア (versions/consent、22 tests) | D20260523-097〜098 | 完了 |
 | [D20260523_032_tdd__shared_ai.md](./D20260523_032_tdd__shared_ai.md) | 2026-05-23 | /flow:tdd _shared/ai | SDK 非依存コア (prompt/schema/quota/rate-limit/retry、37 tests) | D20260523-095〜096 | 完了 |

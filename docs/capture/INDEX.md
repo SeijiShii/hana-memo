@@ -1,12 +1,13 @@
 # capture ドキュメントインデックス
 
-**最終更新**: 2026-05-22 15:30
-**生成元**: /flow:feature capture
+**最終更新**: 2026-05-23 18:10
+**生成元**: /flow:feature capture + /flow:tdd (2026-05-23、UI 非依存コア)
+**状態**: コア実装完了 (2026-05-23、React hook / camera / Realtime / 実 IO は app bootstrap defer)
 
 <!-- auto-generated-start -->
 
 ## 機能概要
-撮影 → AI 同定 → 保存の中核フロー (UC1)。
+撮影 → AI 同定 → 保存の中核フロー (UC1)。撮影パイプライン orchestration + status 遷移 実装済。
 
 ## ファイル一覧（番号順）
 | 番号 | ファイル | 種別 | 状態 | 最終更新 | 短い説明 |
@@ -15,6 +16,8 @@
 | 002 | [002_capture_PLAN.md](./002_capture_PLAN.md) | PLAN | 完了 | 2026-05-22 | Phase 5 分割 (UI→DB→AI→Realtime→quota) |
 | 003 | [003_capture_UNIT_TEST.md](./003_capture_UNIT_TEST.md) | UNIT_TEST | 完了 | 2026-05-22 | useCaptureFlow + image 変換 + Realtime mock |
 | 004 | [004_capture_E2E_TEST.md](./004_capture_E2E_TEST.md) | E2E_TEST | 完了 | 2026-05-22 | 8 シナリオ (E-CA-1〜8、EXIF strip critical) |
+| 101 | [101_capture_IMPL_REPORT.md](./101_capture_IMPL_REPORT.md) | IMPL_REPORT | コア完了 | 2026-05-23 | flow/status/note 実装、React hook/camera/Realtime defer |
+| 102 | [102_capture_UNIT_TEST_REPORT.md](./102_capture_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-23 | 11 tests / 行 98.46% / 分岐 94.73% |
 
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
@@ -26,7 +29,8 @@
 - **依存**: `_shared/auth`, `_shared/db`, `_shared/storage`, `_shared/ai`, `_shared/helpers/image,location,season`, `account` (user_settings), `legal` (ai_consent)
 - **被依存**: `notebook` (一覧), `export` (PDF 対象), `memory` (季節レコメンド), `billing` (使用量参照)
 - 関連論点: [論点-004] 位置情報粒度 (解決済 account 側), [論点-006] 匿名 trial (解決済 _shared/auth 側)
-- 実装コード: `src/features/capture/`
+- 実装コード (コア): `src/features/capture/{errors,note,status,flow,index}.ts`
+- defer (app bootstrap): useImageConvert/useGeolocation/useCaptureFlow/useIdentifyStatus hook / camera UI / Realtime sub / captureApi (実 DB)
 
 ## AI アクセスガイド
 - 機能概要 → README.md
