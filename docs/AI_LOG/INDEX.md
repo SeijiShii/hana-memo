@@ -1,8 +1,10 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 10:10 (+09:00)
-**総セッション数**: 24
-**総 decision 数**: 182
+**最終更新**: 2026-05-23 10:36 (+09:00)
+**総セッション数**: 25
+**総 decision 数**: 188
+
+> 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_025_auto_continuous.md](./D20260523_025_auto_continuous.md) | 2026-05-23 | /flow:auto | P4 HIT → /flow:tdd (Class B pause) | D20260523-064〜066 | 完了 (Class B pause) |
 | [D20260523_024_revise__shared_analytics_sec_004.md](./D20260523_024_revise__shared_analytics_sec_004.md) | 2026-05-23 | /flow:revise _shared/analytics | sec_004 (High 法令必須) | D20260523-051〜063 | 完了 |
 | [D20260523_023_resume_continuous.md](./D20260523_023_resume_continuous.md) | 2026-05-23 | /flow:resume continuous | Skill auto-invoke 反復 1 | 進行中 (反復ログ) | 進行中 |
 | [D20260523_022_revise__shared_ai_sec_001-003.md](./D20260523_022_revise__shared_ai_sec_001-003.md) | 2026-05-23 | /flow:revise _shared/ai | sec_001-003 (Critical+High bundle) | D20260523-038〜050 | 完了 |
@@ -43,6 +46,9 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-066 | /flow:auto | Step 6 | Git commit (AI_LOG + INDEX のみ) | auto-recommended | D20260523_025_auto_continuous.md |
+| D20260523-065 | /flow:auto | Step 4.3 | Class B 確認: /flow:tdd manual 起動推奨、loop 保留 | explicit-choice | D20260523_025_auto_continuous.md |
+| D20260523-064 | /flow:auto | Step 1-3 | P4 HIT → auto-pick = /flow:tdd | auto-recommended | D20260523_025_auto_continuous.md |
 | D20260523-063 | /flow:revise _shared/analytics | Step Z | Git commit (revise 4 文書 + INDEX 連動 + §8 履歴 + seed archive + 法務 TODO) | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
 | D20260523-061 | /flow:revise _shared/analytics | Step 7.5 | seed `_pending/` → `_pending_archive/` 移動 (全 secure revise 完了) | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
 | D20260523-060 | /flow:revise _shared/analytics | Step 7.5 | §8 [論点-014] status 履歴に revise 完了 + 法務 TODO 追記 | auto-recommended | D20260523_024_revise__shared_analytics_sec_004.md |
