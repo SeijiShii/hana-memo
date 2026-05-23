@@ -28,7 +28,8 @@
 | 1 | 概念設計 (charter / concept / PREREQUISITES / DOC_MAP / SCENARIO) | ✅ 完了 (2026-05-22) | concept.md §1-§10 確定 + AI_LOG 整合 | `/flow:concept` |
 | 2 | 機能・横断設計 (SPEC / PLAN / UNIT_TEST / E2E_TEST × 14 対象) | ✅ 完了 (2026-05-22) | 機能 7 + 横断 7 の全 4 文書揃い + L1 secure 実施済 | `/flow:feature` + `/flow:secure` |
 | 2.5 | 設計レベル脆弱性レビュー (L1+L2) | ✅ 完了 (2026-05-23) | SECURITY_REVIEW + L2 checklist + §8 Critical/High 論点登録 | `/flow:secure` |
-| 3 | 実装 (TDD、横断 7 → 機能 7 の優先度順) | 🔄 着手前 (前提: 論点-011〜014 解消) | 全 14 対象の 101 実装レポート + 102 単体テストレポート / E2E green | `/flow:tdd` + `/flow:tdd-phase` |
+| 3 | 実装 (TDD、横断 7 → 機能 7 の優先度順) | 🔄 **コア 14/14 完遂** (全 101/102 揃い、Vitest 373 green、coverage ≥80%)。残ゲート = E2E green (app bootstrap で UI/glue wiring 後) | 全 14 対象の 101 実装レポート + 102 単体テストレポート / E2E green | `/flow:tdd` + `/flow:tdd-phase` |
+| 3.5 | **app/api bootstrap** (defer 済 SDK/React/Vercel glue の一括 wiring) | ⏳ 未着手 (次フェーズ) | React+Vite+各 SDK install / provider・hook・api handler wiring / jsdom+SDK mock テスト / E2E green | (手動 install + 統合 + `/flow:tdd` 再走) |
 | 4 | α 公開準備 (法務書類 / SECURITY_RUNBOOK / 監視ダッシュボード / L3-L5 監査) | ⏳ 未着手 | プラポリ / 利用規約 / 特商法表記 公開 / Sentry beforeSend 動作確認 / npm audit green / `security-review` L5 完了 | (`/flow:revise legal` + Anthropic `security-review`) |
 | 5 | 公開後運用 (コスト追跡 / 撤退判断ゲート / 改善ループ) | ⏳ 未着手 | 月次 §4.6 レビュー / `~/ideas/feedback/hana-memo_revenue.csv` 蓄積 / BEP 達成 or 撤退判断 | (人手月次レビュー + `/flow:claim` + `/flow:revise`) |
 
@@ -98,16 +99,16 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 9 件コア完了 (横断 7/7 + legal + account + capture + notebook + billing + export)**、1 件残 (機能 memory)
-- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` / `_shared/storage` / `_shared/ai` / `legal` / `account` / `capture` / `notebook` / `billing` / `export` (UI/SDK 非依存コア完了、glue defer)
-- **進行中ターゲット**: なし (次対象選定待ち)
-- **直前完了セッション**: D20260523_038_tdd_export (`/flow:auto` continuous iteration 10 → `/flow:tdd export` コア、累計 Vitest 365/365)
-- **最終更新時刻**: 2026-05-23T18:19:00+09:00
+- **現在フェーズ**: Phase 3 (実装) — **コア 14/14 完遂** 🎉 (横断 7 + 機能 7 すべて UI/SDK 非依存コア実装 + 101/102 揃い)。残ゲート = E2E green (Phase 3.5 app bootstrap 後)
+- **完了対象 (Phase 3 コア、全 14)**: `_shared/{db,types,helpers,analytics}` (完全)、`_shared/{auth,storage,ai}` + `legal`/`account`/`capture`/`notebook`/`billing`/`export`/`memory` (UI/SDK 非依存コア完了、glue defer)
+- **進行中ターゲット**: なし (Phase 3 TDD 対象を全消化)
+- **直前完了セッション**: D20260523_039_tdd_memory (`/flow:auto` continuous iteration 11 → `/flow:tdd memory` コア、累計 Vitest **373/373**)
+- **最終更新時刻**: 2026-05-23T18:22:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
-- **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤は **injectable パターンで SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズへ defer**
-- **次の推奨コマンド (優先順)**:
-  1. `/flow:auto` (連続実装継続)。次対象 = `memory` (優先度 5、**最後の対象**)。完了で Phase 3 コア実装完遂 → app/api bootstrap フェーズ (defer glue 一括 wiring)
-  2. 機能は UI コンポーネント (React) 比率が高く、SDK/React glue 同様に **UI 非依存のドメインロジック (バリデーション / 状態遷移 / 整形 / 課金計算等) を先行 TDD、React component + Vercel handler は app bootstrap defer** が見込まれる
+- **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
+- **次の推奨ステップ (優先順)**:
+  1. **Phase 3.5 app/api bootstrap** (defer glue 一括 wiring)。`/flow:auto` の TDD 対象は全消化 (全 14 に 101 あり)。次は React + Vite + 各 SDK (Clerk/R2-S3/OpenAI/Upstash/Sentry/Stripe + React/jsPDF/JSZip/DOMPurify) を install → 各 module の defer glue (provider/hook/api handler/component) を wiring → jsdom + SDK mock テスト + E2E green。これは TDD auto-pick 対象ではなく**意図的な統合セットアップ** (SDK install を伴う)
+  2. その後 Phase 4 (α 公開準備): `/flow:revise legal sentry-disclosure` (プラポリ §9.1) + `/flow:secure --phase=deps` (lockfile 生成後) + Anthropic `security-review` L5
 - **app/api bootstrap defer 蓄積** (後続フェーズで wiring):
   - analytics: `api/{check-quota,refresh-matview,export-revenue}.ts` + `vercel.json`
   - auth: `provider.tsx`/`guest-session.ts`/`link.ts`/`hooks.ts`/`getFingerprint`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`

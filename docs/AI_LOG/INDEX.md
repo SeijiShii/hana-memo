@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 18:19 (+09:00)
-**総セッション数**: 38
-**総 decision 数**: 242
+**最終更新**: 2026-05-23 18:22 (+09:00)
+**総セッション数**: 39
+**総 decision 数**: 244
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_039_tdd_memory.md](./D20260523_039_tdd_memory.md) | 2026-05-23 | /flow:tdd memory | UI 非依存コア (recommend、9 tests)。**Phase 3 コア 14/14 完遂** | D20260523-109〜110 | 完了 |
 | [D20260523_038_tdd_export.md](./D20260523_038_tdd_export.md) | 2026-05-23 | /flow:tdd export | UI 非依存コア (csv/validation/filename、22 tests) | D20260523-107〜108 | 完了 |
 | [D20260523_037_tdd_billing.md](./D20260523_037_tdd_billing.md) | 2026-05-23 | /flow:tdd billing | UI 非依存コア (pricing/webhook べき等/revenue、19 tests) | D20260523-105〜106 | 完了 |
 | [D20260523_036_tdd_notebook.md](./D20260523_036_tdd_notebook.md) | 2026-05-23 | /flow:tdd notebook | UI 非依存コア (filter/edit/grouping、20 tests) | D20260523-103〜104 | 完了 |
