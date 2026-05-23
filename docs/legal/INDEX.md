@@ -1,12 +1,13 @@
 # legal ドキュメントインデックス
 
-**最終更新**: 2026-05-22 11:15
-**生成元**: /flow:feature legal
+**最終更新**: 2026-05-23 18:04
+**生成元**: /flow:feature legal + /flow:tdd (2026-05-23、UI 非依存コア)
+**状態**: コア実装完了 (2026-05-23、React UI / Markdown render / DB glue は app bootstrap defer)
 
 <!-- auto-generated-start -->
 
 ## 機能概要
-プラポリ / 利用規約 / 特商法表記 / AI 利用同意 UI。
+プラポリ / 利用規約 / 特商法表記 / AI 利用同意。同意ドメインロジック (semver 再同意判定 + consent record) 実装済。
 
 ## ファイル一覧（番号順）
 | 番号 | ファイル | 種別 | 状態 | 最終更新 | 短い説明 |
@@ -15,6 +16,8 @@
 | 002 | [002_legal_PLAN.md](./002_legal_PLAN.md) | PLAN | 完了 | 2026-05-22 | Phase 4 分割 (静的→初回同意→改訂再同意→問合せ) |
 | 003 | [003_legal_UNIT_TEST.md](./003_legal_UNIT_TEST.md) | UNIT_TEST | 完了 | 2026-05-22 | consent flow + semver 比較 + a11y 確認 |
 | 004 | [004_legal_E2E_TEST.md](./004_legal_E2E_TEST.md) | E2E_TEST | 完了 | 2026-05-22 | 7 シナリオ (E-LE-1 〜 E-LE-7) |
+| 101 | [101_legal_IMPL_REPORT.md](./101_legal_IMPL_REPORT.md) | IMPL_REPORT | コア完了 | 2026-05-23 | versions/consent 実装、React UI/Markdown/DB defer |
+| 102 | [102_legal_UNIT_TEST_REPORT.md](./102_legal_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-23 | 22 tests / 行 98.86% / 分岐 94.59% |
 
 ## 法務書類原稿
 | ファイル | バージョン | 説明 |
@@ -34,7 +37,8 @@
 - **依存**: `_shared/auth` (匿名 session), `_shared/db` (consent_logs), `_shared/helpers/id` (hashIp)
 - **被依存**: `account` (設定画面での同意状況表示), `capture` (AI 同意の存在前提), `billing` (利用規約の存在前提)
 - 関連論点: [論点-009] お問い合わせフォーム実装方針
-- 実装コード: `src/features/legal/`
+- 実装コード (コア): `src/features/legal/{errors,versions,consent,index}.ts`
+- defer (app bootstrap): InitialConsent/ReConsent/LegalPage React component / useConsentStatus hook / Markdown render + DOMPurify / ConsentStore Drizzle 実装
 
 ## AI アクセスガイド
 - 機能概要 → README.md

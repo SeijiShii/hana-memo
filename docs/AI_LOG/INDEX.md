@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 17:58 (+09:00)
-**総セッション数**: 32
-**総 decision 数**: 230
+**最終更新**: 2026-05-23 18:04 (+09:00)
+**総セッション数**: 33
+**総 decision 数**: 232
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_033_tdd_legal.md](./D20260523_033_tdd_legal.md) | 2026-05-23 | /flow:tdd legal | UI 非依存コア (versions/consent、22 tests) | D20260523-097〜098 | 完了 |
 | [D20260523_032_tdd__shared_ai.md](./D20260523_032_tdd__shared_ai.md) | 2026-05-23 | /flow:tdd _shared/ai | SDK 非依存コア (prompt/schema/quota/rate-limit/retry、37 tests) | D20260523-095〜096 | 完了 |
 | [D20260523_031_tdd__shared_storage.md](./D20260523_031_tdd__shared_storage.md) | 2026-05-23 | /flow:tdd _shared/storage | SDK 非依存コア (bucket/validation/presign、28 tests) | D20260523-093〜094 | 完了 |
 | [D20260523_030_tdd__shared_auth.md](./D20260523_030_tdd__shared_auth.md) | 2026-05-23 | /flow:tdd _shared/auth | SDK 非依存コア (trial/rls/webhook、25 tests) | D20260523-091〜092 | 完了 |
