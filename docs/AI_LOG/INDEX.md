@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 11:05 (+09:00)
-**総セッション数**: 26
-**総 decision 数**: 200
+**最終更新**: 2026-05-23 17:20 (+09:00)
+**総セッション数**: 27
+**総 decision 数**: 218
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_027_auto_continuous.md](./D20260523_027_auto_continuous.md) | 2026-05-23 | /flow:auto continuous | iteration 1-3 (types + helpers、SEC-003 / SEC-004 反映) | D20260523-079〜084 | 完了 |
 | [D20260523_026_tdd__shared_db.md](./D20260523_026_tdd__shared_db.md) | 2026-05-23 | /flow:tdd _shared/db | Phase 0 bootstrap + Phase 1-4 (28/28 pass) | D20260523-067〜078 | 完了 |
 | [D20260523_025_auto_continuous.md](./D20260523_025_auto_continuous.md) | 2026-05-23 | /flow:auto | P4 HIT → /flow:tdd (Class B pause) | D20260523-064〜066 | 完了 (Class B pause) |
 | [D20260523_024_revise__shared_analytics_sec_004.md](./D20260523_024_revise__shared_analytics_sec_004.md) | 2026-05-23 | /flow:revise _shared/analytics | sec_004 (High 法令必須) | D20260523-051〜063 | 完了 |

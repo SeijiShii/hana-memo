@@ -98,29 +98,22 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 1 件完了 (`_shared/db`)、13 件残
-- **進行中ターゲット**: なし (`_shared/db` TDD 完了、次対象選定待ち)
-- **直前完了セッション**: D20260523_026_tdd__shared_db (`/flow:tdd _shared/db`、Phase 0 PJ bootstrap + Phase 1-4 完遂、28/28 pass)
-- **最終更新時刻**: 2026-05-23T11:00:00+09:00
+- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **3 件完了**、11 件残
+- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers`
+- **進行中ターゲット**: なし (3 件 TDD 完了、次対象選定待ち)
+- **直前完了セッション**: D20260523_027_auto_continuous (`/flow:auto` continuous loop iteration 1-3、計 4 commit pair = 8 commits)
+- **最終更新時刻**: 2026-05-23T17:20:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
-- **完了対象 (Phase 3)**: `_shared/db`
 - **次の推奨コマンド (優先順)**:
-  1. `/flow:tdd` (連続実装、優先度 1 残 `_shared/types` → `_shared/helpers` → `_shared/analytics` → `legal`、その後優先度 2 `_shared/auth` → `_shared/storage` → `_shared/ai`)
-  2. (TDD 進行中に随時) `/flow:revise legal sentry-disclosure` (プラポリ §9.1 Sentry 委託先記載)
-  3. (TDD 完了後) `/flow:secure --phase=deps` (npm install 完了済、CVE スキャン可)
-- **PJ bootstrap 完了 (D20260523_026)**:
-  - `package.json` + `tsconfig.json` + `drizzle.config.ts` + `vitest.config.ts` + `vercel.json`
-  - `.env.example` 全 23 キー ([SEC-002] closed)
-  - `CLAUDE.md` (テスト環境 + DB ワークフロー + secure 要件)
-  - `npm install` 実行成功、Vitest 28/28 pass
-- **revise 完了 (TDD で順次反映中)**:
-  - `docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/` ([SEC-001] [SEC-003])
-  - `docs/_shared/analytics/revise_sec_004_sentry_pii_scrub_20260523/` ([SEC-004] 法令必須)
+  1. `/flow:auto` (連続実装継続。新セッション推奨、累計 Vitest 119/119、context 健全)。次対象 = `_shared/analytics` (優先度 1、依存 _shared/db、revise SEC-004 反映)
+  2. その後 `legal` → `_shared/{auth,storage,ai}` → 機能 7 件
+- **PJ bootstrap 完了**: package.json / tsconfig / drizzle / vitest / .env.example (全 23 key) / CLAUDE.md
 - **secure findings 状況**:
-  - SEC-002 `.env.example` (Critical): ✅ **closed** (本セッション)
-  - SEC-001/003 (Critical/High): dispatched-to-revise → TDD `_shared/ai` で反映予定
-  - SEC-004 (High 法令必須): dispatched-to-revise → TDD `_shared/analytics` で反映予定
-  - SEC-005/006 (Medium): ✅ 解消 (本セッション、webhook_dedupe + 認可ネガティブテスト)
+  - SEC-002 `.env.example` (Critical): ✅ closed
+  - SEC-005/006 (Medium): ✅ 解消 (webhook_dedupe + 認可ネガティブテスト)
+  - SEC-003 (High SSRF): ✅ 実装反映 (`_shared/helpers/url.ts` assertSafeImageUrl)
+  - SEC-004 (High 法令必須 Sentry PII): sha256Hex 完備 (`_shared/helpers/id.ts`)、scrubber は `_shared/analytics` 次回反映
+  - SEC-001 (Critical rate limit): `_shared/ai` 実装時に Upstash Ratelimit 統合予定 (dispatched-to-revise)
 
 <!-- AUTO-GENERATED:END scenario-cursor -->
 
@@ -135,3 +128,4 @@
 | 2026-05-23T09:55:00+09:00 | §5 カーソル更新: `/flow:revise _shared/ai` で [SEC-001] [SEC-003] の設計反映完了 (4 文書生成、seed を _pending_archive へ移動)。次の推奨を `/flow:revise _shared/analytics` (SEC-004) に進行 | /flow:revise _shared/ai (D20260523_022) |
 | 2026-05-23T10:10:00+09:00 | §5 カーソル更新: `/flow:revise _shared/analytics` で [SEC-004] の設計反映完了 (4 文書、scrubber.ts + Sentry beforeSend + Slack 統合)。全 secure revise 完了 → 次の推奨を `/flow:tdd` 連続実装に進行 | /flow:revise _shared/analytics (D20260523_024) |
 | 2026-05-23T11:00:00+09:00 | §5 カーソル更新: `/flow:tdd _shared/db` 完遂 (Phase 0 PJ bootstrap + Phase 1-4 schema/access/migrations/seed、Vitest 28/28 pass)。[SEC-002] closed、[SEC-005] / [SEC-006] 解消。Phase 3 = 1/14 完了、次の推奨を `_shared/types` 以降の連続実装に進行 | /flow:tdd _shared/db (D20260523_026) |
+| 2026-05-23T17:20:00+09:00 | §5 カーソル更新: `/flow:auto` continuous loop で iteration 1 (_shared/types) + iteration 2 (_shared/helpers) 完遂。Vitest 累計 119/119、[SEC-003] SSRF guard 実装反映 + [SEC-004] sha256Hex 完備。Phase 3 = 3/14 完了。次の推奨を `_shared/analytics` (revise SEC-004 scrubber 反映) に進行 | /flow:auto (D20260523_027) |
