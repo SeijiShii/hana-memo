@@ -838,11 +838,11 @@ public/               # PWA manifest / icons
 
 ### [論点-011] レート制限の具体的実装 (SEC-001、Critical)
 
-- **status**: `dispatched-to-revise`
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 (TDD 待機中、status は実装完了まで維持)
+- **status**: `dispatched-to-revise` (TDD rate-limit 判定コア実装完了、closure は Upstash binding + Vercel handler wiring 待ち)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 (TDD 待機中、status は実装完了まで維持) → 2026-05-23 17:58 **TDD rate-limit 判定コア実装完了** (`/flow:tdd _shared/ai` D20260523_032: `src/shared/ai/rate-limit.ts` `checkIdentifyRateLimit` + `IDENTIFY_RATE_LIMIT` 10/min、RateLimiter DI、行 100%)
 - **dispatch 先**: `docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/` (4 文書完了)
 - **seed**: `docs/_pending_archive/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` (revise 完了で `_pending/` → `_pending_archive/` 移動)
-- **対応 commit (revise)**: 後続コミットで追記、TDD 完了時に status=closed 遷移
+- **対応 commit (revise)**: 後続コミットで追記。**closure 残**: `@upstash/ratelimit` 実バインディング + `api/identify-plant.ts` handler への middleware wiring (app/api bootstrap フェーズ)
 - **影響範囲**: §3 NFR / §4.3 / §4.6.2 / `_shared/ai` / `_shared/auth` / `_shared/db` / `billing`
 - **観点 ID**: O27_rate_limit_scope
 - **severity**: Critical
@@ -882,11 +882,11 @@ public/               # PWA manifest / icons
 
 ### [論点-013] AI Vision の画像 URL 経路 SSRF 防御強化 (SEC-003、High)
 
-- **status**: `dispatched-to-revise`
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 (TDD 待機中)
+- **status**: `closed` (SSRF guard 実装完了、`_shared/{helpers,storage,ai}` で全消費)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:00 **実装完了** (`_shared/helpers/url.ts` `assertSafeImageUrl` + `validateObjectKey`、helpers TDD D20260523_027) → 2026-05-23 17:58 **全消費確認**: `_shared/storage` presign + `_shared/ai` が validateObjectKey/assertSafeImageUrl を再利用 (storage D20260523_031 / ai D20260523_032)
 - **dispatch 先**: `docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/` (4 文書完了、SSRF guard + validateObjectKey を §7.4 で定義)
 - **seed**: `docs/_pending_archive/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` (revise 完了で archive 移動)
-- **対応 commit (revise)**: 後続コミットで追記、TDD 完了時に status=closed 遷移
+- **対応 commit**: `77c17d6` (url.ts SSRF guard) + storage/ai が再利用
 - **影響範囲**: `_shared/ai` / `_shared/helpers` / `_shared/storage`
 - **観点 ID**: O24_input_validation (SSRF)
 - **severity**: High

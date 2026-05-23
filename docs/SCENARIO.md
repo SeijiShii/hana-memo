@@ -98,21 +98,22 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 2 件コア完了**、8 件残
-- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` / `_shared/storage` (SDK 非依存コア完了、glue defer)
-- **進行中ターゲット**: なし (次対象選定待ち)
-- **直前完了セッション**: D20260523_031_tdd__shared_storage (`/flow:auto` continuous iteration 3 → `/flow:tdd _shared/storage` コア、累計 Vitest 222/222)
-- **最終更新時刻**: 2026-05-23T17:54:00+09:00
+- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 3 件コア完了 (横断 7/7 完了)**、7 件残 (全て機能)
+- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` / `_shared/storage` / `_shared/ai` (SDK 非依存コア完了、glue defer)
+- **進行中ターゲット**: なし (横断基盤 7 件すべて完了、機能 7 件が残)
+- **直前完了セッション**: D20260523_032_tdd__shared_ai (`/flow:auto` continuous iteration 4 → `/flow:tdd _shared/ai` コア、累計 Vitest 261/261)
+- **最終更新時刻**: 2026-05-23T17:58:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤は **injectable パターンで SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズへ defer**
 - **次の推奨コマンド (優先順)**:
-  1. `/flow:auto` (連続実装継続)。次対象 = `_shared/ai` (OpenAI Vision、SSRF guard は実装済 `url.ts assertSafeImageUrl` と連携、SDK 非依存コア)
-  2. `legal` (優先度 1 feature、大半が静的法務文書 + プラポリ §9.1 は Phase 4 revise 待ち)
-  3. その後 機能 7 件 (account → capture/notebook/billing → export/memory)
+  1. `/flow:auto` (連続実装継続)。横断 7/7 完了 → 次は機能。`legal` (優先度 1、大半が静的法務文書 + プラポリ §9.1 は Phase 4 revise 待ち) → `account` (優先度 3) → `capture`/`notebook`/`billing` (優先度 4) → `export`/`memory` (優先度 5)
+  2. 機能は UI コンポーネント (React) 比率が高く、SDK/React glue 同様に **UI 非依存のドメインロジック (バリデーション / 状態遷移 / 整形 / 課金計算等) を先行 TDD、React component + Vercel handler は app bootstrap defer** が見込まれる
 - **app/api bootstrap defer 蓄積** (後続フェーズで wiring):
   - analytics: `api/{check-quota,refresh-matview,export-revenue}.ts` + `vercel.json`
   - auth: `provider.tsx`/`guest-session.ts`/`link.ts`/`hooks.ts`/`getFingerprint`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`
   - storage: `api/storage/{upload-url,signed-url,delete}.ts`/`_lib/r2.ts`/`upload.ts`/`fetch.ts useSignedUrl`/`meta.ts`
+  - ai: `api/identify-plant.ts`/`api/_lib/{openai,prompt,schema}.ts`/frontend `identify.ts`/Upstash binding
+  - **横断方針**: 上記 glue は app/api bootstrap フェーズ (React + Vite + 各 SDK install をまとめて行う初回統合) で一括 wiring + jsdom/SDK mock テスト
 - **PJ bootstrap 完了**: package.json / tsconfig / drizzle / vitest / .env.example (全 23 key) / CLAUDE.md
 - **secure findings 状況**:
   - SEC-002 `.env.example` (Critical): ✅ closed

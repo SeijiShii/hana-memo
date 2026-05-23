@@ -30,7 +30,7 @@
 | 1 | [_shared/analytics](./_shared/analytics/) | **実装完了** | 2026-05-22 → 2026-05-23 | 1 | [INDEX](./_shared/analytics/INDEX.md) |
 | 2 | [_shared/auth](./_shared/auth/) | **コア実装完了** (SDK glue defer) | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/auth/INDEX.md) |
 | 2 | [_shared/storage](./_shared/storage/) | **コア実装完了** (SDK glue defer) | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/storage/INDEX.md) |
-| 2 | [_shared/ai](./_shared/ai/) | 設計済 (+ 改修中) | 2026-05-22 | 1 | [INDEX](./_shared/ai/INDEX.md) |
+| 2 | [_shared/ai](./_shared/ai/) | **コア実装完了** (SDK glue defer) | 2026-05-22 → 2026-05-23 | 1 | [INDEX](./_shared/ai/INDEX.md) |
 
 ## 見積もり
 | ファイル | 種別 | 最終更新 |
