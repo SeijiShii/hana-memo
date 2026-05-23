@@ -8,7 +8,7 @@
 | 解決する課題 | 散歩中に見つけた草花の名前を調べないまま忘れる / 既存アプリは「同定」が主役で「自分のノート」が脇役 |
 | 提供価値 | 「自分の発見ノート」を主役、AI 同定はそれを支える脇役。SNS 機能・競争・中毒性を排した自分のペースの発見体験 |
 | 現フェーズ | 企画 → MVP 設計中 |
-| 最終更新 | 2026-05-22 |
+| 最終更新 | 2026-05-24 |
 
 ---
 
@@ -734,6 +734,13 @@ public/               # PWA manifest / icons
 | 2026-05-22 | Edge Functions → Vercel Functions (Node 20) 移植、Vercel Cron で scheduled | BaaS Pivot 派生 | _shared/ai / _shared/analytics / billing | [D20260522-116](./AI_LOG/D20260522_016_concept_baas_pivot.md#decisions) |
 | 2026-05-22 | Auth = Clerk Guest Users (β) + linkIdentity、Webhook で Neon users 同期 | BaaS Pivot 派生 | _shared/auth / account / 認証フロー | [D20260522-117](./AI_LOG/D20260522_016_concept_baas_pivot.md#decisions) |
 | 2026-05-22 | Storage = Cloudflare R2 + Presigned URL 60 分 (RLS は Vercel Function で user_id 検証) | BaaS Pivot 派生 | _shared/storage / capture / export | [D20260522-118](./AI_LOG/D20260522_016_concept_baas_pivot.md#decisions) |
+| 2026-05-22 | [論点-002] 季節レコメンド通知 = MVP アプリ内バッジのみ確定 (Push は α 後再判断 / v2) | memory SPEC | §1.1 / memory / §3 NFR | [D20260522-111](./AI_LOG/D20260522_015_feature_memory.md#decisions) |
+| 2026-05-22 | [論点-003] 図鑑 PDF エンジン = クライアント側 html2canvas + jsPDF 確定 (案A) | export SPEC | §4.3 / export | [D20260522-104](./AI_LOG/D20260522_014_feature_export.md#decisions) |
+| 2026-05-22 | [論点-004] 位置情報粒度 = coarse 約100m default + precise/off 設定可 確定 (案A) | account SPEC | §3 NFR / capture / account / legal | [D20260522-085](./AI_LOG/D20260522_010_feature_account.md#decisions) |
+| 2026-05-22 | [論点-007] 匿名→リンク移行 = first-link-only / merge 機能なし 確定 (案C、重複時は guidance のみ。UX 文言は法務レビュー継続) | auth SPEC | _shared/auth / account / billing | [D20260522-058](./AI_LOG/D20260522_007_feature__shared_auth.md#decisions) |
+| 2026-05-23 | [論点-012] SEC-002 `.env.example` = closed (23 キー作成、TDD _shared/db Phase 0) | /flow:tdd _shared/db | §4.5.3 / PREREQUISITES | [D20260523-067](./AI_LOG/D20260523_026_tdd__shared_db.md#decisions) |
+| 2026-05-23 | [論点-013] SEC-003 SSRF = closed (`assertSafeImageUrl` + `validateObjectKey` を helpers/url.ts に共通化、storage/ai で全消費) | helpers TDD / commit 77c17d6 | _shared/{helpers,storage,ai} | [D20260523-079](./AI_LOG/D20260523_027_auto_continuous.md#decisions) |
+| 2026-05-24 | [論点-015] SEC-007 drizzle-orm SQLi = closed (0.36.4→0.45.2 upgrade、ソース変更0 / Vitest 373 green / npm audit high 0) | /flow:tdd revise / commit de8522c | _shared/db / §3 NFR | [D20260524-017](./AI_LOG/D20260524_045_tdd__shared_db_revise_sec_007.md#decisions) |
 
 ---
 
@@ -749,48 +756,8 @@ public/               # PWA manifest / icons
 - **判断期限**: v2 計画着手時
 - **担当**: seiji
 
-### [論点-002] 季節レコメンド (UC5) の通知方式
-- **影響範囲**: §1.1 主要 UC / `docs/memory/` / §3 NFR (通知)
-- **詰めるべき問い**:
-  1. Web Push 通知を入れるか、アプリ内バッジのみか?
-  2. Push を入れる場合、配信頻度と quiet hours はどう設計するか?
-  3. PWA で iOS Safari の Web Push サポートは現実的か?
-- **候補案**:
-  - 案 A: MVP はアプリ内バッジのみ、Push は v2。利点: charter §2.2 中毒性回避 / 実装シンプル。欠点: ユーザーが起動しないと気付かない
-  - 案 B: MVP から Web Push (opt-in、月 1 回上限)。利点: リテンション向上。欠点: PWA Push の実装複雑 / 中毒性配慮必要
-- **推奨**: **案 A (MVP はアプリ内バッジのみ)**。理由: 「中毒性を狙わない設計」を charter 適合性として明示しているため、Push は慎重に。リテンション課題が顕在化したら v2 で月 1 回上限の opt-in Push を検討。
-- **判断期限**: `/flow:feature memory` 着手前
-- **担当**: seiji
-
-### [論点-003] 図鑑 PDF 生成エンジン
-- **影響範囲**: `docs/export/` / `_shared/storage` / §4.3 (ライブラリ追加判断)
-- **詰めるべき問い**:
-  1. 生成場所: クライアント側 (jsPDF) / Supabase Edge Function (Deno + PDFKit) / Vercel Function (Node + Puppeteer)?
-  2. 高解像度・カスタムレイアウト (PWYW 500 円) でどの程度のクオリティが現実的か?
-  3. 100 件超の図鑑生成でブラウザがハングしないか?
-- **候補案**:
-  - 案 A: クライアント側 jsPDF。利点: コスト 0 / シンプル。欠点: 大量画像で性能限界
-  - 案 B: Supabase Edge Function (Deno + PDFKit)。利点: Supabase 内完結 / 性能安定。欠点: Deno + PDF ライブラリの成熟度
-  - 案 C: Vercel Serverless Function (Node + Puppeteer)。利点: Puppeteer の柔軟性。欠点: Vercel 関数の cold start / コスト
-- **推奨**: **案 A (クライアント側 jsPDF) で MVP、性能課題が出たら案 B へ移行**。理由: 個人ノート用途で 100 件超は稀、まずは無料で動かす。
-- **判断期限**: `/flow:feature export` 着手前 (MVP 後フェーズで OK)
-- **担当**: seiji
-
-### [論点-004] 位置情報の保存粒度
-- **影響範囲**: §3 NFR (プライバシー) / `docs/capture/` / `_shared/helpers/` / `docs/legal/` (プラポリ)
-- **詰めるべき問い**:
-  1. 完全座標 / ~100m 丸め / エリア名 (公園名) のどれをデフォルトにするか?
-  2. ユーザー設定で粒度変更を許容するか?
-  3. 共有時 (図鑑 PDF 出力、Phase 2 で SNS 共有検討時) の挙動は?
-- **候補案**:
-  - 案 A: ~100m 丸めをデフォルト、設定で完全 / エリア名に変更可。共有時はエリア名のみ
-  - 案 B: 完全座標保存、ユーザー個人ノート内のみ表示、共有時は丸め or 削除
-  - 案 C: エリア名のみ (Reverse Geocoding を OpenStreetMap で実施)
-- **推奨**: **案 A (~100m 丸めデフォルト + 設定で粒度変更 + 共有時はエリア名のみ)**。理由: 散歩ルート特定リスク回避 + ノート閲覧での「だいたいの場所」要件を両立。個人情報保護法対応も明示しやすい。
-- **判断期限**: `/flow:feature capture` 着手前
-- **担当**: seiji
-
 ### [論点-006] 匿名 user の SPAM 抑止策
+- **status**: `open` (コア確定・数値継続) — 推奨案 (匿名 AI 同定 3 回 + device fingerprint hard cap) は capture/auth SPEC で**採用済** (D20260522-057)。**「3 回」が妥当かは α 運用挙動で再評価**するため open 維持
 - **影響範囲**: `_shared/auth` / `_shared/db` (api_usage 行制限) / §4.6 コスト追跡
 - **背景**: 匿名スタート採用 (D20260522-022) で「ブラウザ cookie をクリア → 別匿名 user として再生成 → AI 同定 10 回無料枠リセット」のループ悪用が成立してしまう
 - **詰めるべき問い**:
@@ -805,21 +772,6 @@ public/               # PWA manifest / icons
   - 案 D: 匿名 user は無料枠なし (AI 同定はリンク後のみ)、匿名は撮影 + 保存のみ。利点: SPAM 抑止 100%、AI コスト予測安定。欠点: AI 同定を試してから判断したいユーザー離脱
 - **推奨**: **案 A + 案 D ハイブリッド = 匿名 user は AI 同定 3 回/総量 (お試し枠) + 端末フィンガープリント、リンク後に月 10 回無料 + 課金で追加**。理由: 「気軽に試す」を 3 回保証 + SPAM 抑止 + コスト予測安定。フィンガープリント漏れ対策は α 運用で測定。
 - **判断期限**: `/flow:feature billing` 着手前 (AI コスト設計と直結)
-- **担当**: seiji
-
-### [論点-007] 匿名 → リンク時のデータ移行戦略
-- **影響範囲**: `_shared/auth` / `_shared/db` / `account` / `billing`
-- **背景**: 匿名 user で discoveries / images を蓄積後に Google OAuth リンクする際、Supabase の `linkIdentity` API は user_id を維持して identity を追加できるが、以下のエッジケースあり
-- **詰めるべき問い**:
-  1. Google アカウントが**既に別の anonymous user とリンク済**の場合 (機種変更 + リンク失敗時に再リンク試行)、データはどうマージするか?
-  2. リンク後に「やっぱり匿名に戻したい」(unlink) は許容するか?
-  3. 端末 A (匿名 user A) と端末 B (匿名 user B) を同じ Google アカウントにリンクしようとした場合、A と B の discoveries を統合するか、片方を破棄するか?
-- **候補案**:
-  - 案 A: 同一 Google アカウントへの 2 つ目のリンク試行はエラー → ユーザーに「既存リンクの解除 or マージ選択」を提示
-  - 案 B: 自動マージ (両方の discoveries を統合)。利点: ユーザー操作不要。欠点: 重複検知 / 衝突解決ロジック必要
-  - 案 C: 最初のリンクのみ受け付け、2 つ目以降は端末 B 側に「このアカウントは別端末で既にリンク済。新規 Google アカウントでリンクするか、端末 A からログアウト後に再試行」と案内
-- **推奨**: **案 C (最初のリンクのみ、2 つ目以降は明示ガイダンス)**。理由: MVP で複雑なマージロジック不要 + データ統合ミスは取り返しがつかない。Stripe 課金との紐付けも単純化。
-- **判断期限**: `/flow:feature account` 着手前
 - **担当**: seiji
 
 ### [論点-005] 利用分析ツール導入時期と選定
@@ -860,48 +812,6 @@ public/               # PWA manifest / icons
 - **担当**: seiji
 - **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-001`
 
-### [論点-012] `.env.example` テンプレート作成 (SEC-002、Critical)
-
-- **status**: `closed`
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:32 open (TDD-handoff) → 2026-05-23 11:00 **closed** (`/flow:tdd _shared/db` Phase 0 で `.env.example` 全 20+ キー作成完了、後続コミット参照)
-- **対応**: `<root>/.env.example` 新規 (Server-side 12 + Client-side 3 + Cost rates 7 + Budget 1 = 23 キー)
-- **影響範囲**: §4.5.3 / `PREREQUISITES.md` / 全 Vercel Function
-- **観点 ID**: O25_secrets_management
-- **severity**: Critical
-- **検出根拠**: `concept.md §4.5.3` で必須キー 13 件 + コスト単価 7 件を明文化済、`.gitignore` も準拠。しかし `<root>/.env.example` 実ファイル不在 → dev 環境再構築時に取りこぼし / クライアント露出可否の混乱リスク
-- **詰めるべき問い**:
-  1. 作成タイミング: 今すぐ / TDD `_shared/db` 着手と同時
-  2. テンプレ内容: concept §4.5.3 全キーをコピー + 各キーに取得手順リンク + クライアント露出可否のコメント
-- **候補案**:
-  - 案 A (採用): **TDD `_shared/db` 着手と同時に作成** (最初の Drizzle migration で `DATABASE_URL` が必須なため、自然なタイミング)
-  - 案 B (非採用): 今すぐ作成 — TDD 着手のキック作業として後者に組込む方がドキュメントと実装の往復が減る
-- **推奨**: **案 A 採用**
-- **判断期限**: `/flow:tdd` `_shared/db` 着手と同時 (= TDD 着手の最初のタスク)
-- **担当**: seiji
-- **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-002`
-
-### [論点-013] AI Vision の画像 URL 経路 SSRF 防御強化 (SEC-003、High)
-
-- **status**: `closed` (SSRF guard 実装完了、`_shared/{helpers,storage,ai}` で全消費)
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:00 **実装完了** (`_shared/helpers/url.ts` `assertSafeImageUrl` + `validateObjectKey`、helpers TDD D20260523_027) → 2026-05-23 17:58 **全消費確認**: `_shared/storage` presign + `_shared/ai` が validateObjectKey/assertSafeImageUrl を再利用 (storage D20260523_031 / ai D20260523_032)
-- **dispatch 先**: `docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/` (4 文書完了、SSRF guard + validateObjectKey を §7.4 で定義)
-- **seed**: `docs/_pending_archive/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` (revise 完了で archive 移動)
-- **対応 commit**: `77c17d6` (url.ts SSRF guard) + storage/ai が再利用
-- **影響範囲**: `_shared/ai` / `_shared/helpers` / `_shared/storage`
-- **観点 ID**: O24_input_validation (SSRF)
-- **severity**: High
-- **検出根拠**: `_shared/ai/001_ai_SPEC.md` は OpenAI Structured Output schema (出力) はあるが、入力側で R2 Presigned URL に限定する allowlist + private IP 拒否ロジックが未明示。将来 user 指定 URL を受け取る経路追加時の SSRF 攻撃面を予防的に塞ぐ
-- **詰めるべき問い**:
-  1. `identifyPlant` の入力契約を `objectKey: string` に固定するか、URL を受け取る可能性を残すか?
-  2. SSRF guard 関数を `_shared/helpers/url.ts` に共通化するか、`_shared/ai` 内に閉じるか?
-- **候補案**:
-  - 案 A (採用): **入力契約を `objectKey: string` に固定 + SSRF guard は `_shared/helpers/url.ts` に共通化** (将来 OGP / Webhook 等の URL 受領経路で再利用)
-  - 案 B (非採用): URL を受け取る経路を許容し guard で防御 — 攻撃面が広く、guard 漏れリスク高
-- **推奨**: **案 A 採用**
-- **判断期限**: `/flow:tdd` `_shared/ai` 着手前
-- **担当**: seiji
-- **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-003`
-
 ### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
 
 - **status**: `dispatched-to-revise` (TDD scrub core 実装完了、closure は api/ 配信 wiring + α 前 smoke 待ち)
@@ -926,28 +836,37 @@ public/               # PWA manifest / icons
 - **担当**: seiji
 - **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-004`
 
-### [論点-015] drizzle-orm SQL インジェクション (CVE) (SEC-007、High)
+### [論点-008] 季節レコメンド (UC5) の南半球対応
 
-- **status**: `closed` ✅ (drizzle-orm 0.36.4→0.45.2 アップグレードで解消、`npm audit` high 0 確認)
-- **status 履歴**: 2026-05-24 open → 2026-05-24 **dispatched-to-revise** (`/flow:secure --phase=deps` D20260524_043: `npm audit` で GHSA-gpj5-g38j-94v9 検出、seed 生成) → 2026-05-24 **revise 設計完了** (`/flow:revise --resume sec_007_drizzle_orm_sqli` D20260524_044: 4 文書生成、互換性リスク低と評価) → 2026-05-24 **closed** (`/flow:tdd` D20260524_045: drizzle-orm@0.45.2 + drizzle-kit@0.31.10 へ upgrade、ソース変更ゼロ、tsc 0 errors、Vitest 373/373 green、npm audit high 1→0、GHSA-gpj5 検出 0 件)
-- **dispatch 先**: `docs/_shared/db/revise_sec_007_drizzle_orm_sqli_20260524/` (4 文書 + 101/102 完了)
-- **対応 commit**: `de8522c` (fix(deps): drizzle-orm 0.36.4→0.45.2)
-- **seed**: `docs/_pending_archive/sec_007_drizzle_orm_sqli/000_TRIGGER.md` (revise 完了で archive 移動)
-- **影響範囲**: §3 NFR / `_shared/db` (schema.ts / access.ts / withUserScope / migrations)
-- **観点 ID**: O28_dependency_vulnerabilities
-- **severity**: High (CVSS 7.5、CWE-89)
-- **検出根拠**: `npm audit` (lockfile = package-lock.json 4228 行) で `drizzle-orm` (宣言 `^0.36.4`、prod 直接依存) に GHSA-gpj5-g38j-94v9「SQL injection via improperly escaped SQL identifiers」(CVSS 7.5) を検出。修正バージョン `>= 0.45.2`、`isSemVerMajor=true`。当初プロダクト全体 secure (D20260523_017) では lockfile 不在で L4 skip → 本回 (lockfile 生成後) で初検出
+- **status**: `open` (MVP は北半球前提で実装済、memory SPEC / INDEX が本論点を参照)
+- **影響範囲**: `docs/memory/` / §1.1 UC5
+- **背景**: 「去年の今頃」レコメンドは月ベースで季節を推定 (memory 実装)。南半球ユーザーは季節が反転するため、緯度ベースの季節補正が必要になる可能性。本論点は memory SPEC で参照されていたが concept §8 に未登録だった drift を本 UPDATE で解消 (D20260524-027)
 - **詰めるべき問い**:
-  1. drizzle-orm `^0.36.4 → ^0.45.2` のアップグレードで `schema.ts` / `access.ts` / `withUserScope` の API/型互換性が保たれるか (9 マイナー跨ぎ、破壊的変更の可能性)
-  2. `drizzle-kit` (^0.30.1) を協調アップグレードし migration 再生成 + dev branch apply 検証
-  3. Phase 3.5 app/api bootstrap (frontend stack install) と一括で実施するか、独立 revise で先行するか
-- **候補案**:
-  - 案 A (採用): **`/flow:revise --resume sec_007_drizzle_orm_sqli`** で drizzle-orm/drizzle-kit を協調アップグレード + API/型互換性検証 + migration 再生成 + 全 Vitest green 維持確認
-  - 案 B (非採用): accepted-risk として一時受容 — High SQL injection は prod ORM コア依存のため受容不可
-- **推奨**: **案 A 採用** (High、自動 dispatch)
-- **判断期限**: α 公開前必須 (Phase 4 ゲート前)
+  1. MVP は北半球前提のままで良いか (§1 ユーザー = 国内想定のため当面問題なし)?
+  2. 海外展開時に緯度から南北半球を判定し季節ラベルを反転するか?
+- **推奨**: **MVP は北半球前提のまま (国内向け)。海外展開検討時に緯度補正を追加**
+- **判断期限**: 海外展開検討時 (MVP 範囲外)
 - **担当**: seiji
-- **L4 レポート**: `./SECURITY_DEPS_20260524.md#sec-007`
+
+### [論点-009] お問い合わせフォーム実装方針
+
+- **status**: `open` (方向性は確定、実装タイミングが open)。AI_LOG/INDEX では open 追跡済だが concept §8 未登録だった drift を本 UPDATE で解消 (D20260524-027)
+- **影響範囲**: `legal/` (フッタ + `/legal/contact`、§9.4 特商法の連絡先が依存) / `account/` (UI 配置候補) / §6
+- **詰めるべき問い**:
+  1. 自前フォーム (Vercel Function + Resend 無料枠) vs SaaS (Formspree / Tally)?
+  2. URL は `/legal/contact` (法務・問合せ系を 1 箇所集約) か `/account/contact` か?
+- **推奨**: **自前フォーム (Vercel Function + Resend 無料枠) + URL は `/legal/contact`** (BaaS Pivot 後の構成に読み替え。法務系を 1 箇所集約)
+- **判断期限**: **α 公開前** (有償提供時は特商法表記・プラポリの「連絡先」として `/legal/contact` が必須。当初「account 着手前」だったが期限超過のため α 公開前ゲートに更新)
+- **担当**: seiji
+
+### [論点-010] 月次集計の規模拡大運用 (BigQuery / Materialized View)
+
+- **status**: `open` (将来 defer)。AI_LOG/INDEX で open 追跡済の drift を本 UPDATE で解消
+- **影響範囲**: §4.6.4.1 収益エクスポート / `_shared/analytics` / `billing`
+- **詰めるべき問い**: 月数百件超で月次 cron 集計に遅延が出たら BigQuery 連携 or Materialized View のどちらで対応するか?
+- **推奨**: **MVP は Neon 上の月次 cron 集計のまま。月 100 件超で遅延が顕在化したら Materialized View → BigQuery の順で検討**
+- **判断期限**: 月 100 件超 (中規模商用移行時、MVP 範囲外)
+- **担当**: seiji
 
 ---
 
@@ -1072,3 +991,4 @@ staging_exclude_paths: []
 | 2026-05-22 | flow:concept 更新版に追随: §4.7 公開戦略・ドメイン・リバースプロキシ / §4.8 サービス公開周知 / §10 Git リポジトリ・運用 を追加 (旧 §10 → §11 に繰り下げ)。Q12.9 / Q12.10 / Q12.11 / perspectives O22/O29/O31 / charter §1.6 反映 | /flow:concept (UPDATE、コマンド更新の retroactive 適用) |
 | 2026-05-22 | **BaaS Pivot** (charter §0.2 + perspectives O32 連携): Supabase → Neon + Vercel + Clerk + Cloudflare R2 + Drizzle ORM に全面切替。§4.1〜4.3 / §4.5 / §4.6.2-3 / §5 (RLS は Drizzle 層に移行) / §6 / §10.7 を書き換え。理由: Supabase 無料 2 プロジェクト制約はマイクロサービス連発に不適合、Neon は無料 10 DB 並立 (D20260522-114〜119) | /flow:concept (UPDATE、BaaS Pivot) |
 | 2026-05-23 | `/flow:secure` プロダクト全体 L1+L2 実施。検出 6 件 (Critical 2 / High 2 / Medium 2) を [論点-011]〜[論点-014] として §8 に登録。L2 チェックリスト 5 件を `_shared/{auth,ai,storage,analytics,db}/902_*.md` に配置。L4 依存スキャンはロックファイル不在で skip (TDD 着手後に再実行) (D20260523-001〜018) | /flow:secure (プロダクト全体) |
+| 2026-05-24 | **§8 未決事項の棚卸し** (`AUDIT_20260523_1825.md` 推奨 #1-#2 + SEC-007 closure 反映)。解決済み 7 論点 ([論点-002/003/004/007] 機能設計で確定 + [論点-012/013/015] SEC-002/003/007 closed) を §7 決定事項ログへ移動 + §8 から削除。open 維持 = [論点-001/005/006/011/014]。memory SPEC 参照の [論点-008] 南半球 season drift を §8 に追記 (D20260524-024〜029) | /flow:concept (UPDATE、棚卸し) |

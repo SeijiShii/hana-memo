@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
 **最終更新**: 2026-05-24 (+09:00)
-**総セッション数**: 46
-**総 decision 数**: 266
+**総セッション数**: 47
+**総 decision 数**: 272
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260524_047_concept_update_20260524.md](./D20260524_047_concept_update_20260524.md) | 2026-05-24 | /flow:concept (UPDATE) | §8 棚卸し: 解決済み 7 論点 (002/003/004/007/012/013/015) を §7 へ移動、[論点-008] drift 追記 | D20260524-024〜029 | 完了 |
 | [D20260524_046_revise_legal_sentry_disclosure.md](./D20260524_046_revise_legal_sentry_disclosure.md) | 2026-05-24 | /flow:revise legal sentry-disclosure | プラポリ §4 Sentry PII スクラブ開示 (SEC-004 法務 TODO)、v1.1.0、4 文書 | D20260524-019〜022 | 完了 |
 | [D20260524_045_tdd__shared_db_revise_sec_007.md](./D20260524_045_tdd__shared_db_revise_sec_007.md) | 2026-05-24 | /flow:tdd _shared/db revise sec_007 | drizzle-orm 0.45.2 実装 (ソース変更ゼロ、373/373、audit high 0)、[論点-015] closed | D20260524-013〜017 | 完了 |
 | [D20260524_044_revise__shared_db_sec_007.md](./D20260524_044_revise__shared_db_sec_007.md) | 2026-05-24 | /flow:revise _shared/db sec_007 | drizzle-orm `^0.36.4→^0.45.2` SQLi CVE 対応設計 (互換性リスク低)、4 文書 | D20260524-007〜011 | 完了 |
@@ -67,6 +68,10 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260524-029 | /flow:concept (UPDATE) | Step 6.7 | Git commit (docs 棚卸し) | auto-recommended | D20260524_047_concept_update_20260524.md |
+| D20260524-027 | /flow:concept (UPDATE) | Step 5 | [論点-008] 南半球 season drift を §8 追記 | auto-recommended | D20260524_047_concept_update_20260524.md |
+| D20260524-026 | /flow:concept (UPDATE) | Step 3-4 | 解決済み 7 論点 (002/003/004/007/012/013/015) を §7 へ移動 | explicit-choice | D20260524_047_concept_update_20260524.md |
+| D20260524-025 | /flow:concept (UPDATE) | Step 2 | UPDATE 意図 = §8 未決事項の棚卸し | explicit-choice | D20260524_047_concept_update_20260524.md |
 | D20260523-078 | /flow:tdd _shared/db | Step Z | Git commit (Backend code + Docs 別) | auto-recommended | D20260523_026_tdd__shared_db.md |
 | D20260523-077 | /flow:tdd _shared/db | Step 9 | INDEX 連動 + §8 [SEC-002] closed + SCENARIO 進行中 (1/14) | auto-recommended | D20260523_026_tdd__shared_db.md |
 | D20260523-075 | /flow:tdd _shared/db | Step 6 | Vitest 28/28 pass | auto-recommended | D20260523_026_tdd__shared_db.md |
@@ -151,9 +156,9 @@
 | [論点-009] | お問い合わせフォーム実装方針 (自前 Resend vs SaaS) | D20260522_006 | D20260522-051 |
 | [論点-010] | 月次集計の規模拡大運用 (BigQuery 連携 等) | D20260522_013 | D20260522-100 |
 | [論点-011] | レート制限の具体的実装 (O27、Critical) | D20260523_017 | D20260523-015 |
-| [論点-012] | `.env.example` テンプレート作成 (O25、Critical) | D20260523_017 | D20260523-016 |
-| [論点-013] | AI Vision の画像 URL 経路 SSRF 防御強化 (O24、High) | D20260523_017 | D20260523-017 |
 | [論点-014] | Sentry beforeSend PII スクラブ実装 (O26、High / 法令必須) | D20260523_017 | D20260523-018 |
+
+> 注: [論点-012] [論点-013] は 2026-05-24 closed → Superseded chain へ移動 (concept §7、D20260524_047)。[論点-006] はコア確定 (D20260522-057) だが concept §8 では「3 回の妥当性 α 後再評価」として open 維持。
 
 ## Superseded chain（旧 Open → 新解決）
 
@@ -164,6 +169,9 @@
 | [論点-004] | D20260522-085 (user_settings.location_precision 参照) | 2026-05-22 | D20260522_011_feature_capture.md |
 | [論点-006] | D20260522-057 (3 回 trial + device fingerprint) | 2026-05-22 | D20260522_007_feature__shared_auth.md |
 | [論点-007] | D20260522-058 (first-link-only) | 2026-05-22 | D20260522_007_feature__shared_auth.md |
+| [論点-012] | D20260523-067 (.env.example 23 キー、SEC-002 closed) | 2026-05-23 | D20260523_026_tdd__shared_db.md |
+| [論点-013] | D20260523-079 (assertSafeImageUrl + validateObjectKey、SEC-003 closed) | 2026-05-23 | D20260523_027_auto_continuous.md |
+| [論点-015] | D20260524-017 (drizzle-orm 0.45.2 upgrade、SEC-007 closed) | 2026-05-24 | D20260524_045_tdd__shared_db_revise_sec_007.md |
 
 <!-- auto-generated-end -->
 

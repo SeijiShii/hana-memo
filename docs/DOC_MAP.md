@@ -1,8 +1,9 @@
 # プロダクトドキュメントマップ (hana-memo)
 
-**最終更新**: 2026-05-22 18:30 (+09:00)
-**最新コマンド**: /flow:concept (D20260522_016, BaaS Pivot) — Supabase → Neon + Vercel + Clerk + R2 + Drizzle 全面切替、E2E 自動化方針追補
-**統計**: 機能フォルダ 7 / 横断フォルダ 7 / 改修件数 0 / バグ修正件数 0 / クレーム判定件数 0 / Open 論点 5 件 / Superseded 5 件 / decision 計 119 件
+**最終更新**: 2026-05-24 (+09:00)
+**最新コマンド**: /flow:concept UPDATE (D20260524_047) — §8 棚卸し: 解決済み 7 論点を §7 へ移動 + [論点-008/009/010] drift 解消
+**統計**: 機能フォルダ 7 / 横断フォルダ 7 / Open 論点 8 件 / Superseded 8 件 / decision 計 272 件
+> ⚠️ 改修件数 / バグ修正件数 / クレーム判定件数 は本ファイル全体が 2026-05-22 以降未追随 (改修は実際には複数: _shared/{ai,analytics,db} secure revise + legal sentry-disclosure)。次回 `/flow:audit` or DOC_MAP リフレッシュで全統計を reconcile 要。
 
 > **このファイルは AI 用エントリポイント**。
 > 目的別に「どこから読めばいいか」「次に何を Read すべきか」を示す。詳細は各 INDEX / 各ファイルを参照。
@@ -73,7 +74,7 @@
   - [D20260522_015_feature_memory.md](./AI_LOG/D20260522_015_feature_memory.md) — memory 設計 (6 decision)
   - [D20260522_014_feature_export.md](./AI_LOG/D20260522_014_feature_export.md) — export 設計 ([論点-003] 解決)
   - [D20260522_013_feature_billing.md](./AI_LOG/D20260522_013_feature_billing.md) — billing 設計 (Stripe + §4.6.4.1)
-- **Open 論点**: 9 件 (concept §8 と同期、論点-011〜014 は /flow:secure 由来)
+- **Open 論点**: 8 件 (concept §8 と同期: 001/005/006/008/009/010/011/014。011/014 は /flow:secure 由来で closure 待ち、006 はコア確定・数値 α 後再評価)
 - **Superseded chain**: 5 件 (論点-002, 003, 004, 006, 007 解決済)
 
 ## 5. 観点・選好データ（PJ 外部参照）
