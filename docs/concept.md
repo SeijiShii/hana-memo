@@ -926,6 +926,28 @@ public/               # PWA manifest / icons
 - **担当**: seiji
 - **L1 レポート**: `./SECURITY_REVIEW_20260523.md#sec-004`
 
+### [論点-015] drizzle-orm SQL インジェクション (CVE) (SEC-007、High)
+
+- **status**: `dispatched-to-revise` (L4 依存スキャン検出、修正は drizzle-orm メジャーアップ移行が必要)
+- **status 履歴**: 2026-05-24 open → 2026-05-24 **dispatched-to-revise** (`/flow:secure --phase=deps` D20260524_043: `npm audit` で GHSA-gpj5-g38j-94v9 検出、seed 生成)
+- **dispatch 先**: `docs/_pending/sec_007_drizzle_orm_sqli/000_TRIGGER.md`
+- **seed**: 同上 (`/flow:revise --resume sec_007_drizzle_orm_sqli` で対応)
+- **影響範囲**: §3 NFR / `_shared/db` (schema.ts / access.ts / withUserScope / migrations)
+- **観点 ID**: O28_dependency_vulnerabilities
+- **severity**: High (CVSS 7.5、CWE-89)
+- **検出根拠**: `npm audit` (lockfile = package-lock.json 4228 行) で `drizzle-orm` (宣言 `^0.36.4`、prod 直接依存) に GHSA-gpj5-g38j-94v9「SQL injection via improperly escaped SQL identifiers」(CVSS 7.5) を検出。修正バージョン `>= 0.45.2`、`isSemVerMajor=true`。当初プロダクト全体 secure (D20260523_017) では lockfile 不在で L4 skip → 本回 (lockfile 生成後) で初検出
+- **詰めるべき問い**:
+  1. drizzle-orm `^0.36.4 → ^0.45.2` のアップグレードで `schema.ts` / `access.ts` / `withUserScope` の API/型互換性が保たれるか (9 マイナー跨ぎ、破壊的変更の可能性)
+  2. `drizzle-kit` (^0.30.1) を協調アップグレードし migration 再生成 + dev branch apply 検証
+  3. Phase 3.5 app/api bootstrap (frontend stack install) と一括で実施するか、独立 revise で先行するか
+- **候補案**:
+  - 案 A (採用): **`/flow:revise --resume sec_007_drizzle_orm_sqli`** で drizzle-orm/drizzle-kit を協調アップグレード + API/型互換性検証 + migration 再生成 + 全 Vitest green 維持確認
+  - 案 B (非採用): accepted-risk として一時受容 — High SQL injection は prod ORM コア依存のため受容不可
+- **推奨**: **案 A 採用** (High、自動 dispatch)
+- **判断期限**: α 公開前必須 (Phase 4 ゲート前)
+- **担当**: seiji
+- **L4 レポート**: `./SECURITY_DEPS_20260524.md#sec-007`
+
 ---
 
 ## 9. 法務・コンプライアンス書類
