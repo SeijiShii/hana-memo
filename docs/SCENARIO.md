@@ -98,15 +98,15 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 6 件コア完了 (横断 7/7 + legal + account + capture)**、4 件残 (機能)
-- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` / `_shared/storage` / `_shared/ai` / `legal` / `account` / `capture` (UI/SDK 非依存コア完了、glue defer)
+- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 7 件コア完了 (横断 7/7 + legal + account + capture + notebook)**、3 件残 (機能)
+- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` / `_shared/storage` / `_shared/ai` / `legal` / `account` / `capture` / `notebook` (UI/SDK 非依存コア完了、glue defer)
 - **進行中ターゲット**: なし (次対象選定待ち)
-- **直前完了セッション**: D20260523_035_tdd_capture (`/flow:auto` continuous iteration 7 → `/flow:tdd capture` コア、累計 Vitest 309/309)
-- **最終更新時刻**: 2026-05-23T18:10:00+09:00
+- **直前完了セッション**: D20260523_036_tdd_notebook (`/flow:auto` continuous iteration 8 → `/flow:tdd notebook` コア、累計 Vitest 329/329)
+- **最終更新時刻**: 2026-05-23T18:13:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤は **injectable パターンで SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズへ defer**
 - **次の推奨コマンド (優先順)**:
-  1. `/flow:auto` (連続実装継続)。次対象 = `notebook` → `billing` (優先度 4) → `export`/`memory` (優先度 5)。legal/account/capture コア完了済
+  1. `/flow:auto` (連続実装継続)。次対象 = `billing` (優先度 4) → `export`/`memory` (優先度 5)。legal/account/capture/notebook コア完了済
   2. 機能は UI コンポーネント (React) 比率が高く、SDK/React glue 同様に **UI 非依存のドメインロジック (バリデーション / 状態遷移 / 整形 / 課金計算等) を先行 TDD、React component + Vercel handler は app bootstrap defer** が見込まれる
 - **app/api bootstrap defer 蓄積** (後続フェーズで wiring):
   - analytics: `api/{check-quota,refresh-matview,export-revenue}.ts` + `vercel.json`
