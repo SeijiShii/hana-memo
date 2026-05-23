@@ -14,7 +14,7 @@
 | 優先度 | 基盤 | フォルダ | 状態 | 設計完了 | 改修件数 | バグ修正件数 | クレーム件数 | INDEX |
 |---|---|---|---|---|---|---|---|---|
 | 1 | ❌ | [legal](./legal/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./legal/INDEX.md) |
-| 3 | ❌ | [account](./account/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
+| 3 | ❌ | [account](./account/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
 | 4 | ❌ | [billing](./billing/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
