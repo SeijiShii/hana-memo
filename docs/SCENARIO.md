@@ -98,15 +98,17 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **3 件完了**、11 件残
-- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers`
-- **進行中ターゲット**: なし (3 件 TDD 完了、次対象選定待ち)
-- **直前完了セッション**: D20260523_027_auto_continuous (`/flow:auto` continuous loop iteration 1-3、計 4 commit pair = 8 commits)
-- **最終更新時刻**: 2026-05-23T17:20:00+09:00
+- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完了**、10 件残
+- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics`
+- **進行中ターゲット**: なし (4 件 TDD 完了、次対象選定待ち)
+- **直前完了セッション**: D20260523_029_tdd__shared_analytics (`/flow:auto` continuous loop iteration 1 → `/flow:tdd _shared/analytics`、累計 Vitest 169/169)
+- **最終更新時刻**: 2026-05-23T17:42:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
 - **次の推奨コマンド (優先順)**:
-  1. `/flow:auto` (連続実装継続。新セッション推奨、累計 Vitest 119/119、context 健全)。次対象 = `_shared/analytics` (優先度 1、依存 _shared/db、revise SEC-004 反映)
-  2. その後 `legal` → `_shared/{auth,storage,ai}` → 機能 7 件
+  1. `/flow:auto` (連続実装継続)。次対象 = 優先度 2 横断基盤 `_shared/auth` / `_shared/storage` / `_shared/ai` (機能 7 の前提)。**注意**: これら 3 つは外部 SDK (Clerk / R2-S3 / OpenAI) 依存 → analytics の Sentry と同様に injectable 設計で SDK 非依存 testable 実装を推奨 (install 判断は別途)
+  2. `legal` (優先度 1 feature、ただし大半が静的法務文書 + プラポリ §9.1 は Phase 4 revise 待ち)
+  3. その後 機能 7 件 (account → capture/notebook/billing → export/memory)
+- **api/ layer defer**: `_shared/analytics` の Vercel Cron handler (check-quota / refresh-matview / export-revenue) は api/ 層フェーズで実装 (外部 SaaS Admin API + env 依存、smoke-test-only)
 - **PJ bootstrap 完了**: package.json / tsconfig / drizzle / vitest / .env.example (全 23 key) / CLAUDE.md
 - **secure findings 状況**:
   - SEC-002 `.env.example` (Critical): ✅ closed

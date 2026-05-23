@@ -2,7 +2,7 @@
 
 **issue / slug**: sec_004_sentry_pii_scrub
 **実施日**: 2026-05-23
-**状態**: 設計完了
+**状態**: 実装完了 (TDD fold-in、`/flow:tdd _shared/analytics` D20260523_029)。実装レポートは親フォルダ [../101_analytics_IMPL_REPORT.md](../101_analytics_IMPL_REPORT.md) に統合 (scrubber.ts / sentry beforeSend / slack scrub)。実 SDK / 実 Slack への smoke (PII 混入ゼロ目視) は α 公開前に手動実施
 
 <!-- auto-generated-start -->
 

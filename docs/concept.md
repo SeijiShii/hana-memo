@@ -904,11 +904,11 @@ public/               # PWA manifest / icons
 
 ### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
 
-- **status**: `dispatched-to-revise`
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中)
+- **status**: `dispatched-to-revise` (TDD scrub core 実装完了、closure は api/ 配信 wiring + α 前 smoke 待ち)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass)
 - **dispatch 先**: `docs/_shared/analytics/revise_sec_004_sentry_pii_scrub_20260523/` (4 文書完了、scrubber.ts + beforeSend + 7 パターン定義 + Slack 通知統合)
 - **seed**: `docs/_pending_archive/sec_004_sentry_pii_scrub/000_TRIGGER.md` (revise 完了で archive 移動)
-- **対応 commit (revise)**: 後続コミットで追記、TDD 完了時に status=closed 遷移
+- **対応 commit (revise)**: 後続コミットで追記。**closure 残**: api/ Vercel handler の scrub wiring + 実 Sentry / 実 Slack への 1 件投げ目視 (PII 混入ゼロ、α 公開前)
 - **法務 TODO**: プラポリ §9.1 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記 (`/flow:revise legal sentry-disclosure` で α 公開前必須)
 - **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
 - **観点 ID**: O26_pii_logging (legal_required=true)

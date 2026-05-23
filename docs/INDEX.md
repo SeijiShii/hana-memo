@@ -1,7 +1,7 @@
 # プロジェクトドキュメントインデックス — hana-memo
 
-**最終更新**: 2026-05-22 16:20
-**生成元**: /flow:concept、/flow:feature 等が自動更新
+**最終更新**: 2026-05-23 17:40
+**生成元**: /flow:concept、/flow:feature、/flow:tdd 等が自動更新
 
 <!-- auto-generated-start -->
 
@@ -27,7 +27,7 @@
 | 1 | [_shared/db](./_shared/db/) | **実装完了** | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/db/INDEX.md) |
 | 1 | [_shared/types](./_shared/types/) | **実装完了** | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/types/INDEX.md) |
 | 1 | [_shared/helpers](./_shared/helpers/) | **実装完了** | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/helpers/INDEX.md) |
-| 1 | [_shared/analytics](./_shared/analytics/) | 設計済 (+ 改修中) | 2026-05-22 | 1 | [INDEX](./_shared/analytics/INDEX.md) |
+| 1 | [_shared/analytics](./_shared/analytics/) | **実装完了** | 2026-05-22 → 2026-05-23 | 1 | [INDEX](./_shared/analytics/INDEX.md) |
 | 2 | [_shared/auth](./_shared/auth/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/auth/INDEX.md) |
 | 2 | [_shared/storage](./_shared/storage/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/storage/INDEX.md) |
 | 2 | [_shared/ai](./_shared/ai/) | 設計済 (+ 改修中) | 2026-05-22 | 1 | [INDEX](./_shared/ai/INDEX.md) |
