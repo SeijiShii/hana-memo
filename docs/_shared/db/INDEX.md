@@ -22,7 +22,7 @@ Neon Postgres スキーマ + Drizzle ORM + 認可ヘルパ (`withUserScope` / `a
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
-| (なし) |
+| [revise_sec_007_drizzle_orm_sqli_20260524](./revise_sec_007_drizzle_orm_sqli_20260524/) | revise (security-fix) | sec_007_drizzle_orm_sqli | 設計完了 (実装待機) | drizzle-orm `^0.36.4→^0.45.2` SQL injection CVE (GHSA-gpj5-g38j-94v9) 解消、互換性リスク=低 | [INDEX](./revise_sec_007_drizzle_orm_sqli_20260524/INDEX.md) |
 
 ## 関連
 - 親 concept: `../../concept.md` §1.3.2 _shared/db 行, §5

@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
 **最終更新**: 2026-05-24 (+09:00)
-**総セッション数**: 43
-**総 decision 数**: 252
+**総セッション数**: 44
+**総 decision 数**: 257
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260524_044_revise__shared_db_sec_007.md](./D20260524_044_revise__shared_db_sec_007.md) | 2026-05-24 | /flow:revise _shared/db sec_007 | drizzle-orm `^0.36.4→^0.45.2` SQLi CVE 対応設計 (互換性リスク低)、4 文書 | D20260524-007〜011 | 完了 |
 | [D20260524_043_secure_deps.md](./D20260524_043_secure_deps.md) | 2026-05-24 | /flow:secure --phase=deps | L4 依存スキャン (High 1: drizzle-orm SQLi / Medium 9 dev-tooling) → [論点-015] dispatched-to-revise | D20260524-002〜005 | 完了 |
 | [D20260524_042_auto_continuous.md](./D20260524_042_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | P4 deferred security → /flow:secure --phase=deps dispatch | D20260524-001 | 完了 |
 | [D20260523_041_audit_standard.md](./D20260523_041_audit_standard.md) | 2026-05-23 | /flow:audit standard | 整合性監査 (Critical 0 / High 0 / Medium 1 / Low 5) | D20260523-112〜113 | 完了 |
