@@ -928,9 +928,10 @@ public/               # PWA manifest / icons
 
 ### [論点-015] drizzle-orm SQL インジェクション (CVE) (SEC-007、High)
 
-- **status**: `dispatched-to-revise` (L4 依存スキャン検出、修正は drizzle-orm メジャーアップ移行が必要)
-- **status 履歴**: 2026-05-24 open → 2026-05-24 **dispatched-to-revise** (`/flow:secure --phase=deps` D20260524_043: `npm audit` で GHSA-gpj5-g38j-94v9 検出、seed 生成) → 2026-05-24 **revise 設計完了** (`/flow:revise --resume sec_007_drizzle_orm_sqli` D20260524_044: 4 文書生成、使用 drizzle API サーフェスは 0.36→0.45 で安定 = 互換性リスク低と評価、TDD 実装待機)
-- **dispatch 先**: `docs/_shared/db/revise_sec_007_drizzle_orm_sqli_20260524/` (4 文書完了)。closure 残: `/flow:tdd` で `npm install drizzle-orm@^0.45.2` + 全 373 test green + `npm audit` high 0 確認
+- **status**: `closed` ✅ (drizzle-orm 0.36.4→0.45.2 アップグレードで解消、`npm audit` high 0 確認)
+- **status 履歴**: 2026-05-24 open → 2026-05-24 **dispatched-to-revise** (`/flow:secure --phase=deps` D20260524_043: `npm audit` で GHSA-gpj5-g38j-94v9 検出、seed 生成) → 2026-05-24 **revise 設計完了** (`/flow:revise --resume sec_007_drizzle_orm_sqli` D20260524_044: 4 文書生成、互換性リスク低と評価) → 2026-05-24 **closed** (`/flow:tdd` D20260524_045: drizzle-orm@0.45.2 + drizzle-kit@0.31.10 へ upgrade、ソース変更ゼロ、tsc 0 errors、Vitest 373/373 green、npm audit high 1→0、GHSA-gpj5 検出 0 件)
+- **dispatch 先**: `docs/_shared/db/revise_sec_007_drizzle_orm_sqli_20260524/` (4 文書 + 101/102 完了)
+- **対応 commit**: `de8522c` (fix(deps): drizzle-orm 0.36.4→0.45.2)
 - **seed**: `docs/_pending_archive/sec_007_drizzle_orm_sqli/000_TRIGGER.md` (revise 完了で archive 移動)
 - **影響範囲**: §3 NFR / `_shared/db` (schema.ts / access.ts / withUserScope / migrations)
 - **観点 ID**: O28_dependency_vulnerabilities
