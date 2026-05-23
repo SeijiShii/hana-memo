@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 09:42 (+09:00)
-**総セッション数**: 20
-**総 decision 数**: 152
+**最終更新**: 2026-05-23 09:50 (+09:00)
+**総セッション数**: 21
+**総 decision 数**: 156
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,6 +14,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_021_resume_autopick.md](./D20260523_021_resume_autopick.md) | 2026-05-23 | /flow:resume (auto-pick) | P1 → /flow:revise _shared/ai bundle | D20260523-034〜037 | 完了 |
 | [D20260523_020_resume_default.md](./D20260523_020_resume_default.md) | 2026-05-23 | /flow:resume | プロジェクト next-step 推奨 | D20260523-031〜033 | 完了 |
 | [D20260523_019_secure_list-findings.md](./D20260523_019_secure_list-findings.md) | 2026-05-23 | /flow:secure --list-findings | SEC findings triage (4 件) | D20260523-025〜030 | 完了 |
 | [D20260523_018_scenario_init.md](./D20260523_018_scenario_init.md) | 2026-05-23 | /flow:scenario --init | SCENARIO 初版生成 | D20260523-020〜024 | 完了 |
@@ -39,6 +40,10 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-037 | /flow:resume (auto-pick) | Step 6 | Git commit (AI_LOG + INDEX のみ) | auto-recommended | D20260523_021_resume_autopick.md |
+| D20260523-036 | /flow:resume (auto-pick) | Step 4 | 最終 dispatch 指示 = /flow:revise _shared/ai --resume sec_001-003_rate_limit_ssrf | auto-recommended | D20260523_021_resume_autopick.md |
+| D20260523-035 | /flow:resume (auto-pick) | Step 3 | P1 HIT → Critical 最古 + seed あり = SEC-001 bundle | auto-recommended | D20260523_021_resume_autopick.md |
+| D20260523-034 | /flow:resume (auto-pick) | Step 1-2 | L1/L2 不整合 0、§8 SEC: Critical 2 + High 2 active | auto-recommended | D20260523_021_resume_autopick.md |
 | D20260523-033 | /flow:resume | Step 6 | Git commit (AI_LOG + INDEX のみ) | auto-recommended | D20260523_020_resume_default.md |
 | D20260523-032 | /flow:resume | Step 3-4 | 推奨 = /flow:revise _shared/ai --resume sec_001-003_rate_limit_ssrf、ユーザー (a) 採用 | explicit-choice | D20260523_020_resume_default.md |
 | D20260523-031 | /flow:resume | Step 1-3 | ケース B 判定 (中断 0 件、シナリオ進行可、補助 secure 4 件) | auto-recommended | D20260523_020_resume_default.md |
