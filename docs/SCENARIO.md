@@ -98,19 +98,19 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **着手前** (secure findings triage 済)
-- **進行中ターゲット**: なし (3 件 dispatched-to-revise + 1 件 open TDD-handoff)
-- **直前完了フェーズ**: Phase 2.5 (設計レベル脆弱性レビュー L1+L2 + Step L triage)
-- **最終更新セッション**: D20260523_019_secure_list-findings
-- **最終更新時刻**: 2026-05-23T09:35:00+09:00
+- **現在フェーズ**: Phase 3 (実装) **着手前** (secure findings triage 済、revise 1/2 完了)
+- **進行中ターゲット**: なし (1 件 dispatched-to-revise 残 + 1 件 open TDD-handoff)
+- **直前完了セッション**: D20260523_022_revise__shared_ai_sec_001-003 (`/flow:revise _shared/ai`)
+- **最終更新セッション**: D20260523_022_revise__shared_ai_sec_001-003
+- **最終更新時刻**: 2026-05-23T09:55:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
 - **次の推奨コマンド (優先順)**:
-  1. `/flow:revise _shared/ai --resume sec_001-003_rate_limit_ssrf` (Critical [SEC-001] レート制限 + High [SEC-003] SSRF を bundle で SPEC/PLAN 反映)
-  2. `/flow:revise _shared/analytics --resume sec_004_sentry_pii_scrub` (High / 法令必須 [SEC-004] Sentry beforeSend PII スクラブ)
-  3. `/flow:tdd` (連続実装、優先度 1 `_shared/db` から、Phase 0 で [SEC-002] `.env.example` 作成を同時消化)
-- **dispatched-to-revise findings (3 件、seed 待機中)**:
-  - `docs/_pending/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` ([SEC-001] [SEC-003])
+  1. `/flow:revise _shared/analytics --resume sec_004_sentry_pii_scrub` (High / 法令必須 [SEC-004] Sentry beforeSend PII スクラブ)
+  2. `/flow:tdd` (連続実装、優先度 1 `_shared/db` から、Phase 0 で [SEC-002] `.env.example` 作成 + `webhook_dedupe` テーブル + Upstash ratelimit 統合)
+- **dispatched-to-revise findings (残 1 件、seed 待機中)**:
   - `docs/_pending/sec_004_sentry_pii_scrub/000_TRIGGER.md` ([SEC-004])
+- **revise 完了 (TDD 待機中、_pending_archive へ移動済)**:
+  - `docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/` ([SEC-001] [SEC-003] 設計反映完了)
 - **open + TDD-handoff (1 件)**:
   - concept §8 [論点-012] [SEC-002] `.env.example` — `/flow:tdd _shared/db` Phase 0 で作成
 
@@ -124,3 +124,4 @@
 |---|---|---|
 | 2026-05-23T09:07:12+09:00 | 初版作成 (`/flow:scenario --init`)。シナリオ種別 = **MVP α 公開型 (個人ツール → スモール商用 段階移行)**。Phase 1-5 + Phase 2.5 (secure) を採用。現在地カーソルを Phase 3 着手前 + 論点-011〜014 を前提条件としてセット (decision_id=D20260523-020) | /flow:scenario --init (D20260523_018) |
 | 2026-05-23T09:35:00+09:00 | §5 カーソル更新: `/flow:secure --list-findings` で 4 件 triage 完了 (3 件 dispatched-to-revise + 1 件 open TDD-handoff)。次の推奨コマンドを `--resume <seed_id>` 形式に詳細化 (decision_id=D20260523-029) | /flow:secure --list-findings (D20260523_019) |
+| 2026-05-23T09:55:00+09:00 | §5 カーソル更新: `/flow:revise _shared/ai` で [SEC-001] [SEC-003] の設計反映完了 (4 文書生成、seed を _pending_archive へ移動)。次の推奨を `/flow:revise _shared/analytics` (SEC-004) に進行 | /flow:revise _shared/ai (D20260523_022) |

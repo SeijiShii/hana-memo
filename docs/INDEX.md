@@ -22,15 +22,15 @@
 | 5 | ❌ | [memory](./memory/) | 設計済 | 2026-05-22 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 
 ## 横断フォルダ
-| 優先度 | フォルダ | 状態 | 設計完了 | INDEX |
-|---|---|---|---|---|
-| 1 | [_shared/db](./_shared/db/) | 設計済 | 2026-05-22 | [INDEX](./_shared/db/INDEX.md) |
-| 1 | [_shared/types](./_shared/types/) | 設計済 | 2026-05-22 | [INDEX](./_shared/types/INDEX.md) |
-| 1 | [_shared/helpers](./_shared/helpers/) | 設計済 | 2026-05-22 | [INDEX](./_shared/helpers/INDEX.md) |
-| 1 | [_shared/analytics](./_shared/analytics/) | 設計済 | 2026-05-22 | [INDEX](./_shared/analytics/INDEX.md) |
-| 2 | [_shared/auth](./_shared/auth/) | 設計済 | 2026-05-22 | [INDEX](./_shared/auth/INDEX.md) |
-| 2 | [_shared/storage](./_shared/storage/) | 設計済 | 2026-05-22 | [INDEX](./_shared/storage/INDEX.md) |
-| 2 | [_shared/ai](./_shared/ai/) | 設計済 | 2026-05-22 | [INDEX](./_shared/ai/INDEX.md) |
+| 優先度 | フォルダ | 状態 | 設計完了 | 改修件数 | INDEX |
+|---|---|---|---|---|---|
+| 1 | [_shared/db](./_shared/db/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/db/INDEX.md) |
+| 1 | [_shared/types](./_shared/types/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/types/INDEX.md) |
+| 1 | [_shared/helpers](./_shared/helpers/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/helpers/INDEX.md) |
+| 1 | [_shared/analytics](./_shared/analytics/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/analytics/INDEX.md) |
+| 2 | [_shared/auth](./_shared/auth/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/auth/INDEX.md) |
+| 2 | [_shared/storage](./_shared/storage/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/storage/INDEX.md) |
+| 2 | [_shared/ai](./_shared/ai/) | 設計済 (+ 改修中) | 2026-05-22 | 1 | [INDEX](./_shared/ai/INDEX.md) |
 
 ## 見積もり
 | ファイル | 種別 | 最終更新 |
