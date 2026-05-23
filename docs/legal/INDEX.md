@@ -30,7 +30,7 @@
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
-| (なし) |
+| [revise_sentry_disclosure_20260524](./revise_sentry_disclosure_20260524/) | revise (legal-required) | sentry-disclosure | 設計完了 (実装待機) | プラポリ §4 に Sentry PII スクラブ後送信を明記 (SEC-004 法務 TODO)、v1.0.0→v1.1.0 | [INDEX](./revise_sentry_disclosure_20260524/INDEX.md) |
 
 ## 関連
 - 親 concept: `../concept.md` §9, §1.3.1 legal 行

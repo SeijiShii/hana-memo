@@ -909,7 +909,7 @@ public/               # PWA manifest / icons
 - **dispatch 先**: `docs/_shared/analytics/revise_sec_004_sentry_pii_scrub_20260523/` (4 文書完了、scrubber.ts + beforeSend + 7 パターン定義 + Slack 通知統合)
 - **seed**: `docs/_pending_archive/sec_004_sentry_pii_scrub/000_TRIGGER.md` (revise 完了で archive 移動)
 - **対応 commit (revise)**: 後続コミットで追記。**closure 残**: api/ Vercel handler の scrub wiring + 実 Sentry / 実 Slack への 1 件投げ目視 (PII 混入ゼロ、α 公開前)
-- **法務 TODO**: プラポリ §9.1 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記 (`/flow:revise legal sentry-disclosure` で α 公開前必須)
+- **法務 TODO**: プラポリ §4 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記。**設計完了** (`docs/legal/revise_sentry_disclosure_20260524/` D20260524_046、v1.0.0→v1.1.0)、実装 = `/flow:tdd legal sentry-disclosure` 待機 (α 公開前必須)
 - **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
 - **観点 ID**: O26_pii_logging (legal_required=true)
 - **severity**: High (法令必須、severity-threshold 除外不可)
