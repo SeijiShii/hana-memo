@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 (+09:00)
-**総セッション数**: 17
-**総 decision 数**: 137
+**最終更新**: 2026-05-23 09:10 (+09:00)
+**総セッション数**: 18
+**総 decision 数**: 143
 
 > このフォルダは AI 主導の自走 / 後追いトレースを目的とする詳細ログ。
 > セッションごとに 1 ファイル、append-only、過去ファイルは削除・編集禁止。
@@ -14,7 +14,8 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
-| [D20260523_017_secure_product_wide.md](./D20260523_017_secure_product_wide.md) | 2026-05-23 | /flow:secure | プロダクト全体 (L1+L2) | D20260523-001〜018 | 完了 |
+| [D20260523_018_scenario_init.md](./D20260523_018_scenario_init.md) | 2026-05-23 | /flow:scenario --init | SCENARIO 初版生成 | D20260523-020〜024 | 完了 |
+| [D20260523_017_secure_product_wide.md](./D20260523_017_secure_product_wide.md) | 2026-05-23 | /flow:secure | プロダクト全体 (L1+L2) | D20260523-001〜018 (+ commit 019) | 完了 |
 | [D20260522_016_concept_baas_pivot.md](./D20260522_016_concept_baas_pivot.md) | 2026-05-22 | /flow:concept (UPDATE) | BaaS Pivot 全体 | D20260522-114〜119 | 完了 |
 | [D20260522_015_feature_memory.md](./D20260522_015_feature_memory.md) | 2026-05-22 | /flow:feature | memory | D20260522-108〜113 | 完了 |
 | [D20260522_014_feature_export.md](./D20260522_014_feature_export.md) | 2026-05-22 | /flow:feature | export | D20260522-102〜107 | 完了 |
@@ -36,6 +37,11 @@
 
 | ID | command | phase | chosen (短縮) | type | ファイル |
 |---|---|---|---|---|---|
+| D20260523-024 | /flow:scenario --init | Git commit | SCENARIO + AI_LOG コミット | auto-recommended | D20260523_018_scenario_init.md |
+| D20260523-023 | /flow:scenario --init | カーソル初期セット | Phase 3 着手前、前提=論点-011〜014 解消 | auto-recommended | D20260523_018_scenario_init.md |
+| D20260523-022 | /flow:scenario --init | §4 分岐ルール初期化 | 9 種の分岐パターン定義 | auto-recommended | D20260523_018_scenario_init.md |
+| D20260523-021 | /flow:scenario --init | §2 5 Phase + 2.5 採用 | concept / feature / secure / TDD / α 公開 / 運用 | auto-recommended | D20260523_018_scenario_init.md |
+| D20260523-020 | /flow:scenario --init | シナリオ種別 | MVP α 公開型 (個人ツール → スモール商用) | auto-recommended | D20260523_018_scenario_init.md |
 | D20260523-018 | /flow:secure | §8 論点登録 | [論点-014] Sentry beforeSend PII スクラブ (High / 法令必須) | auto-recommended | D20260523_017_secure_product_wide.md |
 | D20260523-017 | /flow:secure | §8 論点登録 | [論点-013] AI Vision SSRF 防御強化 (High) | auto-recommended | D20260523_017_secure_product_wide.md |
 | D20260523-016 | /flow:secure | §8 論点登録 | [論点-012] `.env.example` テンプレ作成 (Critical) | auto-recommended | D20260523_017_secure_product_wide.md |

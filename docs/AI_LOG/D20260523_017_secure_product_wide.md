@@ -209,7 +209,7 @@
 
 ## Git コミット (D20260523-019)
 
-- **commit hash**: `f0ee695`
+- **commit hash**: `142ad08` (amend で更新、当初 `f0ee695` は AI_LOG の commit decision 追記のため 1 回 amend)
 - **branch**: `main`
 - **files**: 11 件 (生成 7 / 更新 4)
 - **chosen_type**: auto-recommended
