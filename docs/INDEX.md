@@ -25,7 +25,7 @@
 | 優先度 | フォルダ | 状態 | 設計完了 | 改修件数 | INDEX |
 |---|---|---|---|---|---|
 | 1 | [_shared/db](./_shared/db/) | **実装完了** | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/db/INDEX.md) |
-| 1 | [_shared/types](./_shared/types/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/types/INDEX.md) |
+| 1 | [_shared/types](./_shared/types/) | **実装完了** | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/types/INDEX.md) |
 | 1 | [_shared/helpers](./_shared/helpers/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/helpers/INDEX.md) |
 | 1 | [_shared/analytics](./_shared/analytics/) | 設計済 (+ 改修中) | 2026-05-22 | 1 | [INDEX](./_shared/analytics/INDEX.md) |
 | 2 | [_shared/auth](./_shared/auth/) | 設計済 | 2026-05-22 | 0 | [INDEX](./_shared/auth/INDEX.md) |
