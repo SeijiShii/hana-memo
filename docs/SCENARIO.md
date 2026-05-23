@@ -98,20 +98,21 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 1 件コア完了**、9 件残
-- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` (SDK 非依存コア完了、glue defer)
+- **現在フェーズ**: Phase 3 (実装) **進行中** — 14 対象中 **4 件完全 + 2 件コア完了**、8 件残
+- **完了対象 (Phase 3)**: `_shared/db` / `_shared/types` / `_shared/helpers` / `_shared/analytics` (完全)、`_shared/auth` / `_shared/storage` (SDK 非依存コア完了、glue defer)
 - **進行中ターゲット**: なし (次対象選定待ち)
-- **直前完了セッション**: D20260523_030_tdd__shared_auth (`/flow:auto` continuous iteration 2 → `/flow:tdd _shared/auth` コア、累計 Vitest 194/194)
-- **最終更新時刻**: 2026-05-23T17:48:00+09:00
+- **直前完了セッション**: D20260523_031_tdd__shared_storage (`/flow:auto` continuous iteration 3 → `/flow:tdd _shared/storage` コア、累計 Vitest 222/222)
+- **最終更新時刻**: 2026-05-23T17:54:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤は **injectable パターンで SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズへ defer**
 - **次の推奨コマンド (優先順)**:
-  1. `/flow:auto` (連続実装継続)。次対象 = `_shared/storage` (R2/S3 presigned URL、SDK 非依存コア) → `_shared/ai` (OpenAI Vision、SSRF guard は実装済 url.ts と連携)
+  1. `/flow:auto` (連続実装継続)。次対象 = `_shared/ai` (OpenAI Vision、SSRF guard は実装済 `url.ts assertSafeImageUrl` と連携、SDK 非依存コア)
   2. `legal` (優先度 1 feature、大半が静的法務文書 + プラポリ §9.1 は Phase 4 revise 待ち)
   3. その後 機能 7 件 (account → capture/notebook/billing → export/memory)
 - **app/api bootstrap defer 蓄積** (後続フェーズで wiring):
   - analytics: `api/{check-quota,refresh-matview,export-revenue}.ts` + `vercel.json`
   - auth: `provider.tsx`/`guest-session.ts`/`link.ts`/`hooks.ts`/`getFingerprint`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`
+  - storage: `api/storage/{upload-url,signed-url,delete}.ts`/`_lib/r2.ts`/`upload.ts`/`fetch.ts useSignedUrl`/`meta.ts`
 - **PJ bootstrap 完了**: package.json / tsconfig / drizzle / vitest / .env.example (全 23 key) / CLAUDE.md
 - **secure findings 状況**:
   - SEC-002 `.env.example` (Critical): ✅ closed

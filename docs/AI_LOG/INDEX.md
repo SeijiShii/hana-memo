@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-23 17:48 (+09:00)
-**総セッション数**: 30
-**総 decision 数**: 226
+**最終更新**: 2026-05-23 17:54 (+09:00)
+**総セッション数**: 31
+**総 decision 数**: 228
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260523_031_tdd__shared_storage.md](./D20260523_031_tdd__shared_storage.md) | 2026-05-23 | /flow:tdd _shared/storage | SDK 非依存コア (bucket/validation/presign、28 tests) | D20260523-093〜094 | 完了 |
 | [D20260523_030_tdd__shared_auth.md](./D20260523_030_tdd__shared_auth.md) | 2026-05-23 | /flow:tdd _shared/auth | SDK 非依存コア (trial/rls/webhook、25 tests) | D20260523-091〜092 | 完了 |
 | [D20260523_029_tdd__shared_analytics.md](./D20260523_029_tdd__shared_analytics.md) | 2026-05-23 | /flow:tdd _shared/analytics | feature + SEC-004 fold-in (50 tests、行 99.49%) | D20260523-087〜090 | 完了 |
 | [D20260523_028_auto_continuous.md](./D20260523_028_auto_continuous.md) | 2026-05-23 | /flow:auto continuous | iteration 1 → /flow:tdd _shared/analytics | D20260523-085〜086 | 完了 |
