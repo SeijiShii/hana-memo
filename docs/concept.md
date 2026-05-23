@@ -338,6 +338,21 @@ public/               # PWA manifest / icons
 - **本番との差異**: dev は Neon dev branch + Clerk dev key、本番は Neon main branch + Clerk prod key、`.env.production` で吸収
 - **E2E テスト**: Playwright + Vercel preview deploy URL に対して実行 (preview ごとに ephemeral Neon branch 推奨、CI で `neonctl branches create --name ci-$SHA` → 終了時 delete)
 
+#### 4.5.7 dev 起動スクリプト計画 (`scripts/dev.sh`、perspectives O36)
+
+> 本 PJ は Docker 不要・Neon cloud のため、O36 が想定する「複数コンテナの順序起動」型ではなく **`vercel dev` 一発 + 前段 health check + 起動後 smoke** の薄い構成で足りる。動作確認用のワンショット起動エントリポイントとして `scripts/dev.sh` を Phase 3.5 bootstrap で生成する。
+
+| 項目 | 内容 |
+|---|---|
+| **launcher 種別** | bash (`scripts/dev.sh` 単体。stop は Ctrl+C trap で完結、別 stop script 不要) |
+| **起動順序** | (1) `.env.local` 存在チェック (無ければ `.env.example` コピーを案内して exit 1) → (2) DB ping (health check) → (3) `vercel dev` 起動 (Vite frontend + Vercel Functions を 1 プロセス、port 3000) |
+| **health check** | 起動前: `psql "$DATABASE_URL" -c 'select 1'` で Neon 接続確認 (失敗時 exit 1)。起動後: 下記 smoke endpoint を `curl` で疎通確認 (最大 N 秒リトライ) |
+| **smoke test endpoint (2 件)** | ① `GET http://localhost:3000/` → 200 (Vite app shell) ／ ② `GET http://localhost:3000/api/health` → 200 `{ "ok": true }` (Phase 3.5 で軽量 health Function を作成) |
+| **stop / cleanup** | Ctrl+C (SIGINT/SIGTERM) を `trap` で捕捉 → `vercel dev` 子プロセスを kill + 一時ログ削除。Neon は cloud のため停止対象なし |
+| **生成タイミング** | Phase 3.5 app/api bootstrap の最初のタスク (`/flow:status` の bootstrap 基準 = `scripts/dev.sh` + CI yaml 存在、O36+O37) |
+
+**疎通の考え方**: 外部 SDK (Clerk/R2/OpenAI/Stripe) はキー未設定でも dev shell が立ち上がることを優先。各 SDK は `.env.local` 未設定時に graceful degrade (機能無効 + 警告ログ) する方針 (glue wiring 時に担保)。
+
 ### 4.6 コスト・収益追跡と継続判断ループ
 
 #### 4.6.1 PJ 性質別の必要レベル

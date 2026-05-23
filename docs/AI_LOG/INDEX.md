@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
 **最終更新**: 2026-05-24 (+09:00)
-**総セッション数**: 47
-**総 decision 数**: 272
+**総セッション数**: 48
+**総 decision 数**: 277
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260524_048_bootstrap_phase35_milestone_a.md](./D20260524_048_bootstrap_phase35_milestone_a.md) | 2026-05-24 | /flow:concept §4.5.7 + Phase 3.5 bootstrap | Milestone A foundation: フロントスタック install + app shell + api/health + scripts/dev.sh (typecheck0/373green/build OK/dev 200) | D20260524-030〜034 | 完了 (Milestone A) |
 | [D20260524_047_concept_update_20260524.md](./D20260524_047_concept_update_20260524.md) | 2026-05-24 | /flow:concept (UPDATE) | §8 棚卸し: 解決済み 7 論点 (002/003/004/007/012/013/015) を §7 へ移動、[論点-008] drift 追記 | D20260524-024〜029 | 完了 |
 | [D20260524_046_revise_legal_sentry_disclosure.md](./D20260524_046_revise_legal_sentry_disclosure.md) | 2026-05-24 | /flow:revise legal sentry-disclosure | プラポリ §4 Sentry PII スクラブ開示 (SEC-004 法務 TODO)、v1.1.0、4 文書 | D20260524-019〜022 | 完了 |
 | [D20260524_045_tdd__shared_db_revise_sec_007.md](./D20260524_045_tdd__shared_db_revise_sec_007.md) | 2026-05-24 | /flow:tdd _shared/db revise sec_007 | drizzle-orm 0.45.2 実装 (ソース変更ゼロ、373/373、audit high 0)、[論点-015] closed | D20260524-013〜017 | 完了 |
