@@ -1,11 +1,6 @@
 // [SEC-003] SSRF guard + [SEC-005 関連] validateObjectKey tests
 import { describe, it, expect } from 'vitest';
-import {
-  assertSafeImageUrl,
-  validateObjectKey,
-  SsrfError,
-  ValidationError,
-} from './url';
+import { assertSafeImageUrl, validateObjectKey, SsrfError, ValidationError } from './url';
 
 const ALLOW = ['account.r2.cloudflarestorage.com'];
 
@@ -120,9 +115,9 @@ describe('validateObjectKey', () => {
   });
 
   it('rejects non-string inputs', () => {
-    // @ts-expect-error
+    // @ts-expect-error 型違反を意図的にテスト
     expect(() => validateObjectKey(null, 'user_abc')).toThrow(ValidationError);
-    // @ts-expect-error
+    // @ts-expect-error 型違反を意図的にテスト
     expect(() => validateObjectKey('user_abc/x', undefined)).toThrow(ValidationError);
   });
 });

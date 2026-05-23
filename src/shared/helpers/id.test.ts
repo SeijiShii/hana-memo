@@ -30,9 +30,9 @@ describe('sha256Hex', () => {
   });
 
   it('throws on non-string input', async () => {
-    // @ts-expect-error
+    // @ts-expect-error 型違反を意図的にテスト
     await expect(sha256Hex(123)).rejects.toThrow(TypeError);
-    // @ts-expect-error
+    // @ts-expect-error 型違反を意図的にテスト
     await expect(sha256Hex(null)).rejects.toThrow(TypeError);
   });
 

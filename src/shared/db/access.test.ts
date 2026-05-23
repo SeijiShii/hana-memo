@@ -27,9 +27,9 @@ describe('withUserScope', () => {
   it('throws TypeError when userId is not a string', async () => {
     // @ts-expect-error - 意図的に型違反
     await expect(withUserScope(null, async () => 'ok')).rejects.toThrow(TypeError);
-    // @ts-expect-error
+    // @ts-expect-error 型違反を意図的にテスト
     await expect(withUserScope(undefined, async () => 'ok')).rejects.toThrow(TypeError);
-    // @ts-expect-error
+    // @ts-expect-error 型違反を意図的にテスト
     await expect(withUserScope(123, async () => 'ok')).rejects.toThrow(TypeError);
   });
 
@@ -52,9 +52,7 @@ describe('assertOwner', () => {
   });
 
   it('throws AuthorizationError when userId mismatches', () => {
-    expect(() => assertOwner({ userId: 'user_xyz' }, 'user_abc')).toThrow(
-      AuthorizationError,
-    );
+    expect(() => assertOwner({ userId: 'user_xyz' }, 'user_abc')).toThrow(AuthorizationError);
   });
 
   it('throws AuthorizationError with expected/actual fields', () => {
@@ -70,9 +68,7 @@ describe('assertOwner', () => {
   });
 
   it('throws AuthorizationError for snake_case mismatch', () => {
-    expect(() => assertOwner({ user_id: 'user_xyz' }, 'user_abc')).toThrow(
-      AuthorizationError,
-    );
+    expect(() => assertOwner({ user_id: 'user_xyz' }, 'user_abc')).toThrow(AuthorizationError);
   });
 });
 
