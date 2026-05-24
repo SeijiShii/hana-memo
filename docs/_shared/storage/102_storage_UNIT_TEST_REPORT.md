@@ -46,4 +46,39 @@
 
 ## カバレッジ未達・補足
 - `index.ts` (barrel) 0%: re-export のみ。
-- **defer (本レポート対象外)**: UT-ST-U04/U05 (browser PUT + retry)、UT-ST-F05/F06 (useSignedUrl React hook)、UT-ST-M01〜M03 (meta R2 HEAD/List)、UT-ST-E01/B01 (retry/並列)。app/api bootstrap フェーズで @aws-sdk mock + jsdom で実施。
+- ~~defer~~ → **Phase 3.5 Milestone B (2026-05-24) で glue テスト追加済** (下記)。
+
+---
+
+## 追記: Phase 3.5 Milestone B — glue 単体テスト (2026-05-24, /flow:auto 反復 1)
+
+defer していたテストを happy-dom + SDK/fetch mock で実装 (新規 45 件)。
+
+| # | テストケース | テストファイル | 結果 |
+|---|------------|-------------|------|
+| UT-ST-U01 | uploadPlantImage WebP → presign + PUT → UploadResult | src/.../upload.test.ts | ✅ |
+| UT-ST-U02/U03 | jpeg / 10MB → InvalidImageError (presign せず) | upload.test.ts | ✅ |
+| UT-ST-U04/E01 | PUT network 失敗 → 2 retry 後 UploadFailedError + console.error | upload.test.ts | ✅ |
+| UT-ST-U05 | replacePlantImage presign + PUT (upsert) | upload.test.ts | ✅ |
+| UT-ST-U06 | deletePlantImage POST /delete に objectKey | upload.test.ts | ✅ |
+| UT-ST-U07 | upload-url 403 (所有者違反) → UploadFailedError | upload.test.ts | ✅ |
+| (追加) | PUT 5xx → retry し最終失敗 / delete 403 → throw | upload.test.ts | ✅ |
+| UT-ST-F01/F02 | getSignedUrl URL 返却 / expiresIn 送出 | fetch.test.ts (happy-dom) | ✅ |
+| UT-ST-F03/F04 | getSignedUrls batch Record / 欠落 key undefined | fetch.test.ts | ✅ |
+| UT-ST-F05/F06 | useSignedUrl mount→URL+55分 interval / unmount cleanup | fetch.test.ts | ✅ |
+| UT-ST-E02 | useSignedUrl objectKey 変更で新 fetch / null は no-fetch | fetch.test.ts | ✅ |
+| UT-ST-M01/M02/M03 | getObjectMetadata / listUserImages / list に userId 送らず | meta.test.ts | ✅ |
+| (api) | loadR2Config endpoint/不足 throw + PresignClient/MetaClient 配線 | api/storage/_lib/r2.test.ts | ✅ |
+| (api) | resolveUserId 解決 / null→UserNotFoundError | api/storage/_lib/user.test.ts | ✅ |
+| (api) | parse{UploadUrl,SignedUrl,Delete,Meta}Body 正規化 | api/storage/*.test.ts | ✅ |
+
+### glue サマリー
+| 項目 | 値 |
+|------|-----|
+| glue 追加テスト | 45 件 (storage src 24 + api/storage 21) |
+| storage core + glue 合計 | 73 件 (src 51 + api 22) |
+| 成功 | 73 件 / 失敗 0 件 / 成功率 100% |
+| storage src 行カバレッジ | 97.84% |
+| 全体テスト | 464 / 464 pass |
+
+> handler default export (verify→resolveUserId→SDK/DB) は E2E (Milestone C、Vercel preview + 実 R2) で検証。unit は pure helper + injectable 配線を対象 (auth glue と同方針)。

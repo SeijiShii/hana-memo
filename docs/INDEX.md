@@ -1,6 +1,6 @@
 # プロジェクトドキュメントインデックス — hana-memo
 
-**最終更新**: 2026-05-23 17:40
+**最終更新**: 2026-05-24 13:40
 **生成元**: /flow:concept、/flow:feature、/flow:tdd 等が自動更新
 
 <!-- auto-generated-start -->
@@ -29,7 +29,7 @@
 | 1 | [_shared/helpers](./_shared/helpers/) | **実装完了** | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/helpers/INDEX.md) |
 | 1 | [_shared/analytics](./_shared/analytics/) | **実装完了** | 2026-05-22 → 2026-05-23 | 1 | [INDEX](./_shared/analytics/INDEX.md) |
 | 2 | [_shared/auth](./_shared/auth/) | **コア実装完了** (SDK glue defer) | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/auth/INDEX.md) |
-| 2 | [_shared/storage](./_shared/storage/) | **コア実装完了** (SDK glue defer) | 2026-05-22 → 2026-05-23 | 0 | [INDEX](./_shared/storage/INDEX.md) |
+| 2 | [_shared/storage](./_shared/storage/) | **実装完了** (glue wiring 済) | 2026-05-22 → 2026-05-24 | 0 | [INDEX](./_shared/storage/INDEX.md) |
 | 2 | [_shared/ai](./_shared/ai/) | **コア実装完了** (SDK glue defer) | 2026-05-22 → 2026-05-23 | 1 | [INDEX](./_shared/ai/INDEX.md) |
 
 ## 見積もり
