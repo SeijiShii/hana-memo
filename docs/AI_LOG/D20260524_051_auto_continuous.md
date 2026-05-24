@@ -218,6 +218,48 @@ iteration: 0 (loop 開始前)
     memory [flow-auto-no-pivot-questions]: browser 検証不能でも停止せず mechanical default で続行。
 ```
 
+```yaml
+- id: D20260524-051-016
+  question: CI/CD yaml (O37) は要実装か
+  chosen: 不要 — 既存で完備 (.github/workflows/ci.yml + dependabot.yml)
+  chosen_type: auto-recommended
+  context: ci.yml = lint+typecheck+test:coverage(788)+vite build+prod audit を main push/PR で実行。Milestone C の O37 は充足済。反復9 は app 統合配線へ
+```
+
+**反復9 着手**: app 統合配線 + ナビ shell (Clerk provider mount + auth gating + nav + 各 seam 画面に実 hook/callback 配線、mock で happy-dom テスト)。
+
+**反復9 結果**: app 統合配線 完遂。`app/{AppAuthProvider,AppShell,useAuthToken,AppConsentGate}` + 6 container (Notebook/Billing/BillingSuccess/Settings/Capture/Preview)。検証: typecheck 0 / **Vitest 810 green** (新規 +22)。commit ee16bac。
+
+```yaml
+- id: D20260524-051-017
+  question: 反復9 後の状態 — §1.5.8 verification-gap checkpoint の評価
+  chosen: 1-decision pause (§4.5.1 sanctioned)。app 全体が build 済だが browser 未実行 → 単一 verify 依頼
+  chosen_type: auto-recommended
+  context: |
+    §1.5.8 の 3 条件すべて成立:
+    (1) env で検証不能 — Clerk session / 実 API / browser が必要、本 headless env に無し
+    (2) 初出基盤パターン — full app-integration は初実行、一度も browser で動かしていない
+    (3) 高複製 — 残 runtime seam (guest sign-in / OAuth link / Stripe redirect / R2 / OpenAI) + E2E が
+        7 画面分、いずれも統合の runtime 動作に依存
+    → 残作業を build し続ける前に 1 回 browser/runtime 検証を促す (marker 保持、回答後継続)。
+    これは upfront 戦略質問 (5/24 却下) とは異なり、全 slice + 統合 build 後の sanctioned verify point。
+- id: D20260524-051-018
+  question: loop の残作業分類
+  chosen: Class-A buildable (settings/consent api endpoint + thumbnail objectKey) と runtime-gated (auth/payment/storage 実フロー + E2E) に二分
+  chosen_type: auto-recommended
+  context: |
+    Class-A 残 (build 可、unit test 可): /api/account/settings (GET/PATCH) / /api/legal/consents (GET/POST) /
+      discovery 応答に image objectKey 追加 (thumbnail signed URL)。
+    runtime-gated 残 (browser/Clerk keys/Vercel preview 必須、E2E gate): Clerk guest β sign-in UX /
+      OAuth link / 実 Stripe Checkout / 実 R2 upload + OpenAI identify / Playwright E2E (preview=Class B)。
+```
+
+## loop pause: §1.5.8 verification checkpoint (2026-05-24T21:42)
+
+**状態: 進行中 (§1.5.8 1-decision pause、marker 保持)**。本 /flow:auto loop (D20260524_051、反復1-9) は Milestone C の **Class-A・headless 検証可能スコープを完遂**: 全 7 feature presentation + app 統合配線 + nav + CI 確認、**Vitest 607→810 green、commit ce7db46〜ee16bac**。
+
+残作業は (a) 少数の Class-A backend seam (settings/consent endpoint + thumbnail objectKey) と (b) runtime/browser/Clerk-key/Vercel-gated (実 auth/payment/storage フロー + E2E gate)。app 全体が一度も browser で動いていないため、§1.5.8 に従い **1 回の browser/runtime 検証を促して pause**。ユーザー回答後に (a) の継続 or 検証フィードバック反映で再開。
+
 
 
 
