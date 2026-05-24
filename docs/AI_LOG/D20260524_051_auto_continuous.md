@@ -153,6 +153,20 @@ iteration: 0 (loop 開始前)
     実 lib binding は app/E2E 層へ defer (MapView と同方針)。export 画面 + format 選択 + CSV を testable に。
 ```
 
+**反復5 結果**: export 書き出しダイアログ presentation 完遂。ExportDialog/ExportButton を notebook に統合。CSV end-to-end、PDF/ZIP は injectable seam + pdfUnlocked gate。検証: typecheck 0 / **Vitest 704 green** (新規 +21)。commit 76204d6。
+
+```yaml
+- id: D20260524-051-012
+  question: 反復6 の auto-pick
+  chosen: P3 Milestone C presentation 続行 → billing presentation (PWYW checkout 画面)
+  chosen_type: auto-recommended
+  context: |
+    capture/notebook/memory/export slice 完了。残 = billing → legal → account (いずれも UI defer)。
+    billing は PWYW checkout / unlock / OAuthRequiredModal(既存)。Stripe SDK は app/api 済、
+    画面 (価格選択 + checkout 起動 + status 表示) が presentation。Stripe redirect は外部 = seam/defer。
+```
+
+
 
 
 
