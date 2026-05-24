@@ -1,6 +1,6 @@
 # プロジェクトドキュメントインデックス — hana-memo
 
-**最終更新**: 2026-05-24 20:30
+**最終更新**: 2026-05-25 07:30
 **生成元**: /flow:concept、/flow:feature、/flow:tdd 等が自動更新
 
 <!-- auto-generated-start -->
@@ -13,13 +13,13 @@
 ## 機能フォルダ
 | 優先度 | 基盤 | フォルダ | 状態 | 設計完了 | 改修件数 | バグ修正件数 | クレーム件数 | INDEX |
 |---|---|---|---|---|---|---|---|---|
-| 1 | ❌ | [legal](./legal/) | **実装完了** (同意ゲート + 文書ビュー済、本文確定は公開前) | 2026-05-22 → 2026-05-24 | 1 | 0 | 0 | [INDEX](./legal/INDEX.md) |
-| 3 | ❌ | [account](./account/) | **実装完了** (設定画面 + 削除確認済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
+| 1 | ❌ | [legal](./legal/) | **実装完了** (同意ゲート + 文書ビュー + `api/legal/consents` 永続化済、本文確定は公開前) | 2026-05-22 → 2026-05-25 | 1 | 0 | 0 | [INDEX](./legal/INDEX.md) |
+| 3 | ❌ | [account](./account/) | **実装完了** (設定画面 + 削除確認 + `api/account/settings` 永続化済) | 2026-05-22 → 2026-05-25 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | **実装完了** (撮影画面 presentation + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
-| 4 | ❌ | [notebook](./notebook/) | **実装完了** (図鑑 4-mode view + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
+| 4 | ❌ | [notebook](./notebook/) | **実装完了** (図鑑 4-mode view + routing + list 応答 imageObjectKey 済) | 2026-05-22 → 2026-05-25 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
 | 4 | ❌ | [billing](./billing/) | **実装完了** (PWYW 課金画面 + glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
 | 5 | ❌ | [export](./export/) | **実装完了** (書き出しダイアログ済、実 PDF/ZIP は app/E2E) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
-| 5 | ❌ | [memory](./memory/) | **実装完了** (去年の今頃 carousel/badge 統合済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
+| 5 | ❌ | [memory](./memory/) | **実装完了** (去年の今頃 carousel/badge + recommend 応答 imageObjectKey 済) | 2026-05-22 → 2026-05-25 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 
 ## 横断フォルダ
 | 優先度 | フォルダ | 状態 | 設計完了 | 改修件数 | INDEX |

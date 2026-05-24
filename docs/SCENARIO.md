@@ -7,7 +7,7 @@
 > Resume Contract: `~/.claude/flow-data/resume-contract.md` 準拠
 
 **初版作成**: 2026-05-23
-**最終更新セッション**: D20260523_018_scenario_init
+**最終更新セッション**: D20260525_052_auto_continuous
 
 ---
 
@@ -104,16 +104,18 @@
 - **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
 - **進行中ターゲット**: ✅ **Milestone C presentation — 全 7 feature 画面実装完遂** (D20260524_051 /flow:auto 反復2-8)。capture (撮影/プレビュー) / notebook (図鑑 4-mode view) / memory (去年の今頃 carousel/badge) / export (書き出しダイアログ) / billing (PWYW 課金画面) / legal (同意ゲート + 文書ビュー) / account (設定 + 削除確認) を全て実装。`src/lib/utils.ts` (cn foundation) + 各 feature の `pages/`・`components/` + `App.tsx` routing。**Vitest 788 green** (607→788、+181)。全画面は **props-seam** (実 hook/SDK/外部 redirect は注入) で独立テスト済
 - **✅ app 統合配線 + ナビ shell 完遂** (D20260524_051 反復9): `app/{AppAuthProvider (Clerk mount、key 不在 graceful) / AppShell (撮影·図鑑·設定 bottom nav) / useAuthToken (getToken bridge) / AppConsentGate}` + 6 container (Notebook/Billing/BillingSuccess/Settings/Capture/Preview) が実 hook/callback を seam 画面に配線。**Vitest 810 green** (788→810)。CI/CD (O37) は既存 `.github/workflows/ci.yml` で充足済
-- **次の残作業 (2 分類)**: **(a) Class-A buildable** — `/api/account/settings` (GET/PATCH) + `/api/legal/consents` (GET/POST) persistence endpoint + discovery 応答に image objectKey 追加 (thumbnail signed URL)。**(b) runtime/browser-gated (= E2E gate)** — Clerk guest β sign-in UX / OAuth link / 実 Stripe Checkout / 実 R2 upload + OpenAI identify / 各画面の視覚・実機検証 / Playwright E2E (preview = Class B)
-- **E2E gate**: 🚫 **依然 BLOCKED**。app 全体は build + 配線済だが **一度も browser で未実行**。Clerk keys + 実行環境 + (E2E は) Vercel preview が必要。§1.5.8 verification checkpoint: 残 runtime 作業を build する前に 1 回 browser/runtime 検証を推奨
-- **直前セッション**: D20260524_051 (/flow:auto 反復1-9: E2E gate blocked 判定 → 全 7 feature presentation + app 統合配線、Vitest 607→810 green、commit ce7db46〜ee16bac)。§1.5.8 verification checkpoint で pause
-- **最終更新時刻**: 2026-05-24T21:42:00+09:00
+- **✅ 残 Class-A buildable backend seam 全完遂** (D20260525_052 /flow:auto 反復1-4): **(a1)** `api/legal/consents` (GET/POST、consent 永続化) + **(a2)** `api/account/settings` (GET/PATCH、user_settings 永続化、SettingsContainer の settings=null seam closure) + **(a3)** notebook/memory discovery 応答に `imageObjectKey` (images leftJoin、thumbnail signed URL データ層)。**Vitest 810→853 green (+43)**、commit 69d2c48〜861d870 (4 commit)。全て DB 注入で headless unit test 済
+- **残作業 (b) = runtime/browser/Class-B-gated のみ** (headless 達成不能): Clerk guest β sign-in UX / OAuth link / 実 Stripe Checkout / 実 R2 upload + OpenAI identify / per-card signed-URL thumbnail 取得 / 各画面の視覚・実機検証 / Playwright E2E (preview = Class B)。**いずれも実 Clerk/Stripe/R2/OpenAI keys + browser + Vercel preview が必須**
+- **E2E gate**: 🚫 **依然 BLOCKED** (外部リソース未充足)。**§1.5.8 verification checkpoint も依然 pending** — app は build + 全配線 + 全 backend seam 済だが **一度も browser/実 runtime で未実行**。次の前進には実行環境 (keys + browser/Vercel preview) が必要
+- **直前セッション**: D20260525_052 (/flow:auto 反復1-4: 残 Class-A backend seam 完遂、Vitest 810→853、commit 69d2c48〜861d870)。Class-A スコープ尽き + 残は Class-B/外部 key gated のため §4.5.1 #5+#2 で停止
+- **最終更新時刻**: 2026-05-25T07:30:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
-- **次の推奨ステップ (優先順)**:
-  1. **Phase 3.5 Milestone B (UI wiring)** 続行: 残 SDK (jsPDF / JSZip / DOMPurify = export) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。SDK glue = ✅auth → ✅storage → ✅ai ([SEC-001]) → ✅analytics ([SEC-004] wiring) → ✅billing (stripe@17)。画面/データ層 = ✅capture (hooks/CameraCapture/captureApi) → ✅notebook (list/edit api + hooks) → ✅export (CSV: discoveries api + useExport) → ✅memory (recommend api + useMemories)。**Milestone B 完遂 → 次 = Milestone C (E2E + 残 presentation)**
-  2. **Milestone C (次フェーズ)**: E2E green (Playwright smoke ジャーニー、Vercel preview) + 残 presentation 実装 — notebook 4 モード view (timeline/calendar/map/figure) / export 実 PDF (jsPDF/html2canvas) + 画像 ZIP (JSZip) / capture canvas WebP 実変換 / memory バッジ・カルーセル。CI/CD yaml (O37) も本 Milestone で配置
-  3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装、[SEC-004] closure) + `security-review` L5
+- **次の推奨ステップ (優先順)** — ⚠️ **headless 自動開発スコープは完遂。以降は実行環境 (keys + browser/Vercel preview) 必須**:
+  1. **§1.5.8 runtime verification (ユーザー作業)**: `.env.local` に実 keys (Clerk/Stripe/R2/OpenAI/Upstash) を投入 → `bash scripts/dev.sh` で起動 → browser で app shell + 同意ゲート + 撮影→識別→図鑑保存 の最小フローを 1 回目視検証。app は全 build + 全配線 + 全 backend seam 済だが一度も実 runtime で未実行のため、残 runtime 配線の前に 1 回検証を推奨
+  2. **残 runtime 配線 (検証後)**: Clerk guest β sign-in / OAuth link / 実 Stripe Checkout redirect / 実 R2 upload + OpenAI identify / per-card signed-URL thumbnail (resolveThumbnail → useSignedUrl) を実 hook に配線
+  3. **E2E (Class B)**: Playwright smoke ジャーニーを Vercel preview に対し green (= Class B preview deploy 承認が必要)。CI/CD yaml (O37) は既存 `.github/workflows/ci.yml` で充足済
+  4. **Phase 4 (α 公開準備)**: `/flow:tdd legal sentry-disclosure` (プラポリ実装、[SEC-004] closure) + `security-review` L5
 - **app/api bootstrap defer 蓄積** (Milestone B で wiring):
   - ✅ billing (完了 D20260524_050 反復4): `api/billing/{create-checkout-session,stripe-webhook,status,confirm}.ts` + `api/billing/_lib/stripe.ts` (stripe@17、SDK 隔離) + `api/export-revenue.ts` (月次 cron) + `src/features/billing/{api,hooks}.ts` + `OAuthRequiredModal.tsx`。元 PLAN の Supabase Edge Fn/Realtime → Vercel api/ + status fetch+poll に置換。残=E2E (Milestone C)
   - ✅ analytics (完了 D20260524_050 反復3): `api/{check-quota,refresh-matview}.ts` + `api/_lib/cron.ts` + `sentry-client.ts` (実 Sentry beforeSend)。`api/export-revenue.ts` も billing 反復4 で wiring 済。SEC-004 closure = legal TDD (Phase 4)
@@ -144,3 +146,4 @@
 | 2026-05-23T10:10:00+09:00 | §5 カーソル更新: `/flow:revise _shared/analytics` で [SEC-004] の設計反映完了 (4 文書、scrubber.ts + Sentry beforeSend + Slack 統合)。全 secure revise 完了 → 次の推奨を `/flow:tdd` 連続実装に進行 | /flow:revise _shared/analytics (D20260523_024) |
 | 2026-05-23T11:00:00+09:00 | §5 カーソル更新: `/flow:tdd _shared/db` 完遂 (Phase 0 PJ bootstrap + Phase 1-4 schema/access/migrations/seed、Vitest 28/28 pass)。[SEC-002] closed、[SEC-005] / [SEC-006] 解消。Phase 3 = 1/14 完了、次の推奨を `_shared/types` 以降の連続実装に進行 | /flow:tdd _shared/db (D20260523_026) |
 | 2026-05-23T17:20:00+09:00 | §5 カーソル更新: `/flow:auto` continuous loop で iteration 1 (_shared/types) + iteration 2 (_shared/helpers) 完遂。Vitest 累計 119/119、[SEC-003] SSRF guard 実装反映 + [SEC-004] sha256Hex 完備。Phase 3 = 3/14 完了。次の推奨を `_shared/analytics` (revise SEC-004 scrubber 反映) に進行 | /flow:auto (D20260523_027) |
+| 2026-05-25T07:30:00+09:00 | §5 カーソル更新: `/flow:auto` continuous loop (反復1-4) で Phase 3.5 Milestone C の**残 Class-A buildable backend seam を全完遂** — `api/legal/consents` (GET/POST) + `api/account/settings` (GET/PATCH) 永続化 endpoint + notebook/memory discovery 応答 `imageObjectKey` (images leftJoin)。Vitest 810→853 green (+43)、commit 69d2c48〜861d870。headless 達成可能スコープ完遂 + 残は実 keys/browser/Vercel preview(Class B) 必須のため §4.5.1 #5+#2 で停止。§1.5.8 runtime verification は依然 pending | /flow:auto (D20260525_052) |
