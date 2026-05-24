@@ -1,6 +1,7 @@
-// notebook feature barrel (UI 非依存コア)
+// notebook feature barrel (コア + app bootstrap glue)
 // 関連: docs/notebook/001_notebook_SPEC.md
-// 4 モード React view / 詳細編集 UI / コラージュ canvas / OG image / Realtime は app bootstrap フェーズで追加
+// データ IO は api/notebook/ (Vercel Function)、hooks は useNotebook/useDiscoveryEdit。
+// 4 モード view / コラージュ canvas / OG image は Milestone C (presentation/E2E)
 export { NotebookError } from './errors';
 export type { NotebookDiscovery } from './types';
 export {
@@ -22,3 +23,18 @@ export {
   type EditRecord,
 } from './edit';
 export { sortByCapturedAtDesc, groupBySpecies } from './grouping';
+export {
+  fetchDiscoveries,
+  updateDiscovery,
+  softDeleteDiscovery,
+  type NotebookApiOptions,
+  type NotebookPage,
+  type EditValue,
+} from './notebookApi';
+export {
+  useNotebook,
+  useDiscoveryEdit,
+  type UseNotebookOptions,
+  type UseNotebookResult,
+  type UseDiscoveryEditOptions,
+} from './hooks';
