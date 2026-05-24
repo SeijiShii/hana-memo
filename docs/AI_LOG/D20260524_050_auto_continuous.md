@@ -102,3 +102,27 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 
 > 反復 2 (ai) 完了。[SEC-001] Critical closed。SCENARIO §5 次ターゲット = analytics module (api/cron + Sentry beforeSend wiring = [SEC-004] closure)。
 
+### 反復 3: P3 — /flow:tdd _shared/analytics (cron handler + 実 Sentry binding)
+
+```yaml
+- id: D20260524-050-006
+  question: 反復3 の auto-pick (ai 完了後の再評価)
+  chosen: P3 — analytics module glue (Vercel cron + 実 Sentry beforeSend binding)
+  chosen_type: auto-recommended
+  context: P1 open SEC=0, P2 中断=0, P3 scenario §5 次=analytics。heavy boundary marker 更新後も継続。
+- id: D20260524-050-007
+  question: analytics glue 実装 + [SEC-004] 進捗判定
+  chosen: 完了 (wiring) — typecheck 0 / eslint 0 / Vitest 497 green (新規 11)。[SEC-004] は closed にせず open 維持
+  chosen_type: auto-recommended
+  context: >
+    install @sentry/browser。新規: src/shared/analytics/sentry-client.ts (initBrowserSentry が実 Sentry を
+    scrubBeforeSend 付きで init = [SEC-004] 本番 scrub wiring) + api/_lib/cron.ts (Bearer 認証) +
+    api/{refresh-matview,check-quota}.ts (vercel.json cron) + 各 test。.env.example に CRON_SECRET 追加。
+    [SEC-004] は analytics 側 wiring 完了だが closure 残 = legal プラポリ TDD (Phase 4) + α 前 smoke のため
+    concept §8 [論点-014] は dispatched-to-revise のまま維持 (誤って closed にしない)。
+    export-revenue は非 cron/非 SEC のため defer 継続。
+  完了ステップ: [sentry-client binding, cron auth, refresh-matview, check-quota, レポート/INDEX/concept §8/SCENARIO 更新]
+```
+
+> 反復 3 (analytics) 完了。[SEC-004] analytics wiring 完了 (legal TDD Phase 4 で closed 予定)。SCENARIO §5 次ターゲット = billing (Stripe Checkout + Webhook)。
+

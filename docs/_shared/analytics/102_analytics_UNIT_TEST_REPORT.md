@@ -1,7 +1,13 @@
 # 単体テストレポート: _shared/analytics
 
 ## 実施日時
-2026-05-23 17:40 (JST)
+2026-05-23 17:40 (JST) コア / 2026-05-24 14:04 (JST) glue 追記
+
+> **Phase 3.5 Milestone B glue (2026-05-24, /flow:auto 反復3)**: 新規 11 件 (全体 497 green)。
+> - `src/shared/analytics/sentry-client.test.ts` (3): **[SEC-004]** initBrowserSentry が実 init を beforeSend=scrubBeforeSend + uid hash 化で呼ぶ / dsn 空→skip / opt-out→init せず
+> - `api/_lib/cron.test.ts` (3): assertCronAuth Bearer 一致 / 不一致(401) / 未設定(fail-closed)
+> - `api/check-quota.test.ts` (5): evaluateQuotaAlert 予算80%閾値 / カスタム閾値 / budget 0 除算回避 + currentYearMonth
+> - cron handler default export (DB/Slack) は E2E (Milestone C)。
 
 ## 関連ドキュメント
 - [003_analytics_UNIT_TEST.md](./003_analytics_UNIT_TEST.md) — 単体テスト項目 (base)

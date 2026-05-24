@@ -2,7 +2,7 @@
 
 **最終更新**: 2026-05-24 (+09:00)
 **総セッション数**: 50
-**総 decision 数**: 286
+**総 decision 数**: 288
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,7 +16,7 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
-| [D20260524_050_auto_continuous.md](./D20260524_050_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復1 storage glue (R2/S3 presign) + 反復2 ai glue (identify-plant + Upstash、**[SEC-001] closed**)。486 green / 新規 67、storage+ai 実装完了 | D20260524-050-001〜005 | 完了 |
+| [D20260524_050_auto_continuous.md](./D20260524_050_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復1 storage glue + 反復2 ai glue (**[SEC-001] closed**) + 反復3 analytics glue (cron + 実 Sentry beforeSend、[SEC-004] wiring)。497 green / 新規 78、storage+ai+analytics 実装完了 | D20260524-050-001〜007 | 完了 |
 | [D20260524_049_auto_continuous.md](./D20260524_049_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復6 = Phase 3.5 Milestone B auth glue (Clerk/fingerprint/Vercel wiring、419 green) + iteration5 finalize + legal style fix | D20260524-030〜033 | 完了 |
 | [D20260524_048_bootstrap_phase35_milestone_a.md](./D20260524_048_bootstrap_phase35_milestone_a.md) | 2026-05-24 | /flow:concept §4.5.7 + Phase 3.5 bootstrap | Milestone A foundation: フロントスタック install + app shell + api/health + scripts/dev.sh (typecheck0/373green/build OK/dev 200) | D20260524-030〜034 | 完了 (Milestone A) |
 | [D20260524_047_concept_update_20260524.md](./D20260524_047_concept_update_20260524.md) | 2026-05-24 | /flow:concept (UPDATE) | §8 棚卸し: 解決済み 7 論点 (002/003/004/007/012/013/015) を §7 へ移動、[論点-008] drift 追記 | D20260524-024〜029 | 完了 |

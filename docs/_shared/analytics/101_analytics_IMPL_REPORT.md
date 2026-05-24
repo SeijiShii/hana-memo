@@ -59,3 +59,29 @@ opt-in user のエラー監視 (Sentry)、自前 API コストログ (api_usage)
 ### テスト
 - 新規 50 テスト全 pass、analytics 行カバレッジ 99.49% / 分岐 86.25% (scrubber/sentry/slack 100%)
 - 全体 169/169 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone B — glue wiring (2026-05-24, /flow:auto 反復 3)
+
+defer していた Vercel Cron handler + Sentry 実 SDK バインディングを wiring。`@sentry/browser` install。
+
+### 実装 (glue)
+- `src/shared/analytics/sentry-client.ts` (新規): `createSentryClient` (@sentry/browser → `SentryLike`) +
+  `initBrowserSentry` (VITE_SENTRY_DSN + opt-in ゲート → `initSentry` 注入)。**[SEC-004] 本番 PII scrub の wiring**
+  (実 Sentry init が必ず `scrubBeforeSend` を通る)。unit test で beforeSend=scrubBeforeSend + uid hash 化を検証。
+- `api/_lib/cron.ts` (新規): `assertCronAuth` (Vercel Cron `Bearer <CRON_SECRET>` 検証、fail-closed)。
+- `api/refresh-matview.ts` (新規): cron 認証 → `refreshMonthlyMatview` (vercel.json 03:00)。
+- `api/check-quota.ts` (新規): cron 認証 → 当月 OpenAI コスト集計 → `evaluateQuotaAlert` (予算 80% 閾値、純関数) →
+  超過時 `notifySlack` (scrub 経由、vercel.json 04:00)。
+- `.env.example`: `CRON_SECRET` 追加。
+
+### [SEC-004] 進捗 (まだ closed ではない)
+- ✅ analytics 側 wiring 完了: 実 Sentry beforeSend スクラブ + Slack scrub (check-quota が消費)。
+- ⏳ closure 残: **legal プラポリ実装 (`/flow:tdd legal sentry-disclosure`、Phase 4)** + 実 Sentry/Slack への 1 件投げ目視 (α 公開前)。
+
+### defer 継続
+- `api/export-revenue.ts` (月次収益、非 cron / 非 SEC) は billing/export wiring フェーズへ継続 defer。
+
+### 検証
+- typecheck 0 / eslint 0 / **Vitest 497 green (新規 11)** / handler default export は E2E (Milestone C)。

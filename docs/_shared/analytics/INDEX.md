@@ -1,8 +1,8 @@
 # _shared/analytics ドキュメントインデックス
 
-**最終更新**: 2026-05-23 17:40
-**生成元**: /flow:concept (初期化) + /flow:revise (2026-05-23) + /flow:tdd (2026-05-23 実装完了)
-**状態**: 実装完了 (2026-05-23)
+**最終更新**: 2026-05-24 14:04
+**生成元**: /flow:concept (初期化) + /flow:revise (2026-05-23) + /flow:tdd (2026-05-23) + Phase 3.5 glue (2026-05-24)
+**状態**: 実装完了 (2026-05-24、cron handler + 実 Sentry beforeSend wiring 済。[SEC-004] は legal TDD Phase 4 で closed 予定)
 
 <!-- auto-generated-start -->
 
@@ -29,8 +29,9 @@ Sentry + 自前 OpenAI コストログ + PII scrubber ([SEC-004])。
 - **依存**: `_shared/db` (api_usage / userSettings) ✅、`_shared/types/analytics` ✅、`_shared/helpers/id` (sha256Hex) ✅
 - **被依存**: `_shared/ai`, 全機能
 - 関連論点: [論点-005], [論点-014] ([SEC-004] scrub core 実装完了)
-- 実装コード: `src/shared/analytics/{scrubber,sentry,cost,unit-prices,slack,index}.ts`
-- defer: `api/{check-quota,refresh-matview,export-revenue}.ts` + `vercel.json` (api/ 層フェーズ)
+- 実装コード: `src/shared/analytics/{scrubber,sentry,cost,unit-prices,slack,sentry-client,index}.ts`
+- 実装コード (glue、2026-05-24): `src/shared/analytics/sentry-client.ts` (実 Sentry binding) + `api/{refresh-matview,check-quota}.ts` + `api/_lib/cron.ts`
+- defer 継続: `api/export-revenue.ts` (非 cron / 非 SEC、billing/export wiring フェーズ)
 
 ## AI アクセスガイド
 - 機能概要 → README.md

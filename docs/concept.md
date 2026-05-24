@@ -829,11 +829,11 @@ public/               # PWA manifest / icons
 
 ### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
 
-- **status**: `dispatched-to-revise` (TDD scrub core 実装完了、closure は api/ 配信 wiring + α 前 smoke 待ち)
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass)
+- **status**: `dispatched-to-revise` (scrub core + 実 Sentry beforeSend wiring 完了。closure 残 = legal プラポリ TDD (Phase 4) + α 前 smoke)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass) → 2026-05-24 14:04 **実 Sentry beforeSend wiring 完了** (`/flow:auto` 反復3 D20260524_050: `sentry-client.ts` `initBrowserSentry` が `@sentry/browser` を `scrubBeforeSend` 付きで init、unit 検証。Slack scrub は check-quota cron が消費)
 - **dispatch 先**: `docs/_shared/analytics/revise_sec_004_sentry_pii_scrub_20260523/` (4 文書完了、scrubber.ts + beforeSend + 7 パターン定義 + Slack 通知統合)
 - **seed**: `docs/_pending_archive/sec_004_sentry_pii_scrub/000_TRIGGER.md` (revise 完了で archive 移動)
-- **対応 commit (revise)**: 後続コミットで追記。**closure 残**: api/ Vercel handler の scrub wiring + 実 Sentry / 実 Slack への 1 件投げ目視 (PII 混入ゼロ、α 公開前)
+- **対応 commit**: revise (D20260523_024) + scrub core (D20260523_029) + 実 Sentry wiring (D20260524_050 反復3、`feat(analytics): Phase 3.5 Milestone B`)。**closure 残**: legal プラポリ TDD (`/flow:tdd legal sentry-disclosure`、Phase 4) + 実 Sentry/Slack への 1 件投げ目視 (PII 混入ゼロ、α 公開前)
 - **法務 TODO**: プラポリ §4 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記。**設計完了** (`docs/legal/revise_sentry_disclosure_20260524/` D20260524_046、v1.0.0→v1.1.0)、実装 = `/flow:tdd legal sentry-disclosure` 待機 (α 公開前必須)
 - **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
 - **観点 ID**: O26_pii_logging (legal_required=true)
