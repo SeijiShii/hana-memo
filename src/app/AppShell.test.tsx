@@ -40,10 +40,10 @@ describe('AppShell', () => {
     const notebookLink = screen.getByRole('link', { name: /図鑑/ });
     // react-router の NavLink は active リンクに aria-current="page" を付与する。
     expect(notebookLink.getAttribute('aria-current')).toBe('page');
-    expect(notebookLink.className).toContain('text-green-700');
+    expect(notebookLink.className).toContain('text-moss-dark'); // デザイントークン (active 強調色)
 
     const captureLink = screen.getByRole('link', { name: /撮影/ });
     expect(captureLink.getAttribute('aria-current')).toBeNull();
-    expect(captureLink.className).toContain('text-neutral-400');
+    expect(captureLink.className).toContain('text-ink-faint'); // 非 active
   });
 });

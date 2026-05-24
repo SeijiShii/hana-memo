@@ -33,6 +33,7 @@
     "@upstash/redis": "^1.38.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
+    "lucide-react": "^1.16.0",
     "openai": "^4.104.0",
     "pg": "^8.13.1",
     "react": "^18.3.1",

@@ -1,3 +1,44 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  /* 主ボタン (苔色 pill) */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-moss px-6 py-3
+           text-base font-semibold text-white shadow-soft transition-colors
+           hover:bg-moss-dark focus-visible:outline focus-visible:outline-2
+           focus-visible:outline-offset-2 focus-visible:outline-moss disabled:opacity-50;
+  }
+  /* 副ボタン (苔色アウトライン) */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-pill border border-moss
+           px-6 py-3 text-base font-semibold text-moss-dark transition-colors hover:bg-moss-light;
+  }
+  /* カード (発見ノートの主役要素) */
+  .card {
+    @apply rounded-card border border-line bg-surface shadow-soft;
+  }
+  /* チップ / 小ラベル */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-pill border border-line bg-surface-soft
+           px-2.5 py-1 text-xs text-ink-soft;
+  }
+  .chip-pollen {
+    @apply border-pollen/40 bg-pollen-soft text-[#9a751c];
+  }
+}

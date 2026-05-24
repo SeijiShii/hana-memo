@@ -1,5 +1,7 @@
 import { Link, Routes, Route } from 'react-router-dom';
+import { Camera, BookOpen } from 'lucide-react';
 import { AppShell } from './app/AppShell';
+import { SproutingNote } from './components/illustrations/Botanical';
 import { AppConsentGate } from './app/AppConsentGate';
 import { CaptureContainer, PreviewContainer } from './features/capture';
 import { NotebookContainer } from './features/notebook';
@@ -19,22 +21,20 @@ import { SettingsContainer } from './features/account';
 //   - AppConsentGate (同意 overlay) はルート末尾に常時マウント (既定 disabled、Milestone C で有効化)。
 function Home() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-white text-neutral-800">
-      <h1 className="text-2xl font-bold text-green-700">hana-memo 🌿</h1>
-      <p className="max-w-sm text-center text-sm text-neutral-500">
-        散歩中に出会った草花を撮るだけで AI が名前を当て、自分だけの植物発見ノートが育っていく PWA
+    <main className="flex min-h-dvh flex-col items-center justify-center px-6 pb-16 text-center">
+      <SproutingNote size={128} aria-hidden className="mb-4" />
+      <h1 className="text-[26px] font-bold leading-tight text-moss-dark">hana-memo</h1>
+      <p className="mt-3 max-w-xs text-sm leading-relaxed text-ink-soft">
+        散歩中に出会った草花を撮るだけ。AI
+        が名前を教えてくれて、自分だけの植物発見ノートが少しずつ育っていきます。
       </p>
-      <Link
-        to="/capture"
-        className="rounded-lg bg-green-600 px-6 py-3 text-base font-semibold text-white hover:bg-green-700"
-      >
+      <Link to="/capture" className="btn-primary mt-8">
+        <Camera size={18} aria-hidden />
         撮影する
       </Link>
-      <Link
-        to="/notebook"
-        className="rounded-lg border border-green-600 px-6 py-3 text-base font-semibold text-green-700 hover:bg-green-50"
-      >
-        発見ノート
+      <Link to="/notebook" className="btn-ghost mt-3">
+        <BookOpen size={18} aria-hidden />
+        発見ノートをひらく
       </Link>
     </main>
   );
