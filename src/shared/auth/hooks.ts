@@ -1,13 +1,14 @@
 /**
- * 認証 React hooks — Clerk の useUser / useAuth を hana-memo のドメイン形に正規化する。
+ * 認証 React hooks — AuthSnapshot context を hana-memo のドメイン形に正規化する。
  *
  * - `useClerkUserId`: Vercel Function 認証 (JWT subject) で使う Clerk user id を同期取得
- * - `useCurrentUser`: Clerk user を {clerkUserId, email, isAnonymous, isLoaded, isSignedIn} に整形
+ * - `useCurrentUser`: 認証状態を {clerkUserId, email, isAnonymous, isLoaded, isSignedIn} に整形
  *
+ * Clerk への直接依存は `./context.tsx` の ClerkAuthBridge に隔離済 (keyless でも throw しない)。
  * Neon users との合体 (trial_used_count 等) が要るコンポーネントは別途 `/api/...` を叩く。
- * 関連: docs/_shared/auth/001_auth_SPEC.md §1.1, 002_auth_PLAN.md Phase 5
+ * 関連: src/shared/auth/context.tsx, docs/_shared/auth/001_auth_SPEC.md §1.1, 002_auth_PLAN.md Phase 5
  */
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useAuthSnapshot } from './auth-context';
 
 export type CurrentUser = {
   isLoaded: boolean;
@@ -18,22 +19,19 @@ export type CurrentUser = {
   isAnonymous: boolean;
 };
 
-/** Clerk user id を取得する (未 sign-in は null)。 */
+/** Clerk user id を取得する (未 sign-in / keyless は null)。 */
 export function useClerkUserId(): string | null {
-  const { userId } = useAuth();
-  return userId ?? null;
+  return useAuthSnapshot().userId;
 }
 
-/** Clerk の現在 user をドメイン形に正規化して返す。 */
+/** 認証スナップショットをドメイン形に正規化して返す (keyless でも throw しない)。 */
 export function useCurrentUser(): CurrentUser {
-  const { user, isLoaded, isSignedIn } = useUser();
-  const email = user?.primaryEmailAddress?.emailAddress ?? null;
-  const hasExternal = (user?.externalAccounts?.length ?? 0) > 0;
+  const { isLoaded, isSignedIn, userId, email, hasExternalAccount } = useAuthSnapshot();
   return {
     isLoaded,
-    isSignedIn: Boolean(isSignedIn),
-    clerkUserId: user?.id ?? null,
+    isSignedIn,
+    clerkUserId: userId,
     email,
-    isAnonymous: Boolean(user) && !email && !hasExternal,
+    isAnonymous: Boolean(userId) && !email && !hasExternalAccount,
   };
 }

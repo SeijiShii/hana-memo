@@ -13,7 +13,7 @@
  * 関連: docs/_shared/auth/001_auth_SPEC.md §1.1, src/shared/auth/hooks.ts (useCurrentUser/useClerkUserId)
  */
 import { useEffect, useState } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuthSnapshot } from '../shared/auth/auth-context';
 
 export type AuthTokenState = {
   /** 取得済みトークン。未取得 / 未 sign-in の間は null。 */
@@ -29,7 +29,7 @@ export type AuthTokenState = {
  * isLoaded && isSignedIn のとき getToken() を呼び、解決値を token に格納する。
  */
 export function useAuthToken(): AuthTokenState {
-  const { getToken, isLoaded, isSignedIn } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuthSnapshot();
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {

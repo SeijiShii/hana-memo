@@ -14,6 +14,7 @@
  */
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../shared/auth/provider';
+import { ClerkAuthBridge } from '../shared/auth/ClerkAuthBridge';
 
 /** frontend 公開可能キー。未設定なら keyless モードで children を素通しする。 */
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
@@ -45,5 +46,10 @@ export function AppAuthProvider({ children, publishableKey }: AppAuthProviderPro
       </>
     );
   }
-  return <AuthProvider publishableKey={key}>{children}</AuthProvider>;
+  // キーあり: ClerkProvider 内に bridge を挿し、Clerk → AuthSnapshot を context へ供給する。
+  return (
+    <AuthProvider publishableKey={key}>
+      <ClerkAuthBridge>{children}</ClerkAuthBridge>
+    </AuthProvider>
+  );
 }

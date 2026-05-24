@@ -12,9 +12,21 @@ vi.mock('@clerk/clerk-react', () => ({
   ClerkProvider: ({ children }: { children: ReactNode }) => (
     <div data-testid="clerk-provider">{children}</div>
   ),
+  // ClerkAuthBridge が読む hooks (キーあり時のみマウントされる)。
+  useAuth: () => ({ isLoaded: true, isSignedIn: false, userId: null, getToken: async () => null }),
+  useUser: () => ({ user: null }),
 }));
 
 import { AppAuthProvider } from './AppAuthProvider';
+import { useCurrentUser } from '../shared/auth/hooks';
+import { useAuthToken } from './useAuthToken';
+
+/** 実ドメイン hooks を呼ぶ子。keyless で provider 不在でも throw しないことの回帰検証用。 */
+function AuthConsumingChild() {
+  const user = useCurrentUser();
+  const { token } = useAuthToken();
+  return <span>{`signed=${user.isSignedIn} token=${token ?? 'null'}`}</span>;
+}
 
 describe('AppAuthProvider', () => {
   it('publishableKey あり → ClerkProvider で children をラップする', () => {
@@ -43,5 +55,26 @@ describe('AppAuthProvider', () => {
     // 開発者向けの未設定通知が出る。
     const note = screen.getByRole('note');
     expect(note.textContent).toContain('VITE_CLERK_PUBLISHABLE_KEY');
+  });
+
+  it('回帰: keyless で子が useCurrentUser/useAuthToken を呼んでも white-screen しない', () => {
+    // 以前は ClerkProvider 不在で Clerk hooks が throw → ツリー全体が空描画 (white-screen) になっていた。
+    // 現在は hooks が AuthContext 既定 (KEYLESS_AUTH) を読むため未 sign-in 状態で安全に描画される。
+    render(
+      <AppAuthProvider>
+        <AuthConsumingChild />
+      </AppAuthProvider>,
+    );
+    expect(screen.getByText('signed=false token=null')).toBeTruthy();
+  });
+
+  it('keyあり: ClerkAuthBridge 経由で子の認証 hooks が解決する', () => {
+    render(
+      <AppAuthProvider publishableKey="pk_test_x">
+        <AuthConsumingChild />
+      </AppAuthProvider>,
+    );
+    // mock の useAuth/useUser (未 sign-in) が bridge 経由で子に届く。
+    expect(screen.getByText('signed=false token=null')).toBeTruthy();
   });
 });

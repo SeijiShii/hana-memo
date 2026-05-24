@@ -1,35 +1,39 @@
 // @vitest-environment happy-dom
 /**
- * hooks.ts 単体テスト (Clerk user → ドメイン形 正規化)
+ * hooks.ts 単体テスト (AuthSnapshot → ドメイン形 正規化)
  * 由来: 003_auth_UNIT_TEST.md §1.1 (S04/S05), 002_auth_PLAN.md Phase 5
+ *
+ * hooks は AuthContext のみを読む (Clerk 直接依存は context.tsx の bridge に隔離)。
+ * 本テストは AuthContext.Provider でスナップショットを注入して正規化を検証する。
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
-
-const useUserMock = vi.fn();
-const useAuthMock = vi.fn();
-
-vi.mock('@clerk/clerk-react', () => ({
-  useUser: () => useUserMock(),
-  useAuth: () => useAuthMock(),
-}));
-
+import type { ReactNode } from 'react';
 import { useCurrentUser, useClerkUserId } from './hooks';
+import { AuthContext, KEYLESS_AUTH, type AuthSnapshot } from './auth-context';
 
-beforeEach(() => {
-  useUserMock.mockReset();
-  useAuthMock.mockReset();
-});
+function wrapper(snapshot: AuthSnapshot) {
+  return ({ children }: { children: ReactNode }) => (
+    <AuthContext.Provider value={snapshot}>{children}</AuthContext.Provider>
+  );
+}
+
+const snap = (over: Partial<AuthSnapshot>): AuthSnapshot => ({ ...KEYLESS_AUTH, ...over });
 
 describe('useClerkUserId', () => {
   it('sign-in 済なら userId を返す', () => {
-    useAuthMock.mockReturnValue({ userId: 'user_1' });
-    const { result } = renderHook(() => useClerkUserId());
+    const { result } = renderHook(() => useClerkUserId(), {
+      wrapper: wrapper(snap({ isSignedIn: true, userId: 'user_1' })),
+    });
     expect(result.current).toBe('user_1');
   });
 
   it('未 sign-in は null', () => {
-    useAuthMock.mockReturnValue({ userId: null });
+    const { result } = renderHook(() => useClerkUserId(), { wrapper: wrapper(KEYLESS_AUTH) });
+    expect(result.current).toBeNull();
+  });
+
+  it('provider 不在 (keyless) でも throw せず null', () => {
     const { result } = renderHook(() => useClerkUserId());
     expect(result.current).toBeNull();
   });
@@ -37,16 +41,17 @@ describe('useClerkUserId', () => {
 
 describe('useCurrentUser', () => {
   it('email あり (OAuth) → isAnonymous=false', () => {
-    useUserMock.mockReturnValue({
-      isLoaded: true,
-      isSignedIn: true,
-      user: {
-        id: 'user_1',
-        primaryEmailAddress: { emailAddress: 'a@example.com' },
-        externalAccounts: [{ provider: 'google' }],
-      },
+    const { result } = renderHook(() => useCurrentUser(), {
+      wrapper: wrapper(
+        snap({
+          isLoaded: true,
+          isSignedIn: true,
+          userId: 'user_1',
+          email: 'a@example.com',
+          hasExternalAccount: true,
+        }),
+      ),
     });
-    const { result } = renderHook(() => useCurrentUser());
     expect(result.current).toEqual({
       isLoaded: true,
       isSignedIn: true,
@@ -57,23 +62,32 @@ describe('useCurrentUser', () => {
   });
 
   it('email/external 無し (Guest) → isAnonymous=true', () => {
-    useUserMock.mockReturnValue({
-      isLoaded: true,
-      isSignedIn: true,
-      user: { id: 'guest_1', externalAccounts: [] },
+    const { result } = renderHook(() => useCurrentUser(), {
+      wrapper: wrapper(snap({ isLoaded: true, isSignedIn: true, userId: 'guest_1' })),
     });
-    const { result } = renderHook(() => useCurrentUser());
     expect(result.current.isAnonymous).toBe(true);
     expect(result.current.email).toBeNull();
   });
 
-  it('user 未ロードは isAnonymous=false (user が null のため)', () => {
-    useUserMock.mockReturnValue({ isLoaded: false, isSignedIn: false, user: null });
-    const { result } = renderHook(() => useCurrentUser());
+  it('user 未確立 (userId なし) は isAnonymous=false', () => {
+    const { result } = renderHook(() => useCurrentUser(), {
+      wrapper: wrapper(snap({ isLoaded: false, isSignedIn: false })),
+    });
     expect(result.current).toMatchObject({
       isLoaded: false,
       isSignedIn: false,
       clerkUserId: null,
+      isAnonymous: false,
+    });
+  });
+
+  it('provider 不在 (keyless) は未 sign-in の既定を返し throw しない', () => {
+    const { result } = renderHook(() => useCurrentUser());
+    expect(result.current).toEqual({
+      isLoaded: true,
+      isSignedIn: false,
+      clerkUserId: null,
+      email: null,
       isAnonymous: false,
     });
   });
