@@ -19,3 +19,4 @@ export {
   type RateLimitResult,
 } from './rate-limit';
 export { BACKOFF_MS, withRetry, type RetryOptions } from './retry';
+export { identifyPlant, retryIdentify, type IdentifyClientOptions } from './identify';
