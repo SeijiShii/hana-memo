@@ -1,16 +1,24 @@
-// capture feature barrel (UI 非依存コア)
+// capture feature barrel (コア + app bootstrap glue)
 // 関連: docs/capture/001_capture_SPEC.md
-// React hooks (useImageConvert/useGeolocation/useCaptureFlow/useIdentifyStatus) + camera + Realtime は app bootstrap フェーズで追加
+// IO は api/capture/ (Vercel Function)、画面は CameraCapture + hooks (Phase 3.5 Milestone B)
 export { CaptureError, AiConsentRequiredError } from './errors';
 export { MAX_USER_NOTE, sanitizeUserNote } from './note';
+export { DISCOVERY_STATUSES, isTerminalStatus, canRetry, nextStatusOnRetry } from './status';
+export { runCapturePipeline, type CaptureDeps, type CapturePipelineInput } from './flow';
 export {
-  DISCOVERY_STATUSES,
-  isTerminalStatus,
-  canRetry,
-  nextStatusOnRetry,
-} from './status';
+  createDiscovery,
+  attachImage,
+  deleteDiscovery,
+  fetchDiscoveryStatus,
+  type CaptureApiOptions,
+  type DiscoveryStatusResult,
+} from './captureApi';
 export {
-  runCapturePipeline,
-  type CaptureDeps,
-  type CapturePipelineInput,
-} from './flow';
+  useImageConvert,
+  useGeolocation,
+  useCaptureFlow,
+  useIdentifyStatus,
+  type CaptureFlowOptions,
+  type IdentifyStatusOptions,
+} from './hooks';
+export { CameraCapture, type CameraCaptureProps } from './CameraCapture';
