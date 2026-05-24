@@ -41,3 +41,7 @@ drizzle/meta/_journal.json.bak
 # Test outputs
 playwright-report/
 test-results/
+
+# flow continuous-loop transient markers
+.flow-loop-active
+.flow-needs-compact
