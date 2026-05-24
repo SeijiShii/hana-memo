@@ -5,6 +5,10 @@ import { NotebookPage } from './features/notebook';
 // Phase 3.5 app bootstrap で各機能の画面を順次 wiring していく。
 // home → /capture (撮影) / /notebook (発見ノート) を起点に各 feature の presentation を配線する。
 // NotebookPage は token を要する useNotebook をアプリ層で配線する想定 (現状は props 既定の空一覧)。
+// export (書き出し: CSV/PDF/画像 ZIP) も NotebookPage ヘッダの props-seam (exportProps) 経由で同じ
+// auth bootstrap 時に配線する。CSV は useExport.exportCsv、PDF/画像 ZIP は実 jsPDF/JSZip レンダラを
+// 注入した生成関数を渡す (実 PDF/ZIP 生成 + token/billing unlock 配線は Milestone C)。
+// memory 同様、token 配線前は exportProps 未指定で書き出しボタンを非表示にしておく (後方互換)。
 function Home() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-white text-neutral-800">

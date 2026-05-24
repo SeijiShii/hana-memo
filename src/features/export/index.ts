@@ -19,3 +19,5 @@ export {
   type DiscoveryCsvRow,
 } from './exportApi';
 export { useExport, type UseExportOptions, type PdfRenderer } from './hooks';
+export { ExportDialog, type ExportDialogProps, type ExportFormat } from './components/ExportDialog';
+export { ExportButton, type ExportButtonProps } from './components/ExportButton';

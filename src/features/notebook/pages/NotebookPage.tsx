@@ -21,6 +21,7 @@ import { CalendarView } from '../components/CalendarView';
 import { MapView } from '../components/MapView';
 import { FigureView } from '../components/FigureView';
 import { MemoryBadge, MemorySection, type MemoryDiscovery } from '../../memory';
+import { ExportButton, ExportDialog, type ExportDialogProps } from '../../export';
 import type { NotebookDiscovery } from '../types';
 
 export type NotebookViewMode = 'timeline' | 'calendar' | 'map' | 'figure';
@@ -56,6 +57,14 @@ export type NotebookPageProps = {
   resolveMemoryThumbnail?: (m: MemoryDiscovery) => string | null;
   /** memory カード押下時 (詳細遷移をアプリ層で配線)。 */
   onSelectMemory?: (m: MemoryDiscovery) => void;
+  /**
+   * エクスポート配線 (export 機能、UC1/UC2/UC4)。ExportDialog の props から open/onClose を除いた値を
+   * アプリ層 (useExport + billing unlock 由来) で渡す。未指定なら書き出しボタン + ダイアログとも非表示
+   * (後方互換 / memory 統合と同パターン)。open/onClose は本画面が内部 state で制御する。
+   */
+  exportProps?: Omit<ExportDialogProps, 'open' | 'onClose'>;
+  /** 削除予約中など書き出し不可のとき true (SPEC §6.1)。既定 false。 */
+  exportDisabled?: boolean;
 };
 
 /** 発見ノート画面。モードタブで 4 view を切り替える。 */
@@ -70,8 +79,11 @@ export function NotebookPage({
   memoriesLoading = false,
   resolveMemoryThumbnail,
   onSelectMemory,
+  exportProps,
+  exportDisabled = false,
 }: NotebookPageProps) {
   const [mode, setMode] = useState<NotebookViewMode>(initialMode);
+  const [exportOpen, setExportOpen] = useState(false);
 
   const renderBody = () => {
     // 取得中かつ未取得 → ローディング。取得済みでの追加ロード中は一覧を出し続ける。
@@ -112,7 +124,12 @@ export function NotebookPage({
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-xl font-bold text-green-700">発見ノート</h1>
-        <MemoryBadge count={memories.length} />
+        <div className="flex items-center gap-2">
+          <MemoryBadge count={memories.length} />
+          {exportProps ? (
+            <ExportButton onClick={() => setExportOpen(true)} disabled={exportDisabled} />
+          ) : null}
+        </div>
       </div>
       <MemorySection
         memories={memories}
@@ -139,6 +156,9 @@ export function NotebookPage({
         ))}
       </nav>
       <div>{renderBody()}</div>
+      {exportProps ? (
+        <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} {...exportProps} />
+      ) : null}
     </main>
   );
 }
