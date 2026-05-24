@@ -1,7 +1,12 @@
-// billing feature barrel (UI 非依存コア)
+// billing feature barrel (コア + app bootstrap glue)
 // 関連: docs/billing/001_billing_SPEC.md
-// Stripe SDK (create-checkout-session/stripe-webhook 署名検証) / React hooks / UI は app bootstrap フェーズで追加
-export { BillingError, InvalidAmountError } from './errors';
+// Stripe SDK 署名検証 / Checkout 作成は api/billing/ (Vercel Function) に隔離。本 barrel は frontend glue を再輸出。
+export {
+  BillingError,
+  InvalidAmountError,
+  CheckoutFailedError,
+  CheckoutPendingError,
+} from './errors';
 export {
   AI_CREDITS_PER_UNIT,
   AI_CREDIT_UNIT_PRICE_JPY,
@@ -24,9 +29,21 @@ export {
   type BillingUnlockRecord,
   type BillingStore,
 } from './webhook';
+export { REVENUE_CSV_COLUMNS, grossMargin, buildRevenueCsv, type RevenueRow } from './revenue';
 export {
-  REVENUE_CSV_COLUMNS,
-  grossMargin,
-  buildRevenueCsv,
-  type RevenueRow,
-} from './revenue';
+  createCheckout,
+  fetchBillingStatus,
+  confirmCheckout,
+  type CheckoutInput,
+  type BillingApiOptions,
+  type BillingStatus,
+  type ConfirmResult,
+  type ConfirmOptions,
+} from './api';
+export {
+  useBillingStatus,
+  useAiCredits,
+  usePdfUnlocked,
+  type UseBillingStatusResult,
+} from './hooks';
+export { OAuthRequiredModal, type OAuthRequiredModalProps } from './OAuthRequiredModal';
