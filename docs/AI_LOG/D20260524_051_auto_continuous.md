@@ -176,6 +176,17 @@ iteration: 0 (loop 開始前)
   context: capture/notebook/memory/export/billing slice 完了。残 = legal → account。legal = プラポリ/利用規約 同意フロー (consent コア実装済、画面が presentation)。[SEC-004] 開示にも関与
 ```
 
+**反復7 結果**: legal 同意ゲート + 法務文書ビュー presentation 完遂。ConsentGate (overlay、再同意 needsReConsent) / LegalPage (本文 placeholder) / docs.ts。SEC-004 Sentry/PII 開示明記。検証: typecheck 0 / **Vitest 761 green** (新規 +23)。commit 4125124。
+
+```yaml
+- id: D20260524-051-014
+  question: 反復8 の auto-pick
+  chosen: P3 Milestone C presentation 続行 → account presentation (設定画面、最後の feature)
+  chosen_type: auto-recommended
+  context: capture/notebook/memory/export/billing/legal slice 完了。残最後 = account (設定 / AI 同意 toggle / アカウント削除)。settings/deletion コア実装済、画面が presentation
+```
+
+
 
 
 

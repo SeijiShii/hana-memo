@@ -1,8 +1,8 @@
 # legal ドキュメントインデックス
 
-**最終更新**: 2026-05-23 18:04
-**生成元**: /flow:feature legal + /flow:tdd (2026-05-23、UI 非依存コア)
-**状態**: コア実装完了 (2026-05-23、React UI / Markdown render / DB glue は app bootstrap defer)
+**最終更新**: 2026-05-24 21:14
+**生成元**: /flow:feature legal + /flow:tdd (2026-05-23 コア) + /flow:auto 反復7 D20260524_051 (MS-C 同意 UI)
+**状態**: 実装完了 (2026-05-24、同意ゲート overlay + 法務文書ビュー + routing 実装済。残 = 法務本文確定 + DB 配線)
 
 <!-- auto-generated-start -->
 
@@ -16,7 +16,7 @@
 | 002 | [002_legal_PLAN.md](./002_legal_PLAN.md) | PLAN | 完了 | 2026-05-22 | Phase 4 分割 (静的→初回同意→改訂再同意→問合せ) |
 | 003 | [003_legal_UNIT_TEST.md](./003_legal_UNIT_TEST.md) | UNIT_TEST | 完了 | 2026-05-22 | consent flow + semver 比較 + a11y 確認 |
 | 004 | [004_legal_E2E_TEST.md](./004_legal_E2E_TEST.md) | E2E_TEST | 完了 | 2026-05-22 | 7 シナリオ (E-LE-1 〜 E-LE-7) |
-| 101 | [101_legal_IMPL_REPORT.md](./101_legal_IMPL_REPORT.md) | IMPL_REPORT | コア完了 | 2026-05-23 | versions/consent 実装、React UI/Markdown/DB defer |
+| 101 | [101_legal_IMPL_REPORT.md](./101_legal_IMPL_REPORT.md) | IMPL_REPORT | 完了 (presentation 済) | 2026-05-24 | versions/consent コア + MS-C 同意ゲート/文書ビュー (ConsentGate/LegalPage) |
 | 102 | [102_legal_UNIT_TEST_REPORT.md](./102_legal_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-23 | 22 tests / 行 98.86% / 分岐 94.59% |
 
 ## 法務書類原稿
@@ -38,6 +38,8 @@
 - **被依存**: `account` (設定画面での同意状況表示), `capture` (AI 同意の存在前提), `billing` (利用規約の存在前提)
 - 関連論点: [論点-009] お問い合わせフォーム実装方針
 - 実装コード (コア): `src/features/legal/{errors,versions,consent,index}.ts`
+- 実装コード (presentation, Phase 3.5 Milestone C): `src/features/legal/components/{ConsentGate,ConsentCheckbox}.tsx` + `pages/LegalPage.tsx` + `docs.ts` + `App.tsx` /legal/* route
+- 残 (公開前 + 配線): 法務本文確定 (react-markdown + docs/legal/*.md 原本 + 法務レビュー) / ConsentGate の app mount + `recordConsents` 配線 / overlay 実機 a11y
 - defer (app bootstrap): InitialConsent/ReConsent/LegalPage React component / useConsentStatus hook / Markdown render + DOMPurify / ConsentStore Drizzle 実装
 
 ## AI アクセスガイド

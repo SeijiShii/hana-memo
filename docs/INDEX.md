@@ -13,7 +13,7 @@
 ## 機能フォルダ
 | 優先度 | 基盤 | フォルダ | 状態 | 設計完了 | 改修件数 | バグ修正件数 | クレーム件数 | INDEX |
 |---|---|---|---|---|---|---|---|---|
-| 1 | ❌ | [legal](./legal/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 1 | 0 | 0 | [INDEX](./legal/INDEX.md) |
+| 1 | ❌ | [legal](./legal/) | **実装完了** (同意ゲート + 文書ビュー済、本文確定は公開前) | 2026-05-22 → 2026-05-24 | 1 | 0 | 0 | [INDEX](./legal/INDEX.md) |
 | 3 | ❌ | [account](./account/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | **実装完了** (撮影画面 presentation + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | **実装完了** (図鑑 4-mode view + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
