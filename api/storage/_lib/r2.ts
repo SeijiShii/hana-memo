@@ -98,14 +98,36 @@ export function createR2PresignClient(deps: R2PresignDeps = {}): PresignClient {
   const sign = deps.sign ?? (getSignedUrl as unknown as SignFn);
   return {
     presignPut: (objectKey, ttlSec, contentType) =>
-      sign(client, new PutObjectCommand({ Bucket: bucket, Key: objectKey, ContentType: contentType }), {
-        expiresIn: ttlSec,
-      }),
+      sign(
+        client,
+        new PutObjectCommand({ Bucket: bucket, Key: objectKey, ContentType: contentType }),
+        {
+          expiresIn: ttlSec,
+        },
+      ),
     presignGet: (objectKey, ttlSec) =>
       sign(client, new GetObjectCommand({ Bucket: bucket, Key: objectKey }), { expiresIn: ttlSec }),
     deleteObject: async (objectKey) => {
       await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: objectKey }));
     },
+  };
+}
+
+/** オブジェクト本体を直接書き込む (cron 等のサーバ生成成果物用、presign を経由しない)。 */
+export type ObjectWriter = (objectKey: string, body: string, contentType: string) => Promise<void>;
+
+/** R2 への直接 PUT 関数を生成する (export-revenue cron 等が利用)。 */
+export function createR2Writer(deps: { client?: S3Client; bucket?: string } = {}): ObjectWriter {
+  const { client, bucket } = resolveClientAndBucket(deps);
+  return async (objectKey, body, contentType) => {
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: objectKey,
+        Body: body,
+        ContentType: contentType,
+      }),
+    );
   };
 }
 
