@@ -27,6 +27,42 @@ export function clampLimit(raw: string | null): number {
   return Math.min(MAX_PAGE_SIZE, Math.max(1, Math.floor(n)));
 }
 
+/** discoveries ⨝ images の取得行 (leftJoin のため imageObjectKey は nullable)。 */
+export type DiscoveryRow = {
+  id: string;
+  commonName: string | null;
+  originalCommonName: string | null;
+  userOverriddenName: string | null;
+  scientificName: string | null;
+  userNote: string | null;
+  status: NotebookDiscovery['status'];
+  capturedAt: Date;
+  season: string | null;
+  locationLat: number | null;
+  locationLng: number | null;
+  imageObjectKey: string | null;
+};
+
+/** 取得行を NotebookDiscovery に整形する (純関数、imageObjectKey/location を含む)。 */
+export function rowToNotebookDiscovery(r: DiscoveryRow): NotebookDiscovery {
+  return {
+    id: r.id,
+    commonName: r.commonName,
+    originalCommonName: r.originalCommonName,
+    userOverriddenName: r.userOverriddenName,
+    scientificName: r.scientificName,
+    userNote: r.userNote,
+    status: r.status,
+    capturedAt: r.capturedAt.toISOString(),
+    season: (r.season ?? 'spring') as NotebookDiscovery['season'],
+    location:
+      r.locationLat != null && r.locationLng != null
+        ? { lat: r.locationLat, lng: r.locationLng }
+        : null,
+    imageObjectKey: r.imageObjectKey,
+  };
+}
+
 function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -39,7 +75,7 @@ async function queryDiscoveries(
   cursor: string | null,
   limit: number,
 ): Promise<NotebookListResult> {
-  const [{ db }, { discoveries }, { eq, and, isNull, lt, desc }] = await Promise.all([
+  const [{ db }, { discoveries, images }, { eq, and, isNull, lt, desc }] = await Promise.all([
     import('../../src/shared/db/client'),
     import('../../src/shared/db/schema'),
     import('drizzle-orm'),
@@ -61,29 +97,17 @@ async function queryDiscoveries(
       season: discoveries.season,
       locationLat: discoveries.locationLat,
       locationLng: discoveries.locationLng,
+      imageObjectKey: images.r2ObjectKey, // 画像未添付は null (leftJoin)
     })
     .from(discoveries)
+    .leftJoin(images, eq(discoveries.imageId, images.id))
     .where(and(...conditions))
     .orderBy(desc(discoveries.capturedAt))
     .limit(limit + 1); // +1 で次ページ有無を判定
 
   const hasMore = rows.length > limit;
   const page = hasMore ? rows.slice(0, limit) : rows;
-  const items: NotebookDiscovery[] = page.map((r) => ({
-    id: r.id,
-    commonName: r.commonName,
-    originalCommonName: r.originalCommonName,
-    userOverriddenName: r.userOverriddenName,
-    scientificName: r.scientificName,
-    userNote: r.userNote,
-    status: r.status,
-    capturedAt: r.capturedAt.toISOString(),
-    season: (r.season ?? 'spring') as NotebookDiscovery['season'],
-    location:
-      r.locationLat != null && r.locationLng != null
-        ? { lat: r.locationLat, lng: r.locationLng }
-        : null,
-  }));
+  const items: NotebookDiscovery[] = page.map(rowToNotebookDiscovery);
   const last = page[page.length - 1];
   return {
     items,
@@ -106,7 +130,10 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
   } catch (err) {
-    return jsonResponse({ error: 'unauthorized' }, err instanceof UnauthorizedError ? err.status : 500);
+    return jsonResponse(
+      { error: 'unauthorized' },
+      err instanceof UnauthorizedError ? err.status : 500,
+    );
   }
   try {
     const userId = await resolveUserId(clerkUserId);

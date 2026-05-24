@@ -12,9 +12,10 @@
  * token=null (未 sign-in / keyless) の間はデータ取得をスキップし、空の NotebookPage を描画する
  * (画面は空状態を出すだけでクラッシュしない)。
  *
- * サムネ resolveThumbnail は seam: NotebookDiscovery / MemoryDiscovery が画像 objectKey を持たないため
- * (types.ts / recommend.ts 参照)、storage 署名付き URL を per-card で引けない。データ層が objectKey を
- * 載せるまでは null を返し、各 view のプレースホルダにフォールバックさせる (TODO: 要データ層拡張)。
+ * サムネ resolveThumbnail は seam: NotebookDiscovery は imageObjectKey を持つ (/api/notebook/list が
+ * images.r2_object_key を載せる) ようになったが、それを /api/storage/signed-url に渡す per-card の
+ * 非同期署名取得は実 R2 を要する runtime 配線 (Milestone C / E2E gate)。それまでは null を返し、各 view の
+ * プレースホルダにフォールバックさせる。MemoryDiscovery 側 (recommend.ts) は objectKey 拡張が別途必要。
  *
  * 関連: src/features/notebook/pages/NotebookPage.tsx, src/features/notebook/hooks.ts,
  *       src/features/export/hooks.ts, src/features/billing/hooks.ts
