@@ -1,5 +1,5 @@
 /**
- * api/storage/_lib/user.ts 単体テスト (Clerk user id → Neon users.id 解決)
+ * api/_lib/user.ts 単体テスト (Clerk user id → Neon users.id 解決)
  */
 import { describe, it, expect, vi } from 'vitest';
 import { resolveUserId, UserNotFoundError } from './user';

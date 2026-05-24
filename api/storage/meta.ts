@@ -10,7 +10,7 @@
  * 関連: docs/_shared/storage/001_storage_SPEC.md §1.3/§3.3, 002_storage_PLAN.md Phase 3
  */
 import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
-import { resolveUserId, UserNotFoundError } from './_lib/user';
+import { resolveUserId, UserNotFoundError } from '../_lib/user';
 import { validateObjectKey, ValidationError } from '../../src/shared/helpers/url';
 
 export type MetaBody = { action: 'head'; objectKey: string } | { action: 'list' };

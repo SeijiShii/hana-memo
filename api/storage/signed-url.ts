@@ -8,7 +8,7 @@
  * 関連: docs/_shared/storage/001_storage_SPEC.md §1.1/§4.1, 002_storage_PLAN.md Phase 2
  */
 import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
-import { resolveUserId, UserNotFoundError } from './_lib/user';
+import { resolveUserId, UserNotFoundError } from '../_lib/user';
 import { createSignedUrl, createSignedUrls } from '../../src/shared/storage/presign';
 import { ValidationError } from '../../src/shared/helpers/url';
 

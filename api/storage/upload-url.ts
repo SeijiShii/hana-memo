@@ -9,7 +9,7 @@
  */
 import { randomUUID } from 'node:crypto';
 import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
-import { resolveUserId, UserNotFoundError } from './_lib/user';
+import { resolveUserId, UserNotFoundError } from '../_lib/user';
 import { createUploadUrl } from '../../src/shared/storage/presign';
 import { InvalidImageError } from '../../src/shared/storage/errors';
 

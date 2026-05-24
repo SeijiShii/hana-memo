@@ -1,11 +1,11 @@
 /**
- * Clerk user id → Neon users.id 解決 (storage Vercel Function 共通)
+ * Clerk user id → Neon users.id 解決 (Vercel Function 共通インフラ)
  *
- * objectKey の先頭 segment は Neon users.id (UUID) のため、Clerk JWT subject から解決する。
- * DB アクセスは dynamic import で行い、判定可能部分を deps 注入できるようにして unit test を
- * DB 非依存に保つ。
+ * storage の objectKey prefix も ai の認可も Neon users.id (UUID) を必要とするため、
+ * Clerk JWT subject から解決する共通ヘルパ。DB アクセスは dynamic import で行い、判定可能部分を
+ * deps 注入できるようにして unit test を DB 非依存に保つ。
  *
- * 関連: docs/_shared/storage/001_storage_SPEC.md §3.2/§3.3, ../_lib/clerk.ts
+ * 関連: ./clerk.ts, docs/_shared/storage/001_storage_SPEC.md §3.3, docs/_shared/ai/001_ai_SPEC.md §4.1
  */
 
 /** Neon に対応 user が無い (404 にマップ)。 */
@@ -24,8 +24,8 @@ export type ResolveUserDeps = {
 
 async function defaultQuery(clerkUserId: string): Promise<string | null> {
   const [{ db }, { users }, { eq }] = await Promise.all([
-    import('../../../src/shared/db/client'),
-    import('../../../src/shared/db/schema'),
+    import('../../src/shared/db/client'),
+    import('../../src/shared/db/schema'),
     import('drizzle-orm'),
   ]);
   const rows = await db
