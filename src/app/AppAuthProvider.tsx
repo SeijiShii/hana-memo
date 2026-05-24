@@ -39,7 +39,8 @@ export function AppAuthProvider({ children, publishableKey }: AppAuthProviderPro
         <div
           role="note"
           aria-label="認証未設定の通知"
-          className="fixed bottom-0 left-0 right-0 z-[60] bg-amber-100 px-3 py-1.5 text-center text-xs text-amber-800"
+          // pointer-events-none: 情報バナーが下部ナビ等の操作を遮らないようにする (クリック透過)。
+          className="pointer-events-none fixed bottom-0 left-0 right-0 z-[60] bg-amber-100 px-3 py-1.5 text-center text-xs text-amber-800"
         >
           認証キー (VITE_CLERK_PUBLISHABLE_KEY) が未設定です。ログイン機能は無効化されています。
         </div>
