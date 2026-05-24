@@ -20,6 +20,7 @@ import { TimelineView } from '../components/TimelineView';
 import { CalendarView } from '../components/CalendarView';
 import { MapView } from '../components/MapView';
 import { FigureView } from '../components/FigureView';
+import { MemoryBadge, MemorySection, type MemoryDiscovery } from '../../memory';
 import type { NotebookDiscovery } from '../types';
 
 export type NotebookViewMode = 'timeline' | 'calendar' | 'map' | 'figure';
@@ -44,6 +45,17 @@ export type NotebookPageProps = {
   resolveThumbnail?: (d: NotebookDiscovery) => string | null;
   /** カード / タイル / ピン押下時 (詳細遷移をアプリ層で配線)。 */
   onSelect?: (d: NotebookDiscovery) => void;
+  /**
+   * 「去年の今頃」の前年同期間 discovery (memory useMemories 由来)。既定 []。
+   * 0 件ならバッジ + セクションとも非表示 (SPEC §1 UC1/UC2 / charter §2.2)。
+   */
+  memories?: MemoryDiscovery[];
+  /** memory 取得中フラグ (キャッシュ miss → fetch 中)。既定 false。 */
+  memoriesLoading?: boolean;
+  /** memory カード → サムネ URL を解決する (storage 配線、既定はプレースホルダ)。 */
+  resolveMemoryThumbnail?: (m: MemoryDiscovery) => string | null;
+  /** memory カード押下時 (詳細遷移をアプリ層で配線)。 */
+  onSelectMemory?: (m: MemoryDiscovery) => void;
 };
 
 /** 発見ノート画面。モードタブで 4 view を切り替える。 */
@@ -54,6 +66,10 @@ export function NotebookPage({
   initialMode = 'timeline',
   resolveThumbnail,
   onSelect,
+  memories = [],
+  memoriesLoading = false,
+  resolveMemoryThumbnail,
+  onSelectMemory,
 }: NotebookPageProps) {
   const [mode, setMode] = useState<NotebookViewMode>(initialMode);
 
@@ -63,11 +79,7 @@ export function NotebookPage({
       return <p className="py-12 text-center text-sm text-neutral-400">読み込み中…</p>;
     }
     if (error) {
-      return (
-        <p className="py-12 text-center text-sm text-red-500">
-          発見の取得に失敗しました
-        </p>
-      );
+      return <p className="py-12 text-center text-sm text-red-500">発見の取得に失敗しました</p>;
     }
     if (discoveries.length === 0) {
       return <p className="py-12 text-center text-sm text-neutral-400">まだ発見がありません</p>;
@@ -98,7 +110,16 @@ export function NotebookPage({
 
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
-      <h1 className="text-xl font-bold text-green-700">発見ノート</h1>
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-xl font-bold text-green-700">発見ノート</h1>
+        <MemoryBadge count={memories.length} />
+      </div>
+      <MemorySection
+        memories={memories}
+        loading={memoriesLoading}
+        resolveThumbnail={resolveMemoryThumbnail}
+        onSelect={onSelectMemory}
+      />
       <nav className="flex gap-1 rounded-xl bg-neutral-100 p-1" aria-label="表示モード">
         {MODE_TABS.map((tab) => (
           <button

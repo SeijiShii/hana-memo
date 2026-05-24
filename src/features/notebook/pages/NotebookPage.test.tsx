@@ -3,10 +3,11 @@
  * NotebookPage 単体テスト
  * 由来: docs/notebook/001_notebook_SPEC.md §1 UC1/UC2 (4 モード切替 / 空 / loading)
  */
-import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { NotebookPage } from './NotebookPage';
 import type { NotebookDiscovery } from '../types';
+import type { MemoryDiscovery } from '../../memory';
 
 function disc(over: Partial<NotebookDiscovery> = {}): NotebookDiscovery {
   return {
@@ -15,6 +16,18 @@ function disc(over: Partial<NotebookDiscovery> = {}): NotebookDiscovery {
     scientificName: 'Taraxacum',
     status: 'identified',
     capturedAt: '2026-04-10T09:00:00Z',
+    season: 'spring',
+    location: null,
+    ...over,
+  };
+}
+
+function mem(id: string, over: Partial<MemoryDiscovery> = {}): MemoryDiscovery {
+  return {
+    id,
+    commonName: id,
+    status: 'identified',
+    capturedAt: '2025-04-10T09:00:00Z',
     season: 'spring',
     location: null,
     ...over,
@@ -71,5 +84,31 @@ describe('NotebookPage', () => {
   it('error → エラー表示', () => {
     render(<NotebookPage discoveries={[]} error={new Error('boom')} />);
     expect(screen.getByText('発見の取得に失敗しました')).toBeTruthy();
+  });
+
+  it('memories ありで「去年の今頃」セクション + バッジを表示する (UC1/UC2)', () => {
+    render(<NotebookPage discoveries={[disc()]} memories={[mem('a'), mem('b')]} />);
+    expect(screen.getByLabelText('去年の今頃')).toBeTruthy();
+    expect(screen.getByLabelText('去年の今頃 2 件')).toBeTruthy();
+  });
+
+  it('memories 0 件 → セクション + バッジ非表示 (押し付けない)', () => {
+    render(<NotebookPage discoveries={[disc()]} memories={[]} />);
+    expect(screen.queryByLabelText('去年の今頃')).toBeNull();
+    expect(screen.queryByLabelText(/去年の今頃 .* 件/)).toBeNull();
+  });
+
+  it('memory props 未指定でも従来どおり描画する (後方互換)', () => {
+    render(<NotebookPage discoveries={[disc()]} />);
+    expect(screen.getByText('発見ノート')).toBeTruthy();
+    expect(screen.queryByLabelText('去年の今頃')).toBeNull();
+  });
+
+  it('memory カード押下で onSelectMemory を発火する', () => {
+    const onSelectMemory = vi.fn();
+    const m = mem('a');
+    render(<NotebookPage discoveries={[disc()]} memories={[m]} onSelectMemory={onSelectMemory} />);
+    fireEvent.click(within(screen.getByLabelText('去年の今頃')).getByRole('button'));
+    expect(onSelectMemory).toHaveBeenCalledWith(m);
   });
 });
