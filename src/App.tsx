@@ -1,6 +1,7 @@
 import { Link, Routes, Route } from 'react-router-dom';
 import { CapturePage, PreviewPage } from './features/capture';
 import { NotebookPage } from './features/notebook';
+import { BillingPage, BillingSuccessPage } from './features/billing';
 
 // Phase 3.5 app bootstrap で各機能の画面を順次 wiring していく。
 // home → /capture (撮影) / /notebook (発見ノート) を起点に各 feature の presentation を配線する。
@@ -32,6 +33,16 @@ function Home() {
   );
 }
 
+// billing (課金) の presentation を配線する。capture の QuotaModal / export の PDF アンロック導線が
+// /billing に遷移する (両者とも navigate('/billing') 済)。BillingPage の購入は Stripe Checkout への
+// リダイレクトという外部副作用を伴うため、onCheckout (props-seam) として注入する。token 配線前の現状は
+// 実 createCheckout + location 遷移を行わない no-op を渡しておき (NotebookPage の未配線と同パターン)、
+// auth/billing hook 配線時 (Milestone C) に createCheckout + location.assign を流し込む。
+// /billing/success は success_url 戻り。confirmCheckout の poll をアプリ層で onConfirm 注入する想定。
+function BillingRoute() {
+  return <BillingPage onCheckout={() => undefined} />;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -39,6 +50,8 @@ export default function App() {
       <Route path="/capture" element={<CapturePage />} />
       <Route path="/capture/preview" element={<PreviewPage />} />
       <Route path="/notebook" element={<NotebookPage />} />
+      <Route path="/billing" element={<BillingRoute />} />
+      <Route path="/billing/success" element={<BillingSuccessPage />} />
     </Routes>
   );
 }
