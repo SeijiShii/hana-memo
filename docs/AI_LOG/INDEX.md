@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-24 (+09:00)
-**総セッション数**: 50
-**総 decision 数**: 288
+**最終更新**: 2026-05-25 (+09:00)
+**総セッション数**: 52
+**総 decision 数**: 312
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,8 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260525_052_auto_continuous.md](./D20260525_052_auto_continuous.md) | 2026-05-25 | /flow:auto continuous | 反復1-4 = Phase 3.5 MS-C 残 Class-A backend seam: `api/legal/consents` (GET/POST) + `api/account/settings` (GET/PATCH) + notebook/memory discovery `imageObjectKey` (images leftJoin)。810→853 green。残 runtime/Class-B gated で停止 | D20260525-052-001〜006 | 完了 |
+| [D20260524_051_auto_continuous.md](./D20260524_051_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復1-9 = Milestone C presentation: 全 7 feature 画面 + app 統合配線 + nav shell。607→810 green。§1.5.8 verification checkpoint で pause | D20260524-051-001〜018 | 完了 |
 | [D20260524_050_auto_continuous.md](./D20260524_050_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復1 storage glue + 反復2 ai glue (**[SEC-001] closed**) + 反復3 analytics glue (cron + 実 Sentry beforeSend、[SEC-004] wiring)。497 green / 新規 78、storage+ai+analytics 実装完了 | D20260524-050-001〜007 | 完了 |
 | [D20260524_049_auto_continuous.md](./D20260524_049_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復6 = Phase 3.5 Milestone B auth glue (Clerk/fingerprint/Vercel wiring、419 green) + iteration5 finalize + legal style fix | D20260524-030〜033 | 完了 |
 | [D20260524_048_bootstrap_phase35_milestone_a.md](./D20260524_048_bootstrap_phase35_milestone_a.md) | 2026-05-24 | /flow:concept §4.5.7 + Phase 3.5 bootstrap | Milestone A foundation: フロントスタック install + app shell + api/health + scripts/dev.sh (typecheck0/373green/build OK/dev 200) | D20260524-030〜034 | 完了 (Milestone A) |
