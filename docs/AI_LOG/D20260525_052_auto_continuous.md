@@ -138,3 +138,61 @@ test: Vitest 810→853 green (+43)、typecheck 0、eslint 0
 **状態: 完了**。本 /flow:auto loop (D20260525_052、反復1-4) は **Phase 3.5 Milestone C の残 Class-A buildable backend seam を全完遂**: legal/account 永続化 endpoint + notebook/memory thumbnail objectKey データ層。**Vitest 810→853 green (+43)、commit 69d2c48〜861d870 (4 commit)**。
 
 残作業は全て **runtime/browser/Class-B-gated** (実 Clerk/Stripe/R2/OpenAI keys + browser + Vercel preview)。headless env では達成不能のため loop 停止 (§4.5.1 #5+#2)。次の再開には実行環境 (keys + browser/Vercel preview) が必要。
+
+---
+
+## loop 再開 (ユーザー指示: 「実キーを保存せずにできる作業にフォールバックして続ける」、2026-05-25 反復5-8)
+
+**状態を 進行中 に戻して継続**。前回の停止判断は過剰に保守的だった: **ローカル headless E2E (dev server 相手) は Class A** (flow:e2e ポリシー、`--against-preview/prod` のみ Class B) で、**実キー不要**で実行できる。WSL2 env で headless Chromium 起動を実測 → `LAUNCH_OK` を確認し E2E を解禁。
+
+```yaml
+- id: D20260525-052-007
+  question: no-key fallback の可否再評価 (停止判断の見直し)
+  chosen: 再開。production build 検証 + Playwright ローカル headless E2E (Class A、no-key) を実施
+  chosen_type: explicit-choice
+  context: |
+    ユーザー指示で停止判断を見直し。npm run build = 成功 (206 modules, PWA SW/manifest)。
+    npx playwright install chromium + bare launch probe = LAUNCH_OK (WSL2 で headless Chromium 起動可)。
+    → E2E gate の no-key 部分は本 env で達成可能。実キー必須なのは実サービスフローのみ。
+```
+
+**反復5 (fix(auth) 8195040)**: **keyless white-screen 不具合を修正**。Playwright で実ブラウザ起動して観測 → keyless 時に全ルートが空描画 + `useAuth can only be used within <ClerkProvider>` で 10+ pageerror。原因: AppAuthProvider keyless 分岐が ClerkProvider 無しで children 描画するが、子が Clerk hooks を直接呼ぶため throw。happy-dom 単体テストは Clerk hooks を mock していたため未検出。修正: Clerk 依存を `ClerkAuthBridge` に隔離し、ドメイン hooks は `AuthContext` (既定 KEYLESS_AUTH) のみ読む。`auth-context.ts` + `ClerkAuthBridge.tsx` 新設、hooks.ts/useAuthToken.ts を context 読み取りに。回帰テスト + ブラウザ実測 (全ルート描画 / pageerror 0)。Vitest 853→865。
+
+```yaml
+- id: D20260525-052-008
+  question: 反復5 — keyless white-screen の修正方針
+  chosen: AuthContext bridge で Clerk 依存を隔離 (rules-of-hooks 準拠、provider 不在で安全既定)
+  chosen_type: auto-recommended
+  context: ドメイン hooks が Clerk を直接呼ぶ限り provider 不在で throw。context 既定値 KEYLESS_AUTH で安全側に倒す。bridge は ClerkProvider 内のみ mount
+```
+
+**反復6 (fix(app) 5ce8bf0)**: **keyless バナーが下部ナビを遮る不具合を修正** (E2E で発覚)。`fixed bottom-0 z-[60]` の情報バナーが AppShell 下部ナビに重なり pointer events を奪取 → 撮影/設定タブがクリック不能。`pointer-events-none` でクリック透過。
+
+**反復7 (test(e2e) 691dc1b)**: **Playwright ローカル headless スモーク harness**。`playwright.config.ts` (build→preview→headless chromium、reuseExistingServer 非 CI) + `e2e/smoke.spec.ts` (8 ジャーニー: app boot / ランディング / 下部ナビ遷移 / 公開 legal / 空状態 / keyless graceful) + `test:e2e` script + `@playwright/test` devDep。**8 passed**。no-key 範囲 (実 Clerk/Stripe/R2/OpenAI + Vercel preview=Class B は対象外)。
+
+```yaml
+- id: D20260525-052-009
+  question: 反復7 — E2E のスコープ (no-key で何を検証するか)
+  chosen: 認証/外部サービス不要の UI 統合スモーク (ランディング/ナビ/公開 legal/空状態/keyless)
+  chosen_type: auto-recommended
+  context: |
+    keyless では token=null で container がデータ取得を seam-skip → 空状態。実データ描画は実 auth が要る。
+    深いデータフロー E2E は Clerk mock harness が要り over-engineering → no-key で確実に green な UI 統合に限定。
+    実サービスフロー (撮影→識別→保存 / checkout / OAuth) は実 keys + Class B preview gated で据え置き。
+```
+
+**反復8 (docs + ci)**: CI に `e2e` job 追加 (`npx playwright install --with-deps chromium` + `test:e2e` + 失敗時 report artifact) → スモークを恒久ゲート化 (white-screen 回帰防止)。`E2E_GATE_STATUS_20260524.md` §0 更新 (BLOCKED→部分 GREEN)。
+
+```yaml
+- id: D20260525-052-010
+  question: 反復8 後の再評価 — no-key work の残り
+  chosen: 主要 no-key work 完遂で停止。残は実キー / Class B / auth-mock harness (over-engineering) gated
+  chosen_type: auto-recommended
+  context: |
+    白画面という致命的不具合を解消し app が実ブラウザで動作 + スモーク green + CI ゲート化。
+    さらなる no-key 深掘り (データフロー E2E) は Clerk mock 基盤が必要で MVP には過剰、
+    a11y/visual 等は polish。実サービスフロー検証は実 keys 必須。→ §4.5.1 で停止、状態=完了。
+    最終: Vitest 865 green / E2E 8 green / typecheck 0 / lint 0 error / build OK。
+```
+
+**状態: 完了 (再開分)**。no-key fallback で **致命的 keyless 不具合 2 件を修正 + Playwright スモーク基盤 (8 green) + CI ゲート化**。commit 8195040 / 5ce8bf0 / 691dc1b + 本 docs。**Vitest 865 green / E2E 8 green**。残は実キー・Class B・auth-mock 基盤 gated。

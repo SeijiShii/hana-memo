@@ -1,13 +1,34 @@
 # E2E ゲート状況レポート — hana-memo
 
 - **作成**: 2026-05-24 (`/flow:e2e` continuous、`/flow:auto` D20260524_051 反復1 から dispatch)
-- **状態**: 🚫 **BLOCKED** — feature journey E2E は実行不可 (前提未達)
-- **FW**: Playwright (concept §4 で宣言済、未 install)
-- **対象 URL 想定**: ローカル dev server (`scripts/dev.sh`) → 将来 Vercel preview (Class B)
+- **状態 (2026-05-25 更新)**: 🟡 **部分 GREEN** — no-key ローカル headless スモークは green、実サービス依存ジャーニーは引き続き gated
+- **FW**: Playwright (✅ install 済、`playwright.config.ts` + `e2e/`、`npm run test:e2e`)
+- **対象 URL**: ローカル `vite preview` (headless Chromium = Class A) → 将来 Vercel preview (Class B)
 
 ---
 
-## 1. 結論
+## 0. 更新 (2026-05-25、/flow:auto D20260525_052 反復5-8 — no-key fallback)
+
+§1-§5 (下記) は D20260524_051 反復1 時点の状況で、**presentation 未実装を前提に BLOCKED と記録**したもの。
+その後 D20260524_051 反復2-9 で全 7 presentation + app 統合配線が完了し、本セッション (D20260525_052) で:
+
+1. **keyless white-screen 不具合を修正** (`fix(auth)` 8195040) — 実ブラウザ検証で発覚。app が実 runtime で boot するようになった。
+2. **keyless バナーが下部ナビを遮る不具合を修正** (`fix(app)` 5ce8bf0) — E2E で発覚。
+3. **Playwright ローカル headless スモーク (8 ジャーニー) を実装・green** (`test(e2e)` 691dc1b)。
+
+→ §1 の「BLOCKED (presentation 0 個)」は**解消**。現在のゲート状況:
+
+| 区分 | 状態 | 内容 |
+|---|---|---|
+| **no-key スモーク (Class A)** | ✅ **GREEN** (8/8) | app boot / ランディング / 下部ナビ遷移 (撮影↔図鑑↔設定) / 公開 legal ページ / 空状態 / keyless graceful。`e2e/smoke.spec.ts` |
+| **実サービス依存ジャーニー** | 🚫 gated | 撮影→識別→保存 (実 R2+OpenAI) / OAuth 連携 / PWYW Checkout (実 Stripe) / guest sign-in (実 Clerk)。実 keys + (preview 実行は) Vercel = Class B が必須 |
+
+§3 の 7 feature 104 ジャーニーのうち **認証/外部サービス不要の UI 統合部分は no-key スモークでカバー**。
+残りは実 keys + 実行環境を要する (本 headless env では達成不能)。
+
+---
+
+## 1. 結論 (2026-05-24 反復1 時点、※ §0 で更新済)
 
 全 7 feature の E2E ジャーニー (`004_*_E2E_TEST.md`) は **現時点で 1 件も実行できない**。
 理由は実装バグではなく、**プレゼンテーション層 (画面 + ルーティング) が未実装**であるため (Milestone B で意図的に defer された範囲)。
