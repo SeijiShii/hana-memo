@@ -99,18 +99,18 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B 進行中 (auth module wiring 完了)**。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
+- **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B ほぼ完遂 (全 SDK glue + 全 feature データ/UI glue wiring 完了)**。残 = Milestone C (E2E + 残 presentation)。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
 - **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**
 - **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
-- **進行中ターゲット**: Phase 3.5 Milestone B 残 — SDK glue (auth/storage/ai/analytics/billing) ✅ + capture UI ✅ + notebook データ層 ✅ + ✅**export CSV glue (D20260524_050 反復7、discoveries api + exportApi + useExport)** → **次=memory の glue (UI wiring 最終)**。実 PDF/画像 ZIP・notebook 4 モード view は Milestone C (presentation)
-- **直前完了セッション**: D20260524_050 (/flow:auto 反復7: export CSV glue、Vitest 598 green / 新規 12)
-- **最終更新時刻**: 2026-05-24T15:01:00+09:00
+- **進行中ターゲット**: ✅**Milestone B 全 feature glue 完遂** (auth/storage/ai/analytics/billing SDK + capture/notebook/export/memory データ・UI glue、D20260524_050 反復1-8)。**次=Milestone C (E2E green + 残 presentation: notebook 4 モード view / export 実 PDF・画像 ZIP / capture canvas / memory バッジ・カルーセル)**
+- **直前完了セッション**: D20260524_050 (/flow:auto 反復8: memory データ層 glue、Vitest 607 green / 新規 9)
+- **最終更新時刻**: 2026-05-24T15:06:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
 - **次の推奨ステップ (優先順)**:
-  1. **Phase 3.5 Milestone B (UI wiring)** 続行: 残 SDK (jsPDF / JSZip / DOMPurify = export) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。SDK glue = ✅auth → ✅storage → ✅ai ([SEC-001]) → ✅analytics ([SEC-004] wiring) → ✅billing (stripe@17)。画面/データ層 = ✅capture (hooks/CameraCapture/captureApi) → ✅notebook (list/edit api + hooks) → ✅export (CSV: discoveries api + useExport) → **memory の glue (次、UI wiring 最終)**
-  2. **Milestone C**: E2E green (Playwright smoke ジャーニー、Vercel preview)
-  3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装) + `security-review` L5
+  1. **Phase 3.5 Milestone B (UI wiring)** 続行: 残 SDK (jsPDF / JSZip / DOMPurify = export) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。SDK glue = ✅auth → ✅storage → ✅ai ([SEC-001]) → ✅analytics ([SEC-004] wiring) → ✅billing (stripe@17)。画面/データ層 = ✅capture (hooks/CameraCapture/captureApi) → ✅notebook (list/edit api + hooks) → ✅export (CSV: discoveries api + useExport) → ✅memory (recommend api + useMemories)。**Milestone B 完遂 → 次 = Milestone C (E2E + 残 presentation)**
+  2. **Milestone C (次フェーズ)**: E2E green (Playwright smoke ジャーニー、Vercel preview) + 残 presentation 実装 — notebook 4 モード view (timeline/calendar/map/figure) / export 実 PDF (jsPDF/html2canvas) + 画像 ZIP (JSZip) / capture canvas WebP 実変換 / memory バッジ・カルーセル。CI/CD yaml (O37) も本 Milestone で配置
+  3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装、[SEC-004] closure) + `security-review` L5
 - **app/api bootstrap defer 蓄積** (Milestone B で wiring):
   - ✅ billing (完了 D20260524_050 反復4): `api/billing/{create-checkout-session,stripe-webhook,status,confirm}.ts` + `api/billing/_lib/stripe.ts` (stripe@17、SDK 隔離) + `api/export-revenue.ts` (月次 cron) + `src/features/billing/{api,hooks}.ts` + `OAuthRequiredModal.tsx`。元 PLAN の Supabase Edge Fn/Realtime → Vercel api/ + status fetch+poll に置換。残=E2E (Milestone C)
   - ✅ analytics (完了 D20260524_050 反復3): `api/{check-quota,refresh-matview}.ts` + `api/_lib/cron.ts` + `sentry-client.ts` (実 Sentry beforeSend)。`api/export-revenue.ts` も billing 反復4 で wiring 済。SEC-004 closure = legal TDD (Phase 4)

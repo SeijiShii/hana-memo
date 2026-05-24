@@ -262,3 +262,30 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 > 反復 7 (export CSV) 完了。残 = memory glue (最後の feature) + Milestone C (E2E + 残 presentation)。
 > 次反復で memory (priority 5) を auto-pick 予定。
 
+### 反復 8: P3 — memory レコメンド データ層 glue (Milestone B 最終 feature)
+
+```yaml
+- id: D20260524-050-016
+  question: 反復7 完了後の auto-pick (反復8)
+  chosen: P3 — memory データ層 glue (recommend api + memoryApi/cache + useMemories)
+  chosen_type: auto-recommended
+  context: >
+    P1 SEC=0, P2 中断=0, P3 next=memory (priority 5、最後の未 glue feature)。memory core
+    (selectLastYearMemories/memoryCacheKey) 実装済、defer = データ IO + localStorage cache + hook。
+    バッジ/カルーセル UI は presentation のため Milestone C。heavy marker (iter7,HEAD=f180c7a) 更新後も継続。
+- id: D20260524-050-017
+  question: memory データ層 glue 実装の検証結果 + Milestone B 完遂判定
+  chosen: 完了 — typecheck 0 / eslint 0 / Vitest 607 green (新規 9)。Milestone B 全 feature glue 完遂
+  chosen_type: auto-recommended
+  context: >
+    新規 backend: api/memory/recommend.ts (lastYearWindow + selectLastYearMemories 再利用 + user_id [SEC-005])。
+    新規 frontend: src/features/memory/{memoryApi,hooks}.ts (fetchMemories + localStorage 日次キャッシュ +
+    useMemories: cache 優先 + E-ME-001 silent fail)。キャッシュ TTL は日付込みキーで表現 (翌日自動 miss)。
+    memory 101/102/INDEX + docs/INDEX「データ層実装完了」+ SCENARIO §5 「Milestone B 完遂」更新。
+    → Milestone B (全 SDK glue + 全 feature データ/UI glue) 完遂。次フェーズ = Milestone C (E2E + 残 presentation)。
+  完了ステップ: [recommend api, memoryApi+cache, useMemories, レポート/INDEX/SCENARIO 更新, Milestone B 完遂宣言]
+```
+
+> 反復 8 (memory) 完了。**Phase 3.5 Milestone B 全 feature glue 完遂** (反復1-8: storage/ai/analytics/billing SDK + capture/notebook/export/memory データ・UI glue)。
+> Vitest 607 green。次フェーズ = **Milestone C (E2E green + 残 presentation: 4 モード view / 実 PDF・ZIP / canvas / バッジ)**。Milestone C は Playwright + 実ブラウザ依存のため、loop の TDD (unit) スコープを超える → 本 continuous loop の自然な完了点。
+

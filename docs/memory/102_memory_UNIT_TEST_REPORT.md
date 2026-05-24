@@ -31,4 +31,29 @@
 
 ## カバレッジ未達・補足
 - `index.ts` (barrel) 0%: re-export のみ。
-- **defer (本レポート対象外)**: 「去年の今頃」バッジ + カルーセル React UI (notebook 統合)、localStorage 当日キャッシュ、実 DB SELECT (E-ME-001 silent fail)。app bootstrap フェーズで jsdom + 実 DB にて実施。
+- ~~defer~~ → **データ層は Phase 3.5 Milestone B で解消** (下記追記)。バッジ/カルーセル UI は Milestone C。
+
+---
+
+## 追記: Phase 3.5 Milestone B glue テスト (2026-05-24, `/flow:auto` 反復8)
+
+| # | テストケース | テストファイル | 結果 |
+|---|------------|-------------|------|
+| (fetch) | fetchMemories GET → memories / 失敗 throw | src/features/memory/memoryApi.test.ts | ✅ |
+| (cache) | write→read 当日キー / 翌日 miss (TTL 24h) / 壊れ JSON null | 同上 | ✅ |
+| (cache hit) | useMemories キャッシュ hit → fetch しない | src/features/memory/hooks.test.tsx | ✅ |
+| (cache miss) | miss → fetch → writeCache + memories セット | 同上 | ✅ |
+| E-ME-001 | fetch 失敗 → silent fail (memories=[], show=false) | 同上 | ✅ |
+| E-ME-003 | 0 件 → show=false | 同上 | ✅ |
+
+### glue サマリー
+
+| 項目 | 値 |
+|------|-----|
+| 追加テスト数 | 9 件 (合計 18 件) |
+| 全体テスト | **607/607 pass** (was 598)、成功率 100% |
+| typecheck / eslint | 0 / 0 |
+
+### 残 (Milestone C / E2E)
+- 「去年の今頃」バッジ + 横スクロールカルーセル React UI (notebook TimelineView 統合) は presentation のため Playwright E2E。
+- recommend handler default export (DB dynamic import 部) は単体非対象、Milestone C E2E でカバー。

@@ -35,3 +35,25 @@ memory: 「去年の今頃」レコメンドロジック
 ### テスト
 - 9 tests pass、memory 行 97.29% / 分岐 88.88% (recommend.ts 中核 100%)
 - 全体 373/373 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone B — レコメンド データ層 glue (2026-05-24, `/flow:auto` 反復8)
+
+defer 済のデータ IO + localStorage キャッシュ + hook を wiring (tested core `selectLastYearMemories` 再利用)。「去年の今頃」バッジ + カルーセル React UI は presentation のため **Milestone C** (notebook TimelineView 統合)。
+
+### 追加実装 (Vercel Function / api/memory/)
+- `api/memory/recommend.ts` (新規、GET): `lastYearWindow` で前年 ±15 日を算出し DB から identified discovery を取得 → `selectLastYearMemories` (最新順・最大 5)。soft-delete 除外 + user_id スコープ ([SEC-005])。
+
+### 追加実装 (frontend / src/features/memory/)
+- `memoryApi.ts` (新規): `fetchMemories` (GET) + `readMemoryCache`/`writeMemoryCache` (localStorage、`memoryCacheKey` 日付込み = 1 日 1 回再計算 TTL 24h 相当)。
+- `hooks.ts` (新規): `useMemories` — 当日キャッシュ hit → 即返却 / miss → fetch → cache。fetch 失敗は **silent fail (E-ME-001)** で memories=[] (バッジ非表示、ページ非破壊)。
+- `index.ts` (追記): glue 再輸出。
+
+### glue テスト結果
+- 新規 9 tests pass (memoryApi 5 / hooks 4)
+- 全体 **607/607 pass** (was 598)、typecheck 0 / eslint 0
+
+### glue 差分メモ
+- バッジ/カルーセル React UI は本反復スコープ外 (純 presentation、notebook TimelineView に統合、Milestone C)。useMemories の `memories`/`show` を描画するだけ。
+- キャッシュ TTL は別実装 (`setTimeout` 等) ではなく **日付込みキー** で表現 (翌日は別キー = 自動 miss、掃除不要)。
