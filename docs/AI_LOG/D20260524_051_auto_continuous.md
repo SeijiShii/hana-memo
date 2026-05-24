@@ -126,5 +126,19 @@ iteration: 0 (loop 開始前)
   context: capture slice 完了。pattern (cn + pages/components + routing + props seam) を notebook に複製。§1.5.8 の "verify 後複製" は browser 検証を E2E gate へ defer したため非ブロッキングで進行
 ```
 
+**反復3 結果**: notebook 図鑑 presentation 完遂 (sub-agent 委託)。
+- 追加: `pages/NotebookPage` (4-mode switcher) + `components/{Timeline,Calendar,Figure,Map}View`。MapView は map SDK 未 install で placeholder + `discoveriesWithCoords` seam (reversibility)。`/notebook` route。
+- data/thumbnail = props 注入 seam (実 hook/signed URL は app 層)。
+- 検証: typecheck 0 / eslint 0 / **Vitest 659 green** (新規 +32)。commit 27d977f (frontend)。
+
+```yaml
+- id: D20260524-051-010
+  question: 反復4 の auto-pick
+  chosen: P3 Milestone C presentation 続行 → memory presentation (季節レコメンド + バッジ/カルーセル)
+  chosen_type: auto-recommended
+  context: capture/notebook slice 完了。残 feature presentation = memory → billing → export → legal → account。優先は製品中核度順 (memory は notebook と連動する季節レコメンド UI)
+```
+
+
 
 
