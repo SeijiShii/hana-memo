@@ -19,7 +19,7 @@
 | 4 | ❌ | [notebook](./notebook/) | **実装完了** (図鑑 4-mode view + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
 | 4 | ❌ | [billing](./billing/) | **実装完了** (Stripe glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
 | 5 | ❌ | [export](./export/) | **CSV 実装完了** (PDF は MS-C) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
-| 5 | ❌ | [memory](./memory/) | **データ層実装完了** (UI は MS-C) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
+| 5 | ❌ | [memory](./memory/) | **実装完了** (去年の今頃 carousel/badge 統合済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 
 ## 横断フォルダ
 | 優先度 | フォルダ | 状態 | 設計完了 | 改修件数 | INDEX |

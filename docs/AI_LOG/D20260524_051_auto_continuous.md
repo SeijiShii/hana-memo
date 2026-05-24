@@ -139,6 +139,21 @@ iteration: 0 (loop 開始前)
   context: capture/notebook slice 完了。残 feature presentation = memory → billing → export → legal → account。優先は製品中核度順 (memory は notebook と連動する季節レコメンド UI)
 ```
 
+**反復4 結果**: memory「去年の今頃」presentation 完遂。MemoryCard/MemorySection/MemoryBadge を notebook に統合。SPEC 忠実 (prior-year recall、称号バッジではない)。検証: typecheck 0 / **Vitest 683 green** (新規 +24)。commit 7a6a93b。
+
+```yaml
+- id: D20260524-051-011
+  question: 反復5 の auto-pick
+  chosen: P3 Milestone C presentation 続行 → export presentation (書き出し画面 + PDF/ZIP)
+  chosen_type: auto-recommended
+  context: |
+    capture/notebook/memory slice 完了。残 = export → billing → legal → account。
+    export は scenario MS-C で「実 PDF (jsPDF) + 画像 ZIP (JSZip)」と明示。CSV は実装済。
+    外部 lib (jsPDF/JSZip) + canvas は browser 検証必須 → reversibility で injectable generator seam を default、
+    実 lib binding は app/E2E 層へ defer (MapView と同方針)。export 画面 + format 選択 + CSV を testable に。
+```
+
+
 
 
 

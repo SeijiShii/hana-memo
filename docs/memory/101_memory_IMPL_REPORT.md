@@ -57,3 +57,31 @@ defer 済のデータ IO + localStorage キャッシュ + hook を wiring (teste
 ### glue 差分メモ
 - バッジ/カルーセル React UI は本反復スコープ外 (純 presentation、notebook TimelineView に統合、Milestone C)。useMemories の `memories`/`show` を描画するだけ。
 - キャッシュ TTL は別実装 (`setTimeout` 等) ではなく **日付込みキー** で表現 (翌日は別キー = 自動 miss、掃除不要)。
+
+---
+
+## 追記: Phase 3.5 Milestone C — 去年の今頃 carousel + badge (2026-05-24, `/flow:auto` D20260524_051 反復4)
+
+defer 済の presentation を SPEC UC1/UC2 通り実装 (data/hooks は実装済を compose、capture/notebook と同 pattern)。
+
+### 追加ファイル (src/features/memory/components/)
+- `MemoryCard.tsx` (新規): 単 card (name null→「不明」/ captured date / thumbnail or 🌿)。
+- `MemorySection.tsx` (新規): 横スクロール carousel host (純 Tailwind `overflow-x-auto snap-x`、ライブラリ未使用)。h2「去年の今頃」、0 件 → 非表示 (CTA 無し、charter §2.2)、loading→「読み込み中…」。`MEMORY_SECTION_ANCHOR_ID` 輸出。
+- `MemoryBadge.tsx` (新規): header count badge「去年の今頃 N」(99+ cap、0/負 → 非表示)。default tap → section へ scroll。
+- `index.ts` (追記): barrel。
+
+### 統合 (notebook)
+- `NotebookPage.tsx` に memory props-seam (`memories`/`memoriesLoading`/`resolveMemoryThumbnail`/`onSelectMemory`) を追加 → header に `MemoryBadge`、body 最上部に `MemorySection` (SPEC UC2「ページ最上部」)。後方互換 (全 prop default)。
+
+### 設計判断
+- SPEC は **「去年の今頃」prior-year recall** (汎用シーズンレコメンド / 称号バッジではない) と確認 → BadgeList/milestone は SPEC に無く実装せず。
+- memories は props 注入 seam (`useMemories` の token 依存を app 層で配線)。
+
+### テスト結果
+- 新規 3 file + NotebookPage 統合 / +24 tests (MemoryCard 5 / MemorySection 7 / MemoryBadge 8 / NotebookPage 統合 +4)。
+- 全体 **683/683 pass** (was 659)、typecheck 0 / eslint 0。
+
+### 残 (browser 実機検証 + app 層配線)
+- carousel 横スクロール / snap の操作感、badge scroll-to-section 挙動、視覚レイアウト。
+- `useMemories({token})` + `resolveMemoryThumbnail` (signed URL) の app 層配線。
+- 各 004 ジャーニー E2E (`docs/E2E_GATE_STATUS_20260524.md`)。
