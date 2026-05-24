@@ -38,3 +38,25 @@ export: CSV 生成 + エクスポート検証 + ファイル名規約
 ### テスト
 - 22 tests pass、export 行 98.46% / 分岐 96.15% (csv/errors/filename 100%)
 - 全体 365/365 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone B — CSV エクスポート glue + PDF オーケストレーション (2026-05-24, `/flow:auto` 反復7)
+
+CSV エクスポートを end-to-end で wiring、PDF はオーケストレーション (unlock/件数ガード + 注入レンダラ) を実装。実 jsPDF/html2canvas レンダリング + 画像 ZIP (JSZip) は browser/canvas 依存のため **Milestone C E2E** に残置。
+
+### 追加実装 (Vercel Function / api/export/)
+- `api/export/discoveries.ts` (新規、GET `?month`): user の discoveries を CSV 行形に整形 (`toDiscoveryCsvRow` で表示名解決・null 正規化、`parseMonthParam` で月フィルタ)。soft-delete 除外 + user_id スコープ ([SEC-005])。
+
+### 追加実装 (frontend / src/features/export/)
+- `exportApi.ts` (新規): `fetchExportRows` (GET) / `buildDiscoveryCsv` (tested `toCsv` + BOM) / `downloadBlob`・`downloadTextFile` (ブラウザ `<a download>` 起動)。
+- `hooks.ts` (新規): `useExport` — `exportCsv` (fetch→CSV→download、E-EX-005) / `exportPdf` (requirePdfUnlocked [E-EX-004] → validatePdfCount [E-EX-001/003] → 注入 `PdfRenderer(rows)` → download)。実 jsPDF は app 層/E2E で注入。
+- `index.ts` (追記): glue 再輸出。
+
+### glue テスト結果
+- 新規 12 tests pass (exportApi 4 / hooks 4 / discoveries parse 4)
+- 全体 **598/598 pass** (was 586)、typecheck 0 / eslint 0
+
+### glue 差分メモ
+- PDF は `PdfRenderer` 注入型に設計 (unlock/件数ガード + ダウンロードのオーケストレーションを unit test、実 jsPDF レンダリングは E2E)。E-EX-004 は unlock 前に fetch しない順序を保証。
+- 画像 ZIP (JSZip) / html2canvas は本反復スコープ外 (browser/canvas、Milestone C)。CSV は完全 wiring。

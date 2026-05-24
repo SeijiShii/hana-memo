@@ -1,6 +1,6 @@
 # プロジェクトドキュメントインデックス — hana-memo
 
-**最終更新**: 2026-05-24 14:56
+**最終更新**: 2026-05-24 15:01
 **生成元**: /flow:concept、/flow:feature、/flow:tdd 等が自動更新
 
 <!-- auto-generated-start -->
@@ -18,7 +18,7 @@
 | 4 | ❌ | [capture](./capture/) | **実装完了** (撮影画面 glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | **データ層実装完了** (view は MS-C) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
 | 4 | ❌ | [billing](./billing/) | **実装完了** (Stripe glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
-| 5 | ❌ | [export](./export/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
+| 5 | ❌ | [export](./export/) | **CSV 実装完了** (PDF は MS-C) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
 | 5 | ❌ | [memory](./memory/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 
 ## 横断フォルダ

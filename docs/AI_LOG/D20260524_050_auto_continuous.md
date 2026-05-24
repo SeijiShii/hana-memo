@@ -235,3 +235,30 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 > 反復 6 (notebook データ層) 完了。残 = export/memory 画面 component + notebook 4 モード view (Milestone C)。
 > 次反復で export (priority 5) を auto-pick 予定。
 
+### 反復 7: P3 — export CSV glue + PDF オーケストレーション
+
+```yaml
+- id: D20260524-050-014
+  question: 反復6 完了後の auto-pick (反復7)
+  chosen: P3 — export CSV glue (discoveries api + exportApi + useExport)
+  chosen_type: auto-recommended
+  context: >
+    P1 SEC=0, P2 中断=0, P3 next=export (priority 5)。export core (csv/validation/filename) 実装済、
+    defer = PDF 生成 / 画像 ZIP / React UI / 実 DB。CSV パスを end-to-end wiring、PDF はガード +
+    注入 PdfRenderer のオーケストレーションのみ (実 jsPDF/html2canvas + JSZip は browser/canvas で Milestone C)。
+    heavy marker (iter6,HEAD=d72c070) 更新後も継続。
+- id: D20260524-050-015
+  question: export CSV glue 実装の検証結果
+  chosen: 完了 — typecheck 0 / eslint 0 / Vitest 598 green (新規 12)
+  chosen_type: auto-recommended
+  context: >
+    新規 backend: api/export/discoveries.ts (toDiscoveryCsvRow/parseMonthParam + soft-delete 除外 + user_id [SEC-005])。
+    新規 frontend: src/features/export/{exportApi,hooks}.ts (fetchExportRows/buildDiscoveryCsv/downloadBlob +
+    useExport: exportCsv 完全 wiring / exportPdf は requirePdfUnlocked[E-EX-004]+validatePdfCount[E-EX-001/003]+注入 renderPdf)。
+    実 PDF/画像 ZIP は Milestone C。export 101/102/INDEX + docs/INDEX「CSV 実装完了」+ SCENARIO カーソル更新。
+  完了ステップ: [discoveries api, exportApi (fetch/csv/download), useExport (csv/pdf), レポート/INDEX/SCENARIO 更新]
+```
+
+> 反復 7 (export CSV) 完了。残 = memory glue (最後の feature) + Milestone C (E2E + 残 presentation)。
+> 次反復で memory (priority 5) を auto-pick 予定。
+
