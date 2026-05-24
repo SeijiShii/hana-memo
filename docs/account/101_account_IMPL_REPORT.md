@@ -37,3 +37,27 @@ account: 設定・削除ドメインロジック (location 精度 + AI 同意 + 
 ### テスト
 - 16 tests pass、account 行 98.59% / 分岐 95.65% (settings/deletion/errors 100%)
 - 全体 300/300 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone C — 設定画面 + アカウント削除確認 presentation (2026-05-24, `/flow:auto` D20260524_051 反復8)
+
+deferred 済の設定 UI を実装 (settings/deletion ロジックは実装済を compose、確立 pattern)。
+
+### 追加ファイル (src/features/account/)
+- `pages/SettingsPage.tsx` (新規): 5 節 (アカウント/位置情報精度/AI 同意/プライバシー/データ管理)。`validateLocationPrecision`/`deriveAiConsentChange`/`isAiConsentActive` を消費。`onUpdateSettings(patch)` 注入 seam。guest link CTA は `OAuthRequiredModal` 再利用。`SettingsView`/`SettingsPatch` を narrowed 注入契約として導入。
+- `components/DeleteAccountDialog.tsx` (新規): **2 段階 irreversible 確認** (step1 警告+件数+「削除を予約」→ step2 理由 textarea + 承認 checkbox → 「確認しました、削除します」)。one-click 不可 (gate)。`onDeleteAccount(reason)` 注入 seam、`sanitizeDeletionReason` 適用。匿名 user は削除節非表示 (先に連携)。
+- `index.ts` (追記) / `App.tsx` (`/settings` + `/account/settings` route)。
+
+### 設計判断 (seam)
+- settings 保存・削除は注入 seam (実 `user_settings` upsert / `consent_logs` / `requestAccountDeletion` は app/db 層)。App.tsx は no-op (token 配線待ち)。
+- logic ファイル (settings/deletion/errors) 無改変。
+
+### テスト結果
+- 新規 2 file / +27 tests (SettingsPage 17 / DeleteAccountDialog 10)。
+- 全体 **788/788 pass** (was 761)、typecheck 0 / eslint 0。
+
+### 残 (browser 実機検証 + app 層配線)
+- 実 settings 永続化 / 削除 grace + signOut / OAuth link round-trip。
+- toggle スイッチの視覚 (Tailwind absolute thumb)。
+- `onUpdateSettings`/`onDeleteAccount`/`isLinked`/`settings` の app 層配線。UC5 (30日 grace gate / DeletionPendingGate) は別 phase。各 004 E2E (`docs/E2E_GATE_STATUS_20260524.md`)。

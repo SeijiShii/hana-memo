@@ -1,8 +1,8 @@
 # account ドキュメントインデックス
 
-**最終更新**: 2026-05-23 18:07
-**生成元**: /flow:feature account + /flow:tdd (2026-05-23、UI 非依存コア)
-**状態**: コア実装完了 (2026-05-23、React UI / hook / RPC / purge は app bootstrap defer)
+**最終更新**: 2026-05-24 21:22
+**生成元**: /flow:feature account + /flow:tdd (2026-05-23 コア) + /flow:auto 反復8 D20260524_051 (MS-C 設定画面)
+**状態**: 実装完了 (2026-05-24、設定画面 + アカウント削除確認 + routing 実装済。残 = 実 RPC/purge 配線 + UC5 grace gate)
 
 <!-- auto-generated-start -->
 
@@ -16,7 +16,7 @@
 | 002 | [002_account_PLAN.md](./002_account_PLAN.md) | PLAN | 完了 | 2026-05-22 | Phase 5 分割 (skeleton→更新→OAuth→削除→legal連携) |
 | 003 | [003_account_UNIT_TEST.md](./003_account_UNIT_TEST.md) | UNIT_TEST | 完了 | 2026-05-22 | hook + RPC + コンポーネント + purge Edge |
 | 004 | [004_account_E2E_TEST.md](./004_account_E2E_TEST.md) | E2E_TEST | 完了 | 2026-05-22 | 7 シナリオ (E-AC-1 〜 E-AC-7) |
-| 101 | [101_account_IMPL_REPORT.md](./101_account_IMPL_REPORT.md) | IMPL_REPORT | コア完了 | 2026-05-23 | settings/deletion 実装、React UI/hook/RPC defer |
+| 101 | [101_account_IMPL_REPORT.md](./101_account_IMPL_REPORT.md) | IMPL_REPORT | 完了 (presentation 済) | 2026-05-24 | settings/deletion コア + MS-C 設定画面/削除確認 (SettingsPage/DeleteAccountDialog) |
 | 102 | [102_account_UNIT_TEST_REPORT.md](./102_account_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-23 | 16 tests / 行 98.59% / 分岐 95.65% |
 
 ## サブフォルダ（改修・バグ修正・クレーム判定履歴）
@@ -30,6 +30,8 @@
 - **被依存**: `capture` (AI 同意 enforce), `billing` (course 表示), `notebook` (削除 gate)
 - 関連論点: [論点-002] 通知 (account 配下、α 後), [論点-006] SPAM, [論点-007] 重複アカウント
 - 実装コード (コア): `src/features/account/{errors,settings,deletion,index}.ts`
+- 実装コード (presentation, Phase 3.5 Milestone C): `src/features/account/pages/SettingsPage.tsx` + `components/DeleteAccountDialog.tsx` + `App.tsx` /settings(+/account/settings) route
+- 残 (配線 + UC5): `onUpdateSettings`/`onDeleteAccount`/`isLinked`/`settings` の app 層配線 / 実 RPC + purge cron / UC5 30日 grace gate (DeletionPendingGate)
 - defer (app bootstrap): React sections/modals/gate / useUserSettings hook / Sentry reconfigure / RPC (request/cancel) / purge-deleted-users (Storage+DB 削除)
 
 ## AI アクセスガイド

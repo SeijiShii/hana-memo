@@ -102,10 +102,11 @@
 - **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B ほぼ完遂 (全 SDK glue + 全 feature データ/UI glue wiring 完了)**。残 = Milestone C (E2E + 残 presentation)。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
 - **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**
 - **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
-- **進行中ターゲット**: Milestone C presentation 着手 (D20260524_051 /flow:auto)。⚠️ **状態訂正**: Milestone B は全 feature の **データ層 + hooks + api client + SDK glue** を完遂 (607 unit green) したが、**ユーザー向け画面 + ルーティングは未実装** (`src/App.tsx` = placeholder Home の 1 ルートのみ、feature 画面コンポーネント 0 個)。旧 cursor は「残 presentation」を notebook 4 モード等のポリッシュと矮小化していたが、実際は **全 feature 画面 + routing/nav 構築が Milestone C の主スコープ**
-- **E2E gate**: 🚫 **BLOCKED** (`docs/E2E_GATE_STATUS_20260524.md`)。app が placeholder shell のため全 7 feature の 004 ジャーニーが実行不可。Playwright install は最初の実画面が routable になった時点で smoke と同時実施。Milestone C presentation 完了後に再評価
-- **直前完了セッション**: D20260524_050 (/flow:auto 反復8: memory データ層 glue、Vitest 607 green / 新規 9)。D20260524_051 = /flow:e2e で E2E gate blocked 判定 → Milestone C presentation へ
-- **最終更新時刻**: 2026-05-24T19:55:00+09:00
+- **進行中ターゲット**: ✅ **Milestone C presentation — 全 7 feature 画面実装完遂** (D20260524_051 /flow:auto 反復2-8)。capture (撮影/プレビュー) / notebook (図鑑 4-mode view) / memory (去年の今頃 carousel/badge) / export (書き出しダイアログ) / billing (PWYW 課金画面) / legal (同意ゲート + 文書ビュー) / account (設定 + 削除確認) を全て実装。`src/lib/utils.ts` (cn foundation) + 各 feature の `pages/`・`components/` + `App.tsx` routing。**Vitest 788 green** (607→788、+181)。全画面は **props-seam** (実 hook/SDK/外部 redirect は注入) で独立テスト済
+- **次 = app 統合配線 + E2E**: ① Clerk auth + 各実 hook (useNotebook/useMemories/useExport/useBillingStatus/useAiCredits/settings/consent) + 外部 redirect/RPC を seam-ready 画面へ app 層配線 + ナビ shell ② E2E green (browser/Clerk keys/Vercel preview 必須 = 一部 Class B) ③ CI/CD yaml (O37)
+- **E2E gate**: 🚫 **依然 BLOCKED** (`docs/E2E_GATE_STATUS_20260524.md`)。画面は揃ったが (a) 実 hook の app 層配線 + (b) browser 実行環境 (Clerk session / 実 API / Vercel preview) が未。各画面の視覚・実機検証も browser 必須。app 統合配線後に再評価
+- **直前完了セッション**: D20260524_051 (/flow:auto: 反復1 E2E gate blocked 判定 → 反復2-8 で全 7 feature presentation 実装、Vitest 788 green)
+- **最終更新時刻**: 2026-05-24T21:24:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
 - **次の推奨ステップ (優先順)**:

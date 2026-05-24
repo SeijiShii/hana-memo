@@ -186,6 +186,39 @@ iteration: 0 (loop 開始前)
   context: capture/notebook/memory/export/billing/legal slice 完了。残最後 = account (設定 / AI 同意 toggle / アカウント削除)。settings/deletion コア実装済、画面が presentation
 ```
 
+**反復8 結果**: account 設定画面 presentation 完遂。SettingsPage (5節) / DeleteAccountDialog (2段階 irreversible gate)。検証: typecheck 0 / **Vitest 788 green** (新規 +27)。commit 097aa70。
+
+## loop 中間サマリ (2026-05-24T21:24、反復8 後) — Milestone C presentation 全完遂
+
+**全 7 feature presentation 実装完遂** (反復2-8)。foundation + 7 縦スライス:
+
+| 反復 | feature | 内容 | 新規 | 累計 green |
+|---|---|---|---|---|
+| 1 | (e2e) | E2E gate BLOCKED 判定 (全画面未実装を発見) | — | 607 |
+| 2 | capture | cn foundation + CapturePage/PreviewPage/CaptureButton/QuotaModal + routing | +20 | 627 |
+| 3 | notebook | NotebookPage 4-mode (Timeline/Calendar/Map/Figure) | +32 | 659 |
+| 4 | memory | MemoryCard/Section/Badge (去年の今頃、notebook 統合) | +24 | 683 |
+| 5 | export | ExportDialog/Button (CSV e2e + PDF/ZIP seam) | +21 | 704 |
+| 6 | billing | BillingPage/SuccessPage/PwywSelector (PWYW、TDD bug fix) | +34 | 738 |
+| 7 | legal | ConsentGate/Checkbox + LegalPage (同意フロー、SEC-004 開示) | +23 | 761 |
+| 8 | account | SettingsPage + DeleteAccountDialog (2段階削除 gate) | +27 | 788 |
+
+- **最終状態**: typecheck 0 / eslint 0 / **Vitest 788 green** (607→788、+181)。新規 install: clsx + tailwind-merge。
+- **横断方針**: 全画面 props-seam (data/外部 redirect/RPC は注入) で happy-dom 独立テスト。実 hook/SDK 配線 + browser 視覚検証は app 統合 + E2E (browser-gated) へ。
+- **reversibility defer**: map tile (Leaflet 等) / jsPDF・JSZip・html2canvas / 実 Stripe redirect / 実 RPC は全て注入 seam で defer (Class A、未 install)。
+
+```yaml
+- id: D20260524-051-015
+  question: 反復9 の auto-pick (全 7 presentation 完遂後)
+  chosen: P3 Milestone C 続行 → app 統合配線 + ナビ shell (Clerk auth + 実 hook を seam 画面へ)
+  chosen_type: auto-recommended
+  context: |
+    全画面実装済。次の機械的ステップ = seam-ready 画面に実 hook/auth を app 層で配線 + ナビ shell。
+    Class A (git tracked、mock で unit test 可)。実 runtime 検証 (Clerk session / 実 API) は browser-gated = E2E gate。
+    memory [flow-auto-no-pivot-questions]: browser 検証不能でも停止せず mechanical default で続行。
+```
+
+
 
 
 
