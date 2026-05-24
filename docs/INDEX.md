@@ -1,6 +1,6 @@
 # プロジェクトドキュメントインデックス — hana-memo
 
-**最終更新**: 2026-05-24 13:40
+**最終更新**: 2026-05-24 14:30
 **生成元**: /flow:concept、/flow:feature、/flow:tdd 等が自動更新
 
 <!-- auto-generated-start -->
@@ -17,7 +17,7 @@
 | 3 | ❌ | [account](./account/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
-| 4 | ❌ | [billing](./billing/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
+| 4 | ❌ | [billing](./billing/) | **実装完了** (Stripe glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
 | 5 | ❌ | [export](./export/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
 | 5 | ❌ | [memory](./memory/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 

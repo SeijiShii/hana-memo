@@ -126,3 +126,51 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 
 > 反復 3 (analytics) 完了。[SEC-004] analytics wiring 完了 (legal TDD Phase 4 で closed 予定)。SCENARIO §5 次ターゲット = billing (Stripe Checkout + Webhook)。
 
+---
+
+## post-compact 再開 (2026-05-24)
+
+反復 3 完了直後の heavy boundary で `.flow-needs-compact` (iteration=3, HEAD=07d9f1b, next=billing) を書込 → compact 発生。
+本ターンは同一 loop (`.flow-loop-active` started=13:25:25 保持) の post-compact 継続。
+- stale `.flow-needs-compact` 削除済 (compact 消費済)
+- working tree clean (HEAD=07d9f1b、`.flow-loop-active` のみ untracked)
+- 再評価: P1 open Critical/High SEC=0 ([論点-011] SEC-001=closed / [論点-014] SEC-004=dispatched-to-revise・analytics wiring 済で closure は Phase 4 legal TDD / [論点-008] は open だが product 判断・非 SEC)、P2 中断=0 (本 loop 継続)、P3 scenario §5 次=billing → ヒット
+- §4.5.2b 準拠: compact 境界では loop 停止しない。次反復へ継続
+
+### 反復 4: P3 — /flow:tdd billing (Stripe SDK glue wiring)
+
+```yaml
+- id: D20260524-050-008
+  question: post-compact 再開後の auto-pick (反復4)
+  chosen: P3 — billing module glue (Stripe Checkout + Webhook Vercel Function + frontend hooks)
+  chosen_type: auto-recommended
+  context: >
+    billing 101 defer items = api/{create-checkout-session,stripe-webhook}.ts (Stripe SDK +
+    Stripe-Signature 検証、UT-BL-CS07/WH04/WH07) + frontend useAiCredits/usePdfUnlocked/checkoutApi/
+    successConfirm poll/OAuthRequiredModal (UT-BL-H/A/SC/OM) + export-revenue 実 Storage 保存 + Slack 送信
+    (UT-BL-ER01/02/06)。コア課金ロジック (pricing/webhook mapping/revenue) は実装済 (19 tests)。
+    [SEC-006] webhook_dedupe べき等性は applyBillingWebhook で表現済 → glue は署名検証 + dedupe 配線。
+    auth/storage/ai/analytics glue パターン踏襲 (SDK は api/_lib に隔離、handler は dynamic import)。
+  Class判定: A (git tracked、Resume Contract 再開可)
+```
+
+```yaml
+- id: D20260524-050-009
+  question: billing glue 実装の検証結果
+  chosen: 完了 — typecheck 0 / eslint 0 / Vitest 540 green (新規 43) / src billing 行 99.14% / npm audit high 0
+  chosen_type: auto-recommended
+  context: >
+    install stripe@^17.7.0 (audit high 0)。SDK は api/billing/_lib/stripe.ts に隔離 (maxNetworkRetries:1 で
+    UT-BL-CS07 の retry 1 を委譲)。新規 backend: api/billing/{create-checkout-session,stripe-webhook,status,
+    confirm}.ts + api/export-revenue.ts (月次 cron)。新規 frontend: src/features/billing/{api,hooks}.ts +
+    OAuthRequiredModal.tsx。api/storage/_lib/r2.ts に createR2Writer 追記。
+    元 PLAN の Supabase Edge Fn/Realtime → Vercel api/ + status fetch+poll に置換 (storage/ai/analytics と同方針)。
+    [SEC-005] confirm は user_id スコープ、[SEC-006] webhook_dedupe べき等性は applyBillingWebhook 再利用。
+    vercel.json に export-revenue cron (0 5 1 * *)、.env.example に APP_BASE_URL 追加。
+    101/102 レポート追記 + billing INDEX/docs INDEX「実装完了」更新。残 = E2E green (Milestone C)。
+  完了ステップ: [stripe _lib 隔離, create-checkout glue, stripe-webhook glue, status/confirm, export-revenue cron, frontend api/hooks/modal, レポート/INDEX/SCENARIO 更新]
+```
+
+> 反復 4 (billing) 完了。Phase 3.5 Milestone B の SDK glue (auth/storage/ai/analytics/billing) 完遂。
+> SCENARIO §5 次ターゲット = capture/notebook/export/memory の画面 component (UI wiring、Milestone B 最終群)。
+

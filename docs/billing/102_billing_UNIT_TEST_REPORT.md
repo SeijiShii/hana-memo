@@ -34,4 +34,42 @@
 
 ## カバレッジ未達・補足
 - `index.ts` (barrel) 0%: re-export のみ。
-- **defer (本レポート対象外)**: UT-BL-CS07 (Stripe API retry)、UT-BL-WH04/WH07 (署名検証/DB 失敗)、UT-BL-H/A/SC/OM (hook/checkoutApi/successConfirm/modal)、UT-BL-ER01/ER02/ER04/ER06 (実 Storage/Slack/api_usage 集計)。app bootstrap フェーズで Stripe SDK mock + jsdom + BillingStore 実装にて実施。
+- ~~defer~~ → **Phase 3.5 Milestone B で解消** (下記追記参照)。
+
+---
+
+## 追記: Phase 3.5 Milestone B glue テスト (2026-05-24, `/flow:auto` 反復4)
+
+| # | テストケース | テストファイル | 結果 |
+|---|------------|-------------|------|
+| UT-BL-CS01/CS03/CS04/CS05 | buildCheckoutParams: ai_credits ¥100×qty / pdf_unlock custom amount / 範囲外 reject | api/billing/create-checkout-session.test.ts | ✅ |
+| UT-BL-CS06 | runCreateCheckout 匿名→LinkRequiredError + Stripe 未呼出 | 同上 | ✅ |
+| UT-BL-CS07 | Stripe API err 伝播 (handler 500、retry は SDK maxNetworkRetries:1) | 同上 | ✅ |
+| (追加) | parseCheckoutBody 正規化 / url null → throw | 同上 | ✅ |
+| UT-BL-WH01/WH03 | 正常 credits 付与 / 重複 event べき等 | api/billing/stripe-webhook.test.ts | ✅ |
+| UT-BL-WH04 | 署名不一致 → 401 + store 未呼出 | 同上 | ✅ |
+| UT-BL-WH07 | DB INSERT 失敗 → 500 (Stripe retry) | 同上 | ✅ |
+| (追加) | 未対応 event type → 200 ignore (recordEvent のみ) | 同上 | ✅ |
+| (fail-closed) | stripe.ts factory: secret 未設定 throw / 指定で fn 返却 | api/billing/_lib/stripe.test.ts | ✅ |
+| UT-BL-A01/A02/A03 | createCheckout ai/pdf 送出 / network→CheckoutFailedError / 401→LinkRequiredError | src/features/billing/api.test.ts | ✅ |
+| UT-BL-SC01/SC02/SC03 | confirmCheckout 即 resolve / timeout→CheckoutPendingError / 2回目反映 | 同上 | ✅ |
+| (追加) | fetchBillingStatus 正常 / 5xx→CheckoutFailedError | 同上 | ✅ |
+| UT-BL-H01/H02 | useAiCredits mount fetch / refresh re-render | src/features/billing/hooks.test.tsx | ✅ |
+| UT-BL-H03 | usePdfUnlocked pdf_unlocked 反映 | 同上 | ✅ |
+| UT-BL-OM01/OM02 | OAuthRequiredModal 表示 + 連携ボタン / onLink 呼出 | src/features/billing/OAuthRequiredModal.test.tsx | ✅ |
+| UT-BL-ER01/ER02/ER06 | export-revenue 集計 CSV 保存 / 0件「収益なし」/ Slack 未設定で続行 | api/export-revenue.test.ts | ✅ |
+
+### glue サマリー
+
+| 項目 | 値 |
+|------|-----|
+| 追加テスト数 | 43 件 (合計 62 件) |
+| 全体テスト | **540/540 pass** (was 497)、成功率 100% |
+| typecheck / eslint | 0 / 0 |
+| src/features/billing 行カバレッジ | 99.14% |
+| npm audit (high/critical) | 0 (stripe@17.7.0) |
+
+### 残 (Milestone C / E2E)
+- 実 Stripe Checkout 完走 → webhook 反映 → confirm poll の E2E (Vercel preview、UT-BL 統合)。
+- UT-BL-ER04 (api_usage_monthly コスト連動の粗利精緻化) は実データ蓄積後に E2E で検証。
+- handler default export (DB dynamic import 部) は単体非対象、Milestone C E2E でカバー (先行 storage/ai/analytics と同方針)。

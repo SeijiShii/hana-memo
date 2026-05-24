@@ -102,17 +102,18 @@
 - **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B 進行中 (auth module wiring 完了)**。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
 - **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**
 - **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
-- **進行中ターゲット**: Phase 3.5 Milestone B 残 module — ✅auth → ✅storage → ✅ai ([SEC-001] closed) → ✅**analytics glue (D20260524_050 反復3、cron + Sentry beforeSend wiring、[SEC-004] は legal TDD 待ち)** → **次=billing (Stripe Checkout + Webhook)** → capture/notebook/export/memory の画面 component
-- **直前完了セッション**: D20260524_050 (/flow:auto 反復3: analytics cron handler + 実 Sentry beforeSend binding、Vitest 497 green / 新規 11)
-- **最終更新時刻**: 2026-05-24T14:05:00+09:00
+- **進行中ターゲット**: Phase 3.5 Milestone B 残 module — ✅auth → ✅storage → ✅ai ([SEC-001] closed) → ✅analytics glue → ✅**billing glue (D20260524_050 反復4、Stripe Checkout/Webhook/status/confirm/export-revenue + hooks/modal wiring)** → **次=capture/notebook/export/memory の画面 component (UI wiring、Milestone B 最終)**
+- **直前完了セッション**: D20260524_050 (/flow:auto 反復4: billing Stripe SDK glue、Vitest 540 green / 新規 43、stripe@17.7.0 install)
+- **最終更新時刻**: 2026-05-24T14:32:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
 - **次の推奨ステップ (優先順)**:
-  1. **Phase 3.5 Milestone B (SDK glue wiring)** 続行: 残 SDK (Stripe + jsPDF / JSZip / DOMPurify) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。推奨順 = ✅auth → ✅storage (@aws-sdk) → ✅ai (openai + @upstash、[SEC-001] closed) → ✅analytics (@sentry/browser + cron、[SEC-004] wiring 済) → **billing Stripe (次)** → capture/notebook/export/memory の画面 component
+  1. **Phase 3.5 Milestone B (SDK glue wiring)** 続行: 残 SDK (jsPDF / JSZip / DOMPurify = export) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。推奨順 = ✅auth → ✅storage (@aws-sdk) → ✅ai (openai + @upstash、[SEC-001] closed) → ✅analytics (@sentry/browser + cron、[SEC-004] wiring 済) → ✅billing (stripe@17、Checkout/Webhook/export-revenue + hooks/modal) → **capture/notebook/export/memory の画面 component (次、UI wiring)**
   2. **Milestone C**: E2E green (Playwright smoke ジャーニー、Vercel preview)
   3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装) + `security-review` L5
 - **app/api bootstrap defer 蓄積** (Milestone B で wiring):
-  - ✅ analytics (完了 D20260524_050 反復3): `api/{check-quota,refresh-matview}.ts` + `api/_lib/cron.ts` + `sentry-client.ts` (実 Sentry beforeSend)。残 defer = `api/export-revenue.ts` (非 cron)、SEC-004 closure = legal TDD (Phase 4)
+  - ✅ billing (完了 D20260524_050 反復4): `api/billing/{create-checkout-session,stripe-webhook,status,confirm}.ts` + `api/billing/_lib/stripe.ts` (stripe@17、SDK 隔離) + `api/export-revenue.ts` (月次 cron) + `src/features/billing/{api,hooks}.ts` + `OAuthRequiredModal.tsx`。元 PLAN の Supabase Edge Fn/Realtime → Vercel api/ + status fetch+poll に置換。残=E2E (Milestone C)
+  - ✅ analytics (完了 D20260524_050 反復3): `api/{check-quota,refresh-matview}.ts` + `api/_lib/cron.ts` + `sentry-client.ts` (実 Sentry beforeSend)。`api/export-revenue.ts` も billing 反復4 で wiring 済。SEC-004 closure = legal TDD (Phase 4)
   - ✅ auth (完了 D20260524_049): `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`。残=Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
   - ✅ storage (完了 D20260524_050): `api/storage/{upload-url,signed-url,delete,meta}.ts`/`_lib/{r2,user}.ts`/`upload.ts`/`fetch.ts useSignedUrl`/`meta.ts`。残=E2E (Milestone C) + R2 bucket/CORS 手動運用
   - ✅ ai (完了 D20260524_050、[SEC-001] closed): `api/identify-plant.ts` (runIdentify)/`api/_lib/{openai,ratelimit}.ts`/frontend `identify.ts`/Upstash binding。残=E2E (Milestone C)

@@ -38,3 +38,38 @@ billing: 課金ドメインロジック (価格検証 + Stripe webhook べき等
 ### テスト
 - 19 tests pass、billing 行 99.21% / 分岐 97.77% (errors/pricing/revenue/webhook 100%、べき等性 WH03 100%)
 - 全体 349/349 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone B — Stripe SDK glue wiring (2026-05-24, `/flow:auto` 反復4)
+
+defer 済の Stripe SDK / Vercel Function / React glue を wiring (core は injectable 設計のまま再利用)。Stripe SDK は `stripe@^17.7.0` を install し `api/billing/_lib/stripe.ts` に隔離 (handler は dynamic import、`maxNetworkRetries:1` で UT-BL-CS07 の retry 1 を SDK 委譲)。
+
+### 追加実装 (Vercel Function / api/)
+- `api/billing/_lib/stripe.ts` (新規): `createStripeCheckoutFn` (Checkout 作成) + `createStripeWebhookVerifier` (`constructEvent` 署名検証)。env 未設定は fail-closed throw。
+- `api/billing/create-checkout-session.ts` (新規): `parseCheckoutBody` / `buildCheckoutParams` (ai_credits=¥100×qty / pdf_unlock=PWYW custom amount、純関数) / `runCreateCheckout` (requireLinked → 検証 → Stripe Session → url、DI) + handler (Clerk 検証 → resolveUserId → `fetchIsLinked` (非匿名判定) → 401 link_required / 400 invalid_amount / 500 checkout_failed)。
+- `api/billing/stripe-webhook.ts` (新規): `processStripeWebhook` (署名検証→`applyBillingWebhook`、DI) — 署名不一致 401 (UT-BL-WH04) / 適用失敗 500 (UT-BL-WH07、Stripe retry) / 重複・ignore・成功 200。Drizzle `BillingStore` 実装 (webhook_dedupe / billing_unlocks / users.ai_credits_remaining 加算 / pdf_unlocked)。
+- `api/billing/status.ts` (新規、GET): ai_credits_remaining / pdf_unlocked を返す (hooks 用)。
+- `api/billing/confirm.ts` (新規、GET `?session_id`): 当該 user の billing_unlocks 反映確認 ([SEC-005] user_id スコープ、successConfirm poll 用)。
+- `api/export-revenue.ts` (新規、cron 月初05:00): `previousYearMonth` + `runExportRevenue` (集計→CSV→R2 保存→Slack、DI)。0 件は header のみ CSV + 「収益なし」通知 (UT-BL-ER02)。`fetchRevenueRows` は billing_unlocks + api_usage_monthly を集計。
+- `api/storage/_lib/r2.ts` (追記): `createR2Writer` (直接 PUT、CSV 保存用)。
+
+### 追加実装 (frontend / src/features/billing/)
+- `errors.ts` (追記): `CheckoutFailedError` (network/5xx、UT-BL-A03) / `CheckoutPendingError` (poll timeout、UT-BL-SC02)。
+- `api.ts` (新規): `createCheckout` (UT-BL-A01/A02/A03、401→LinkRequiredError) / `fetchBillingStatus` / `confirmCheckout` (poll、SC01〜SC03、sleep 注入で決定的テスト)。
+- `hooks.ts` (新規): `useBillingStatus` 基底 + `useAiCredits` (UT-BL-H01/H02) / `usePdfUnlocked` (UT-BL-H03)。**元 PLAN の Supabase Realtime は Vercel+Neon 構成に無いため mount fetch + 明示 refresh() で代替** (JSDoc 明記)。
+- `OAuthRequiredModal.tsx` (新規): 匿名 user 向け Google 連携モーダル (UT-BL-OM01/OM02、`onLink` で linkGoogleIdentity を配線)。
+- `index.ts` (追記): glue を再輸出。
+
+### 設定
+- `vercel.json`: export-revenue cron (`0 5 1 * *`) 追加。
+- `.env.example`: `APP_BASE_URL` 追加 (Checkout redirect 組み立て用)。
+
+### glue テスト結果
+- 新規 43 tests pass (create-checkout 11 / stripe-webhook 5 / stripe _lib 5 / export-revenue 5 / api 9 / hooks 4 / OAuthRequiredModal 4)
+- 全体 **540/540 pass** (was 497)、typecheck 0 / eslint 0、npm audit high 0 (stripe@17.7.0)
+- src/features/billing 行 99.14%。残 = E2E green (Milestone C: 実 Stripe Checkout 完走 + webhook 反映 poll、Vercel preview)
+
+### glue 差分メモ
+- 元 PLAN は Supabase Edge Functions / Realtime 前提だったが、プロジェクトは Vercel Functions + Neon に標準化済 (先行 storage/ai/analytics glue と同様)。Edge Fn → `api/billing/*.ts`、Realtime 購読 → status fetch + refresh()/poll に置換。
+- `runCreateCheckout` の isLinked は handler が Neon users.is_anonymous から判定 (pricing.requireLinked に注入)。
