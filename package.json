@@ -27,6 +27,7 @@
     "@clerk/clerk-react": "^5.61.7",
     "@fingerprintjs/fingerprintjs": "^5.2.0",
     "@neondatabase/serverless": "^0.10.4",
+    "@sentry/browser": "^8.55.2",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "drizzle-orm": "^0.45.2",
