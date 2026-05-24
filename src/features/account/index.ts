@@ -19,3 +19,14 @@ export {
   cancelAccountDeletion,
   type AccountDeletionStore,
 } from './deletion';
+// presentation glue (React sections/modals) — app bootstrap で onUpdateSettings / onDeleteAccount を配線。
+export {
+  DeleteAccountDialog,
+  type DeleteAccountDialogProps,
+} from './components/DeleteAccountDialog';
+export {
+  SettingsPage,
+  type SettingsPageProps,
+  type SettingsView,
+  type SettingsPatch,
+} from './pages/SettingsPage';

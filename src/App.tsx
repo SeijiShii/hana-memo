@@ -3,6 +3,7 @@ import { CapturePage, PreviewPage } from './features/capture';
 import { NotebookPage } from './features/notebook';
 import { BillingPage, BillingSuccessPage } from './features/billing';
 import { LegalPage } from './features/legal';
+import { SettingsPage } from './features/account';
 
 // Phase 3.5 app bootstrap で各機能の画面を順次 wiring していく。
 // home → /capture (撮影) / /notebook (発見ノート) を起点に各 feature の presentation を配線する。
@@ -53,6 +54,18 @@ function BillingRoute() {
 // 配線時は <ConsentGate currentVersions={...} onConsent={recordConsents 配線} onReject={...} /> を
 // App ルートの末尾に常時マウントする想定。
 
+// account (設定) の presentation を配線する。capture の ai_consent_revoked 導線 (CapturePage の
+// 「設定画面へ」リンク → /settings) が本画面に到達する。設定の保存は onUpdateSettings (props-seam)、
+// 削除は onDeleteAccount (props-seam) として注入する。設定の永続化 (user_settings upsert /
+// consent_logs INSERT / Sentry reconfigure) と実削除 (requestAccountDeletion + signOut) はいずれも
+// auth/db token を要するため、NotebookPage / BillingRoute の未配線と同パターンで Milestone C
+// (auth bootstrap) に配線する。それまでは no-op onUpdateSettings を渡し、匿名既定 (isLinked=false) で
+// 連携 CTA を出しておく (後方互換)。capture が誘導する /settings に加え、SPEC UC1 の正規ルート
+// /account/settings も同じ画面に解決させる。
+function SettingsRoute() {
+  return <SettingsPage onUpdateSettings={() => undefined} />;
+}
+
 export default function App() {
   return (
     <Routes>
@@ -62,6 +75,8 @@ export default function App() {
       <Route path="/notebook" element={<NotebookPage />} />
       <Route path="/billing" element={<BillingRoute />} />
       <Route path="/billing/success" element={<BillingSuccessPage />} />
+      <Route path="/settings" element={<SettingsRoute />} />
+      <Route path="/account/settings" element={<SettingsRoute />} />
       <Route path="/legal/privacy" element={<LegalPage doc="privacy_policy" />} />
       <Route path="/legal/terms" element={<LegalPage doc="terms_of_service" />} />
       <Route path="/legal/ai-usage" element={<LegalPage doc="ai_usage" />} />
