@@ -2,13 +2,13 @@
  * 法務文書バージョン管理 + 再同意判定 (純関数)
  * 関連: docs/legal/001_legal_SPEC.md §3, 003_legal_UNIT_TEST.md §1.6 (V01〜V04) / §1.2 (H04〜H06)
  */
-import type { DocType } from '../../shared/types/domain';
+import type { DocType } from "../../shared/types/domain";
 
 /** アプリ側の最新バージョン定数。cookie_policy は [論点-005] 解決後に追加 */
 export const LATEST_VERSIONS: Record<DocType, string | null> = {
-  privacy_policy: 'v1.0.0',
-  terms_of_service: 'v1.0.0',
-  ai_usage: 'v1.0.0',
+  privacy_policy: "v1.1.0",
+  terms_of_service: "v1.0.0",
+  ai_usage: "v1.0.0",
   cookie_policy: null,
 };
 
@@ -63,7 +63,9 @@ export function needsReConsent(
     const cmp = compareVersion(currentV, latestV);
     if (cmp === null) {
       // 形式不正 → 安全側 (再同意要)
-      console.error(`needsReConsent: invalid version for ${docType}: ${currentV} vs ${latestV}`);
+      console.error(
+        `needsReConsent: invalid version for ${docType}: ${currentV} vs ${latestV}`,
+      );
       diffs.push(docType);
     } else if (cmp < 0) {
       diffs.push(docType);
