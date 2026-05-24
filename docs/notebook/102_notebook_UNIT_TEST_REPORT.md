@@ -34,4 +34,35 @@
 
 ## カバレッジ未達・補足
 - `index.ts`/`types.ts` (barrel/型) 0%: 実行ロジックなし。
-- **defer (本レポート対象外)**: 4 モード React view、詳細編集 UI、UC6 コラージュ + Web Share + OG image、useSignedUrl、Realtime、実 DB (UT-NB の UI/IO 部、E-NB-001〜005)。app bootstrap フェーズで jsdom + node-canvas + 実 DB にて実施。E2E は notebook E2E_TEST 参照。
+- ~~defer~~ → **データ層は Phase 3.5 Milestone B で解消** (下記追記)。view/collage は Milestone C。
+
+---
+
+## 追記: Phase 3.5 Milestone B glue テスト (2026-05-24, `/flow:auto` 反復6)
+
+| # | テストケース | テストファイル | 結果 |
+|---|------------|-------------|------|
+| UT-NB-D01 | fetchDiscoveries items + nextCursor | src/features/notebook/notebookApi.test.ts | ✅ |
+| UT-NB-D02 | cursor + limit を query に載せる | 同上 | ✅ |
+| UT-NB-D07 | list 失敗 → NotebookError | 同上 | ✅ |
+| UT-NB-A01/A02 | updateDiscovery common_name / location PATCH | 同上 | ✅ |
+| UT-NB-A03 | softDeleteDiscovery DELETE?id | 同上 | ✅ |
+| UT-NB-E01 | 403/404 → NotebookError | 同上 | ✅ |
+| UT-NB-D01 | useNotebook mount fetch + capturedAt 降順 | src/features/notebook/hooks.test.tsx | ✅ |
+| UT-NB-D03 | useNotebook client filter (season) | 同上 | ✅ |
+| UT-NB-D02 | useNotebook loadMore で次ページ蓄積 | 同上 | ✅ |
+| UT-NB-A01/A03 | useDiscoveryEdit edit/remove + onMutated + error | 同上 | ✅ |
+| UT-NB-A01/A02 | parseEditBody field マッピング + trim + location 範囲 | api/notebook/edit.test.ts | ✅ |
+
+### glue サマリー
+
+| 項目 | 値 |
+|------|-----|
+| 追加テスト数 | 20 件 (合計 40 件) |
+| 全体テスト | **586/586 pass** (was 566)、成功率 100% |
+| typecheck / eslint | 0 / 0 |
+
+### 残 (Milestone C / E2E)
+- UT-NB-CV/MV/EV (4 モード view)、UT-NB-CC (コラージュ canvas)、UT-NB-SS (Web Share)、UT-NB-U (URL filter 同期) は presentation/browser API のため Playwright E2E。
+- UT-NB-D04 (PostGIS 場所円) は MVP では client haversine フィルタで代替、server-side 化は Milestone C。
+- handler default export (DB dynamic import 部) は単体非対象、Milestone C E2E でカバー。

@@ -208,3 +208,30 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 > 反復 5 (capture UI) 完了。Phase 3.5 Milestone B 残 = notebook/export/memory 画面 component。
 > 次反復で notebook (priority 4) を auto-pick 予定。
 
+### 反復 6: P3 — notebook データ層 UI glue
+
+```yaml
+- id: D20260524-050-012
+  question: 反復5 完了後の auto-pick (反復6)
+  chosen: P3 — notebook データ層 glue (list/edit api + useNotebook/useDiscoveryEdit)
+  chosen_type: auto-recommended
+  context: >
+    P1 SEC=0, P2 中断=0, P3 next=notebook (priority 4)。notebook core (filter/edit/grouping) 実装済、
+    defer = データ IO + hooks。4 モード view/collage/OG image は presentation/canvas のため Milestone C 残置
+    (前反復までの glue 同様、testable データ層を本反復で wiring)。heavy marker (iter5,HEAD=2221a6d) 更新後も継続。
+- id: D20260524-050-013
+  question: notebook データ層 glue 実装の検証結果
+  chosen: 完了 — typecheck 0 / eslint 0 / Vitest 586 green (新規 20)
+  chosen_type: auto-recommended
+  context: >
+    新規 backend: api/notebook/{list,edit}.ts (cursor pagination + deleted_at IS NULL + user_id スコープ [SEC-005]、
+    edit は discovery_edits audit + soft-delete)。新規 frontend: src/features/notebook/{notebookApi,hooks}.ts
+    (useNotebook = page 蓄積 + filterDiscoveries + sortByCapturedAtDesc + groupBySpecies、useDiscoveryEdit)。
+    フィルタは tested core を client 適用 (server PostGIS 化は Milestone C)。Realtime 不採用 (refresh/onMutated)。
+    notebook 101/102/INDEX + docs/INDEX「データ層実装完了」+ SCENARIO カーソル更新。
+  完了ステップ: [list api, edit/delete api, notebookApi, useNotebook/useDiscoveryEdit, レポート/INDEX/SCENARIO 更新]
+```
+
+> 反復 6 (notebook データ層) 完了。残 = export/memory 画面 component + notebook 4 モード view (Milestone C)。
+> 次反復で export (priority 5) を auto-pick 予定。
+

@@ -39,3 +39,27 @@ notebook: フィルタ + 編集 + グルーピングのデータロジック
 ### テスト
 - 20 tests pass、notebook 行 98.85% / 分岐 96.22% (errors/filter 100%、edit 100% line)
 - 全体 329/329 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone B — ノート データ層 UI glue wiring (2026-05-24, `/flow:auto` 反復6)
+
+defer 済のデータ IO + hooks を wiring (tested core: filter/edit/grouping は injectable のまま再利用)。4 モード view (timeline/calendar/map/figure) + コラージュ canvas + OG image は **presentation/browser API のため Milestone C (Playwright E2E)** に残置。
+
+### 追加実装 (Vercel Function / api/notebook/)
+- `api/notebook/list.ts` (新規、GET cursor pagination): user の discoveries を capturedAt 降順 page 取得。`deleted_at IS NULL` + user_id スコープ ([SEC-005]、UT-NB-D06/D07)。limit clamp 1..100、nextCursor で無限スクロール。
+- `api/notebook/edit.ts` (新規): PATCH `parseEditBody` (common_name/user_note/location 検証) → discoveries UPDATE + discovery_edits INSERT (before/after audit、UT-NB-A01/A02)。DELETE `?id` → deleted_at soft-delete (UT-NB-A03)。更新 0 件 (他 user) は 404 = 実質 RLS reject (UT-NB-E01)。
+
+### 追加実装 (frontend / src/features/notebook/)
+- `notebookApi.ts` (新規): fetchDiscoveries (cursor) / updateDiscovery / softDeleteDiscovery。
+- `hooks.ts` (新規): `useNotebook` (page 蓄積 + filterDiscoveries + sortByCapturedAtDesc + groupBySpecies、loadMore/refresh、D01-D03) / `useDiscoveryEdit` (edit/remove + onMutated)。
+- `index.ts` (追記): glue 再輸出。
+
+### glue テスト結果
+- 新規 20 tests pass (notebookApi 7 / hooks 7 / edit parse 6)
+- 全体 **586/586 pass** (was 566)、typecheck 0 / eslint 0
+
+### glue 差分メモ
+- フィルタは server PostGIS ではなく page 取得 + tested core `filterDiscoveries` を frontend hook で適用 (MVP DAU 規模で十分、server-side filter 化は Milestone C 検討)。
+- 4 モード view / コラージュ / Web Share / OG image は本反復のスコープ外 (純 presentation + canvas/browser API)。useNotebook の `discoveries`/`groups` を描画する薄い層として Milestone C で追加。
+- 元 PLAN の Realtime → 不採用 (useNotebook.refresh / 編集後 onMutated で再取得)。
