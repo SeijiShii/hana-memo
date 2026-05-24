@@ -6,12 +6,39 @@ command: /flow:auto
 mode: continuous (default、auto-pick + Skill auto-invoke + 反復)
 target: project-wide
 started_at: 2026-05-24T13:25:00+09:00
-last_updated: 2026-05-24T13:25:00+09:00
-状態: 進行中
-完了ステップ一覧: []
+last_updated: 2026-05-24T15:08:00+09:00
+状態: 完了
+完了ステップ一覧: [反復1 storage, 反復2 ai(SEC-001 closed), 反復3 analytics, 反復4 billing, 反復5 capture UI, 反復6 notebook データ層, 反復7 export CSV, 反復8 memory]
 依存セッション: [D20260524_049_auto_continuous]
-iteration: 0
+iteration: 8 (loop 完了)
 ```
+
+## loop 完了サマリ (2026-05-24T15:08、反復8 後)
+
+**Phase 3.5 Milestone B 全 feature glue 完遂**。本 continuous loop (D20260524_050、反復1-8) の成果:
+
+| 反復 | target | 内容 | 新規テスト | 累計 green |
+|---|---|---|---|---|
+| 1 | _shared/storage | R2 SDK glue (presign api) | 45 | 464 |
+| 2 | _shared/ai | OpenAI + Upstash glue ([SEC-001] closed) | 22 | 486 |
+| 3 | _shared/analytics | cron + 実 Sentry beforeSend ([SEC-004] wiring) | 11 | 497 |
+| 4 | billing | Stripe Checkout/Webhook/export-revenue + hooks/modal | 43 | 540 |
+| 5 | capture | 撮影画面 hooks/CameraCapture/captureApi (poll 暴走 bug fix) | 26 | 566 |
+| 6 | notebook | list/edit api + useNotebook/useDiscoveryEdit | 20 | 586 |
+| 7 | export | CSV: discoveries api + useExport (PDF オーケストレーション) | 12 | 598 |
+| 8 | memory | recommend api + useMemories (localStorage cache) | 9 | 607 |
+
+- **最終状態**: typecheck 0 / eslint 0 / **Vitest 607 green** / npm audit high 0 (stripe@17.7.0)
+- **新規 install**: stripe@^17.7.0
+- **SEC**: [SEC-001] closed (反復2)、[SEC-004] analytics wiring 済 (closure は Phase 4 legal TDD)。全 [SEC-005] user_id スコープを新規 api 全 endpoint で強制
+- **発見・修正 bug**: useIdentifyStatus の poll loop 暴走 (effect 依存に関数 identity → OOM) を ref 化で解消 (反復5)
+
+**loop 終了理由**: auto-pick に dispatchable な /flow:tdd target が無い (全 14 target が 101 完了、open Critical/High SEC=0、中断セッション=0)。scenario §5 次ゲート = **Milestone C (E2E green + 残 presentation)** は Playwright + 実ブラウザ + Vercel preview を要し、unit-TDD loop の実行スコープ外。**continuous TDD loop の implementable scope を完遂したため自然終了**。`.flow-loop-active` / `.flow-needs-compact` marker は削除済 (§4.5.1)。
+
+**次アクション (loop 外、ユーザー/別ツール)**:
+1. Milestone C: e2e-runner (Playwright) で smoke ジャーニー + 残 presentation (notebook 4 モード view / 実 PDF jsPDF / 画像 ZIP JSZip / capture canvas WebP / memory バッジ・カルーセル) — 実ブラウザ必須
+2. CI/CD yaml (O37) 配置
+3. Phase 4: `/flow:tdd legal sentry-disclosure` ([SEC-004] closure) + `security-review` L5
 
 ---
 
