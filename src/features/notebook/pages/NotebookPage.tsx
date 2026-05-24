@@ -1,0 +1,123 @@
+/**
+ * 発見ノート (図鑑) 画面 (UC1/UC2) — 4 モード (タイムライン / カレンダー / 地図 / 図鑑) の container。
+ *
+ * モードタブで表示を切り替え、同一 discovery データを各 view コンポーネントに渡す。
+ *
+ * データ配線: useNotebook は token (アプリ層 auth 由来) を要求するため、テスト容易性のため
+ * 本画面は discovery 一覧と loading/error を props で受け取る (capture の props-seam パターンに準拠)。
+ * アプリ層 (App.tsx) で useNotebook を呼んで本画面に流し込む想定。
+ *
+ * 状態表示:
+ *   - loading かつ未取得 → ローディング表示
+ *   - error → エラー表示
+ *   - discovery 0 件 → 空状態「まだ発見がありません」
+ *
+ * 関連: docs/notebook/001_notebook_SPEC.md §1 UC1/UC2, docs/notebook/002_notebook_PLAN.md §4 Phase 1/4
+ */
+import { useState } from 'react';
+import { cn } from '../../../lib/utils';
+import { TimelineView } from '../components/TimelineView';
+import { CalendarView } from '../components/CalendarView';
+import { MapView } from '../components/MapView';
+import { FigureView } from '../components/FigureView';
+import type { NotebookDiscovery } from '../types';
+
+export type NotebookViewMode = 'timeline' | 'calendar' | 'map' | 'figure';
+
+const MODE_TABS: { mode: NotebookViewMode; label: string }[] = [
+  { mode: 'timeline', label: 'タイムライン' },
+  { mode: 'calendar', label: 'カレンダー' },
+  { mode: 'map', label: '地図' },
+  { mode: 'figure', label: '図鑑' },
+];
+
+export type NotebookPageProps = {
+  /** filter + sort 適用済みの discovery 一覧 (アプリ層 useNotebook 由来)。既定 []。 */
+  discoveries?: NotebookDiscovery[];
+  /** 取得中フラグ。 */
+  loading?: boolean;
+  /** 取得エラー。 */
+  error?: Error | null;
+  /** 初期表示モード。既定 'timeline'。 */
+  initialMode?: NotebookViewMode;
+  /** discovery → サムネ URL を解決する (storage 配線、既定はプレースホルダ)。 */
+  resolveThumbnail?: (d: NotebookDiscovery) => string | null;
+  /** カード / タイル / ピン押下時 (詳細遷移をアプリ層で配線)。 */
+  onSelect?: (d: NotebookDiscovery) => void;
+};
+
+/** 発見ノート画面。モードタブで 4 view を切り替える。 */
+export function NotebookPage({
+  discoveries = [],
+  loading = false,
+  error = null,
+  initialMode = 'timeline',
+  resolveThumbnail,
+  onSelect,
+}: NotebookPageProps) {
+  const [mode, setMode] = useState<NotebookViewMode>(initialMode);
+
+  const renderBody = () => {
+    // 取得中かつ未取得 → ローディング。取得済みでの追加ロード中は一覧を出し続ける。
+    if (loading && discoveries.length === 0) {
+      return <p className="py-12 text-center text-sm text-neutral-400">読み込み中…</p>;
+    }
+    if (error) {
+      return (
+        <p className="py-12 text-center text-sm text-red-500">
+          発見の取得に失敗しました
+        </p>
+      );
+    }
+    if (discoveries.length === 0) {
+      return <p className="py-12 text-center text-sm text-neutral-400">まだ発見がありません</p>;
+    }
+    switch (mode) {
+      case 'timeline':
+        return (
+          <TimelineView
+            discoveries={discoveries}
+            resolveThumbnail={resolveThumbnail}
+            onSelect={onSelect}
+          />
+        );
+      case 'calendar':
+        return <CalendarView discoveries={discoveries} onSelect={onSelect} />;
+      case 'map':
+        return <MapView discoveries={discoveries} onSelect={onSelect} />;
+      case 'figure':
+        return (
+          <FigureView
+            discoveries={discoveries}
+            resolveThumbnail={resolveThumbnail}
+            onSelect={onSelect}
+          />
+        );
+    }
+  };
+
+  return (
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
+      <h1 className="text-xl font-bold text-green-700">発見ノート</h1>
+      <nav className="flex gap-1 rounded-xl bg-neutral-100 p-1" aria-label="表示モード">
+        {MODE_TABS.map((tab) => (
+          <button
+            key={tab.mode}
+            type="button"
+            onClick={() => setMode(tab.mode)}
+            aria-pressed={mode === tab.mode}
+            className={cn(
+              'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold',
+              mode === tab.mode
+                ? 'bg-white text-green-700 shadow-sm'
+                : 'text-neutral-500 hover:text-neutral-700',
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+      <div>{renderBody()}</div>
+    </main>
+  );
+}

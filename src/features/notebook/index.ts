@@ -1,7 +1,8 @@
 // notebook feature barrel (コア + app bootstrap glue)
 // 関連: docs/notebook/001_notebook_SPEC.md
 // データ IO は api/notebook/ (Vercel Function)、hooks は useNotebook/useDiscoveryEdit。
-// 4 モード view / コラージュ canvas / OG image は Milestone C (presentation/E2E)
+// 4 モード view / 図鑑画面は presentation 層 (pages/NotebookPage + components/*View)。
+// コラージュ canvas / OG image は別 Milestone。
 export { NotebookError } from './errors';
 export type { NotebookDiscovery } from './types';
 export {
@@ -28,7 +29,8 @@ export {
   updateDiscovery,
   softDeleteDiscovery,
   type NotebookApiOptions,
-  type NotebookPage,
+  // pagination ページ型。presentation の NotebookPage コンポーネントと名前衝突するため別名で公開。
+  type NotebookPage as NotebookPageData,
   type EditValue,
 } from './notebookApi';
 export {
@@ -38,3 +40,13 @@ export {
   type UseNotebookResult,
   type UseDiscoveryEditOptions,
 } from './hooks';
+export { TimelineView, type TimelineViewProps } from './components/TimelineView';
+export { CalendarView, type CalendarViewProps } from './components/CalendarView';
+export {
+  MapView,
+  discoveriesWithCoords,
+  type MapViewProps,
+  type DiscoveryWithCoords,
+} from './components/MapView';
+export { FigureView, type FigureViewProps } from './components/FigureView';
+export { NotebookPage, type NotebookPageProps, type NotebookViewMode } from './pages/NotebookPage';

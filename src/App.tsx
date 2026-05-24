@@ -1,8 +1,10 @@
 import { Link, Routes, Route } from 'react-router-dom';
 import { CapturePage, PreviewPage } from './features/capture';
+import { NotebookPage } from './features/notebook';
 
 // Phase 3.5 app bootstrap で各機能の画面を順次 wiring していく。
-// home → /capture (撮影) を起点に、capture feature の presentation を配線する。
+// home → /capture (撮影) / /notebook (発見ノート) を起点に各 feature の presentation を配線する。
+// NotebookPage は token を要する useNotebook をアプリ層で配線する想定 (現状は props 既定の空一覧)。
 function Home() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-white text-neutral-800">
@@ -16,6 +18,12 @@ function Home() {
       >
         撮影する
       </Link>
+      <Link
+        to="/notebook"
+        className="rounded-lg border border-green-600 px-6 py-3 text-base font-semibold text-green-700 hover:bg-green-50"
+      >
+        発見ノート
+      </Link>
     </main>
   );
 }
@@ -26,6 +34,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/capture" element={<CapturePage />} />
       <Route path="/capture/preview" element={<PreviewPage />} />
+      <Route path="/notebook" element={<NotebookPage />} />
     </Routes>
   );
 }
