@@ -166,6 +166,17 @@ iteration: 0 (loop 開始前)
     画面 (価格選択 + checkout 起動 + status 表示) が presentation。Stripe redirect は外部 = seam/defer。
 ```
 
+**反復6 結果**: billing PWYW 課金画面 presentation 完遂。BillingPage/BillingSuccessPage/PwywSelector + /billing route。Stripe redirect は onCheckout 注入 seam。OAuth gate は既存 modal 再利用。TDD で数量バリデーション bug 検出+修正。検証: typecheck 0 / **Vitest 738 green** (新規 +34)。commit 78c1cea。
+
+```yaml
+- id: D20260524-051-013
+  question: 反復7 の auto-pick
+  chosen: P3 Milestone C presentation 続行 → legal presentation (同意フロー画面)
+  chosen_type: auto-recommended
+  context: capture/notebook/memory/export/billing slice 完了。残 = legal → account。legal = プラポリ/利用規約 同意フロー (consent コア実装済、画面が presentation)。[SEC-004] 開示にも関与
+```
+
+
 
 
 

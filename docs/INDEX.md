@@ -17,7 +17,7 @@
 | 3 | ❌ | [account](./account/) | **コア実装完了** (UI defer) | 2026-05-22 → 2026-05-23 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | **実装完了** (撮影画面 presentation + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | **実装完了** (図鑑 4-mode view + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
-| 4 | ❌ | [billing](./billing/) | **実装完了** (Stripe glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
+| 4 | ❌ | [billing](./billing/) | **実装完了** (PWYW 課金画面 + glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
 | 5 | ❌ | [export](./export/) | **実装完了** (書き出しダイアログ済、実 PDF/ZIP は app/E2E) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
 | 5 | ❌ | [memory](./memory/) | **実装完了** (去年の今頃 carousel/badge 統合済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 

@@ -73,3 +73,32 @@ defer 済の Stripe SDK / Vercel Function / React glue を wiring (core は inje
 ### glue 差分メモ
 - 元 PLAN は Supabase Edge Functions / Realtime 前提だったが、プロジェクトは Vercel Functions + Neon に標準化済 (先行 storage/ai/analytics glue と同様)。Edge Fn → `api/billing/*.ts`、Realtime 購読 → status fetch + refresh()/poll に置換。
 - `runCreateCheckout` の isLinked は handler が Neon users.is_anonymous から判定 (pricing.requireLinked に注入)。
+
+---
+
+## 追記: Phase 3.5 Milestone C — PWYW 課金画面 presentation (2026-05-24, `/flow:auto` D20260524_051 反復6)
+
+deferred 済の billing UI を実装 (Stripe api/hooks/pricing は実装済を compose、確立 pattern)。
+
+### 追加ファイル (src/features/billing/)
+- `pages/BillingPage.tsx` (新規): status (ai_credits/pdf_unlocked) + AI credits 数量 selector (1-10、`aiCreditsAmountJpy`/`aiCreditsGranted`) + PWYW タブ (PwywSelector) + 「購入する」。loading/error/pending/success (E-BL-001/002/007)。OAuth gate は **既存 `OAuthRequiredModal` 再利用** (`isLinked=false` で checkout 中断 → modal、E-BL-002)。
+- `pages/BillingSuccessPage.tsx` (新規): `/billing/success?session_id` 復帰画面。`onConfirm` 注入 poll、処理中→受領確認→30s fallback (E-BL-005)。
+- `components/PwywSelector.tsx` (新規): suggested chips [¥100/¥500/¥1000] + custom input、`validatePwywAmount`。`formatJpy` 輸出。
+- `index.ts` (追記) / `App.tsx` (`/billing` + `/billing/success` route)。
+
+### 設計判断 (seam)
+- **Stripe Checkout redirect は `onCheckout` 注入 seam** — component は `createCheckout`/`window.location` を import しない。test は `onCheckout({type,quantity/amountJpy})` 呼出を assert (実 redirect なし)。app 層で `createCheckout` + `location.assign` を注入。
+- `BillingSuccessPage.onConfirm` も注入 (実 `confirmCheckout` poll は app 層)。
+- logic ファイル (api/hooks/pricing/revenue/webhook/errors/OAuthRequiredModal) は無改変。
+
+### TDD で検出+修正した bug
+- `BillingPage` の AI credits 購入ボタンが range 外数量 (例 11) で disable されず、`aiCreditsAmountJpy`/`validateQuantity` が render 中 throw し得た → `qtyValid` gate で button-disable + total 表示分岐を共通化して修正。
+
+### テスト結果
+- 新規 3 file / +34 tests (PwywSelector 11 / BillingPage 17 / BillingSuccessPage 6)。
+- 全体 **738/738 pass** (was 704)、typecheck 0 / eslint 0。
+
+### 残 (browser 実機検証 + app 層配線)
+- 実 Stripe Checkout redirect (test card 4242) + success_url/cancel_url round-trip / confirm poll の webhook lag。
+- 視覚レイアウト (PWYW chips モバイル)。
+- `onCheckout`/`onConfirm`/`isLinked`/`status` の app 層配線。各 004 ジャーニー E2E (`docs/E2E_GATE_STATUS_20260524.md`)。
