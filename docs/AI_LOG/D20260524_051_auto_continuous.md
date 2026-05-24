@@ -93,3 +93,38 @@ iteration: 0 (loop 開始前)
     memory [flow-auto-no-pivot-questions]: 質的シフトでも停止せず mechanical default で続行。
 ```
 
+```yaml
+- id: D20260524-051-007
+  question: /flow:tdd capture 起動直後に「frontend をどう作るか」を 3 択で upfront 質問 → ユーザー却下 + /flow:auto 再 invoke
+  chosen: 質問撤回。mechanical default で frontend build 続行 (UI wiring = 最終 Phase)
+  chosen_type: explicit-choice
+  context: |
+    誤り: 状態 mis-track 発覚 + env で視覚検証不能 を理由に upfront 3 択質問を出した
+      (§4.5.2b の誤停止 = 質的シフト pause)。ユーザーは即 /flow:auto 再 invoke で却下。
+    訂正: 残作業が cursor より大きい / 視覚検証不能 は停止理由でない。
+      §1.5.8 verification-gap は「基盤+1 縦スライス後の 1 回 verify 依頼」のみ許容 (upfront 質問は不可)。
+    memory [flow-auto-no-pivot-questions] を本事例で強化済。
+    → /flow:tdd capture を続行、「101 既存 → 続行(deferred presentation)」を auto-answer。
+```
+
+**反復2 結果**: capture presentation slice 完遂 (sub-agent 委託で実装、orchestrator が検証+commit)。
+- 追加: `src/lib/utils.ts` (cn foundation) + capture `pages/{CapturePage,PreviewPage}` + `components/{CaptureButton,QuotaModal}` + App.tsx routing。
+- 検証: typecheck 0 / eslint 0 / **Vitest 627 green** (新規 +20)。commit 484da9f (frontend)。
+- §1.5.8 foundation + 1 縦スライス完了。quota/consent/confirm = props 注入 seam (実 hook 配線は app 統合フェーズ)。
+- browser 視覚検証は E2E gate へ defer (`docs/E2E_GATE_STATUS_20260524.md`)。
+
+```yaml
+- id: D20260524-051-008
+  question: 反復2 後の context-heavy 判定 (§4.5.2a)
+  chosen: heavy → checkpoint persist + .flow-needs-compact marker write + 継続 (ターンは畳まない)
+  chosen_type: auto-recommended
+  context: sub-agent 1 + Read/Edit 多数 + 長時間。harness 透過 compaction に委譲、次反復 (notebook presentation) へ継続
+- id: D20260524-051-009
+  question: 反復3 の auto-pick
+  chosen: P3 Milestone C presentation 続行 → notebook presentation (次コア: 図鑑 view)
+  chosen_type: auto-recommended
+  context: capture slice 完了。pattern (cn + pages/components + routing + props seam) を notebook に複製。§1.5.8 の "verify 後複製" は browser 検証を E2E gate へ defer したため非ブロッキングで進行
+```
+
+
+
