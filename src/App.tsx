@@ -2,6 +2,7 @@ import { Link, Routes, Route } from 'react-router-dom';
 import { CapturePage, PreviewPage } from './features/capture';
 import { NotebookPage } from './features/notebook';
 import { BillingPage, BillingSuccessPage } from './features/billing';
+import { LegalPage } from './features/legal';
 
 // Phase 3.5 app bootstrap で各機能の画面を順次 wiring していく。
 // home → /capture (撮影) / /notebook (発見ノート) を起点に各 feature の presentation を配線する。
@@ -43,6 +44,15 @@ function BillingRoute() {
   return <BillingPage onCheckout={() => undefined} />;
 }
 
+// legal (法務) の presentation を配線する。/legal/* は認証不要の公開静的ページ (UC2)。
+// 同意ゲート (ConsentGate) は特定 URL ではなくアプリ起動時に全画面へ被せる overlay として
+// マウントする設計 (SPEC UC1/UC4)。overlay は「自分の同意済バージョン (deriveLatestConsents 由来)」と
+// 「consent_logs INSERT + localStorage 保存」を要し、いずれも auth/db token を要求する seam のため、
+// NotebookPage / BillingPage の未配線と同パターンで Milestone C (auth bootstrap) で配線する。
+// それまでは overlay を出さず (= 同意必須を強制しない) 既存ルートを素通しにしておく (後方互換)。
+// 配線時は <ConsentGate currentVersions={...} onConsent={recordConsents 配線} onReject={...} /> を
+// App ルートの末尾に常時マウントする想定。
+
 export default function App() {
   return (
     <Routes>
@@ -52,6 +62,10 @@ export default function App() {
       <Route path="/notebook" element={<NotebookPage />} />
       <Route path="/billing" element={<BillingRoute />} />
       <Route path="/billing/success" element={<BillingSuccessPage />} />
+      <Route path="/legal/privacy" element={<LegalPage doc="privacy_policy" />} />
+      <Route path="/legal/terms" element={<LegalPage doc="terms_of_service" />} />
+      <Route path="/legal/ai-usage" element={<LegalPage doc="ai_usage" />} />
+      <Route path="/legal/specified-commercial-transactions" element={<LegalPage doc="scta" />} />
     </Routes>
   );
 }
