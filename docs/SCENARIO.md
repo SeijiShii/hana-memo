@@ -102,13 +102,13 @@
 - **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B 進行中 (auth module wiring 完了)**。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
 - **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**
 - **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
-- **進行中ターゲット**: Phase 3.5 Milestone B 残 module — ✅auth → ✅storage → ✅ai ([SEC-001] closed) → ✅analytics glue → ✅**billing glue (D20260524_050 反復4、Stripe Checkout/Webhook/status/confirm/export-revenue + hooks/modal wiring)** → **次=capture/notebook/export/memory の画面 component (UI wiring、Milestone B 最終)**
-- **直前完了セッション**: D20260524_050 (/flow:auto 反復4: billing Stripe SDK glue、Vitest 540 green / 新規 43、stripe@17.7.0 install)
-- **最終更新時刻**: 2026-05-24T14:32:00+09:00
+- **進行中ターゲット**: Phase 3.5 Milestone B 残 — SDK glue (auth/storage/ai/analytics/billing) ✅完遂 + ✅**capture 撮影画面 glue (D20260524_050 反復5、hooks/CameraCapture/captureApi + api/capture wiring)** → **次=notebook/export/memory の画面 component (UI wiring、Milestone B 最終群)**
+- **直前完了セッション**: D20260524_050 (/flow:auto 反復5: capture UI glue、Vitest 566 green / 新規 26。useIdentifyStatus poll 暴走 bug を ref 化で修正)
+- **最終更新時刻**: 2026-05-24T14:48:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
 - **次の推奨ステップ (優先順)**:
-  1. **Phase 3.5 Milestone B (SDK glue wiring)** 続行: 残 SDK (jsPDF / JSZip / DOMPurify = export) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。推奨順 = ✅auth → ✅storage (@aws-sdk) → ✅ai (openai + @upstash、[SEC-001] closed) → ✅analytics (@sentry/browser + cron、[SEC-004] wiring 済) → ✅billing (stripe@17、Checkout/Webhook/export-revenue + hooks/modal) → **capture/notebook/export/memory の画面 component (次、UI wiring)**
+  1. **Phase 3.5 Milestone B (UI wiring)** 続行: 残 SDK (jsPDF / JSZip / DOMPurify = export) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。SDK glue = ✅auth → ✅storage → ✅ai ([SEC-001]) → ✅analytics ([SEC-004] wiring) → ✅billing (stripe@17)。画面 component = ✅capture (hooks/CameraCapture/captureApi) → **notebook/export/memory の画面 component (次、UI wiring 最終群)**
   2. **Milestone C**: E2E green (Playwright smoke ジャーニー、Vercel preview)
   3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装) + `security-review` L5
 - **app/api bootstrap defer 蓄積** (Milestone B で wiring):

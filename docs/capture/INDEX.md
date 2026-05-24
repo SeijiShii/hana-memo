@@ -1,8 +1,8 @@
 # capture ドキュメントインデックス
 
-**最終更新**: 2026-05-23 18:10
-**生成元**: /flow:feature capture + /flow:tdd (2026-05-23、UI 非依存コア)
-**状態**: コア実装完了 (2026-05-23、React hook / camera / Realtime / 実 IO は app bootstrap defer)
+**最終更新**: 2026-05-24 14:48
+**生成元**: /flow:feature capture + /flow:tdd (2026-05-23 コア) + /flow:auto 反復5 (2026-05-24 UI glue)
+**状態**: 実装完了 (2026-05-24、撮影画面 hooks + camera + api/capture wiring 済。残 = Milestone C E2E)
 
 <!-- auto-generated-start -->
 
@@ -16,8 +16,8 @@
 | 002 | [002_capture_PLAN.md](./002_capture_PLAN.md) | PLAN | 完了 | 2026-05-22 | Phase 5 分割 (UI→DB→AI→Realtime→quota) |
 | 003 | [003_capture_UNIT_TEST.md](./003_capture_UNIT_TEST.md) | UNIT_TEST | 完了 | 2026-05-22 | useCaptureFlow + image 変換 + Realtime mock |
 | 004 | [004_capture_E2E_TEST.md](./004_capture_E2E_TEST.md) | E2E_TEST | 完了 | 2026-05-22 | 8 シナリオ (E-CA-1〜8、EXIF strip critical) |
-| 101 | [101_capture_IMPL_REPORT.md](./101_capture_IMPL_REPORT.md) | IMPL_REPORT | コア完了 | 2026-05-23 | flow/status/note 実装、React hook/camera/Realtime defer |
-| 102 | [102_capture_UNIT_TEST_REPORT.md](./102_capture_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-23 | 11 tests / 行 98.46% / 分岐 94.73% |
+| 101 | [101_capture_IMPL_REPORT.md](./101_capture_IMPL_REPORT.md) | IMPL_REPORT | 完了 (UI glue 済) | 2026-05-24 | flow/status/note コア + hooks/CameraCapture/captureApi + api/capture glue |
+| 102 | [102_capture_UNIT_TEST_REPORT.md](./102_capture_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-24 | 37 tests (コア 11 + glue 26) / 全体 566 green |
 
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
@@ -30,7 +30,8 @@
 - **被依存**: `notebook` (一覧), `export` (PDF 対象), `memory` (季節レコメンド), `billing` (使用量参照)
 - 関連論点: [論点-004] 位置情報粒度 (解決済 account 側), [論点-006] 匿名 trial (解決済 _shared/auth 側)
 - 実装コード (コア): `src/features/capture/{errors,note,status,flow,index}.ts`
-- defer (app bootstrap): useImageConvert/useGeolocation/useCaptureFlow/useIdentifyStatus hook / camera UI / Realtime sub / captureApi (実 DB)
+- 実装コード (UI glue, Phase 3.5 Milestone B): `src/features/capture/{captureApi,hooks}.ts` + `CameraCapture.tsx` + `api/capture/{discovery,attach,status}.ts`
+- 残 (Milestone C E2E): 実 canvas WebP 変換 / identify 非同期結果の UI 反映 / 並列・abort (Playwright)。Realtime は不採用 (status poll で代替)
 
 ## AI アクセスガイド
 - 機能概要 → README.md

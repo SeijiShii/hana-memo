@@ -174,3 +174,37 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 > 反復 4 (billing) 完了。Phase 3.5 Milestone B の SDK glue (auth/storage/ai/analytics/billing) 完遂。
 > SCENARIO §5 次ターゲット = capture/notebook/export/memory の画面 component (UI wiring、Milestone B 最終群)。
 
+### 反復 5: P3 — capture UI screen component (画面 wiring)
+
+```yaml
+- id: D20260524-050-010
+  question: 反復4 (billing glue) 完了後の auto-pick (反復5)
+  chosen: P3 — capture 画面 component (priority 4、UI group 最優先)
+  chosen_type: auto-recommended
+  context: >
+    再評価: P1 open Critical/High SEC=0、P2 中断=0、P3 scenario §5 次=画面 component group。
+    優先度順 (capture/notebook=4 > export/memory=5) で capture を先に。capture core (flow/note/status)
+    は実装済、defer = カメラ撮影→storage.upload→ai.identify→capture.flow を束ねる React 画面。
+    heavy boundary で .flow-needs-compact (iteration=4, HEAD=863723c) 書込後も §4.5.2b 準拠で継続。
+```
+
+```yaml
+- id: D20260524-050-011
+  question: capture UI glue 実装の検証結果
+  chosen: 完了 — typecheck 0 / eslint 0 / Vitest 566 green (新規 26)。poll 暴走 bug を発見・修正
+  chosen_type: auto-recommended
+  context: >
+    新規 backend: api/capture/{discovery,attach,status}.ts (Clerk→resolveUserId→user_id スコープ [SEC-005]、
+    attach は validateObjectKey 所有確認)。新規 frontend: src/features/capture/{captureApi,hooks}.ts +
+    CameraCapture.tsx。元 PLAN の Supabase Edge Fn/Realtime → Vercel api/capture/ + status poll に置換。
+    useCaptureFlow は runCapturePipeline (core) に captureApi+uploadPlantImage+identifyPlant を注入。
+    [bug] useIdentifyStatus 初版が effect 依存に sleep/fetchFn(関数 identity) を含めたため inline 関数
+    caller で setResult 再 render ごとに poll loop 再起動 → 無限増殖 OOM (test 186s worker crash)。
+    fetchFn/sleep/onUpdate を ref 化し effect 依存を [discoveryId,token,pollIntervalMs] に修正して解消。
+    capture 101/102/INDEX + docs/INDEX「実装完了」+ SCENARIO カーソル更新。残 = Milestone C E2E。
+  完了ステップ: [api/capture endpoints, captureApi, hooks(IC/GEO/CF/IS), CameraCapture, poll暴走 bug fix, レポート/INDEX/SCENARIO 更新]
+```
+
+> 反復 5 (capture UI) 完了。Phase 3.5 Milestone B 残 = notebook/export/memory 画面 component。
+> 次反復で notebook (priority 4) を auto-pick 予定。
+

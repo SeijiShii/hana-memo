@@ -39,3 +39,28 @@ capture: 撮影パイプライン orchestration + discovery 状態遷移
 ### テスト
 - 11 tests pass、capture 行 98.46% / 分岐 94.73% (errors/flow/note/status 100%)
 - 全体 309/309 pass、typecheck clean
+
+---
+
+## 追記: Phase 3.5 Milestone B — 撮影画面 UI glue wiring (2026-05-24, `/flow:auto` 反復5)
+
+defer 済の React hooks / camera UI / 実 IO を wiring (core `runCapturePipeline` は injectable のまま再利用)。Realtime は Vercel+Neon 構成に無いため status poll で代替。
+
+### 追加実装 (Vercel Function / api/capture/)
+- `api/capture/discovery.ts` (新規): POST `parseCreateDiscoveryBody` → discoveries INSERT (status=identifying)、DELETE `?id` ロールバック。user_id スコープ強制 ([SEC-005])、userNote は sanitizeUserNote (trim 200)。
+- `api/capture/attach.ts` (新規): POST `parseAttachBody` → images INSERT + discoveries.image_id UPDATE。`validateObjectKey` で所有確認 ([SEC-003]/[SEC-005])。
+- `api/capture/status.ts` (新規、GET `?discoveryId`): status + 識別結果を返す (poll 用、user_id スコープ)。
+
+### 追加実装 (frontend / src/features/capture/)
+- `captureApi.ts` (新規): `createDiscovery` (A01/A04) / `attachImage` (A02) / `deleteDiscovery` (CF03 ロールバック) / `fetchDiscoveryStatus` (poll)。
+- `hooks.ts` (新規): `useImageConvert` (toWebP→stripExif) / `useGeolocation` (getCurrentLocation) / `useCaptureFlow` (runCapturePipeline に captureApi+upload+identify を注入、CF01-03) / `useIdentifyStatus` (status poll、IS02/IS03)。
+- `CameraCapture.tsx` (新規): `<input capture=environment>` ベース、mediaDevices 非対応で folder 選択 fallback (E01)。
+- `index.ts` (追記): glue 再輸出。
+
+### glue テスト結果
+- 新規 26 tests pass (captureApi 6 / hooks 9 / CameraCapture 3 / discovery parse 5 / attach parse 3)
+- 全体 **566/566 pass** (was 540)、typecheck 0 / eslint 0
+
+### glue 差分メモ + 発見バグ
+- **[bug fix] `useIdentifyStatus` の poll loop 暴走**: 初版は effect の依存配列に `sleep`/`fetchFn` (関数 identity) を含めていたため、caller が inline 関数を渡すと `setResult` の再 render ごとに effect が再発火 → poll loop が無限増殖し OOM (テストが 186s で worker crash)。`fetchFn`/`sleep`/`onUpdate` を ref 化し effect 依存を `[discoveryId, token, pollIntervalMs]` の安定値のみに修正 (production footgun の解消、グローバル UI デバッグ方針: 実挙動=OOM から根本原因特定)。
+- 元 PLAN は Supabase Edge Fn/Realtime 前提 → Vercel api/capture/ + status poll に置換 (先行 glue と同方針)。triggerIdentify は `_shared/ai identifyPlant` を再利用 (objectKey は upload 結果を closure で受け渡し)。
