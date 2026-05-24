@@ -6,7 +6,8 @@ command: /flow:resume
 mode: continuous (default、auto-pick + Skill auto-invoke + 反復)
 target: project-wide
 started_at: 2026-05-23T10:00:00+09:00
-状態: 進行中
+状態: 完了 (superseded)
+finalize_note: 2026-05-24 D20260524_049 で棚卸し。本セッションが駆動するはずだった連続実装は後続セッション (D20260523_024〜D20260524_048) で全て実施済。dangling「進行中」マーカーが flow:auto P2 で誤検知されるため superseded として確定。
 完了ステップ一覧: [Step 0 入力収集, Step 1 L1 検知, Step 2 L2 照合, Step 3 auto-pick]
 依存セッション: [D20260523_022_revise__shared_ai_sec_001-003, D20260523_018_scenario_init]
 spec 変更ノート: 前回 (D20260523_021) は auto-pick + 表示のみ。今回は新 spec の Skill ツール自動 invoke + 反復モード。Class B (flow:tdd) で必ず pause

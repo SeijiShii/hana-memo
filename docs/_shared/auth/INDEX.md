@@ -1,8 +1,8 @@
 # _shared/auth ドキュメントインデックス
 
-**最終更新**: 2026-05-23 17:48
-**生成元**: /flow:feature _shared/auth + /flow:tdd (2026-05-23、SDK 非依存コア実装)
-**状態**: コア実装完了 (2026-05-23、SDK glue は app/api bootstrap defer)
+**最終更新**: 2026-05-24
+**生成元**: /flow:feature _shared/auth + /flow:tdd (2026-05-23 コア) + /flow:auto Milestone B (2026-05-24 SDK glue)
+**状態**: 実装完了 (コア 2026-05-23 + Clerk/fingerprint/Vercel glue 2026-05-24 Milestone B、E2E は Milestone C)
 
 <!-- auto-generated-start -->
 
@@ -16,7 +16,7 @@ Clerk Guest Users β + Google OAuth Linking。SDK 非依存コア (trial 抑止 
 | 002 | [002_auth_PLAN.md](./002_auth_PLAN.md) | PLAN | 完了 | 2026-05-22 | Phase 4 分割 (session→link→spam→hooks) |
 | 003 | [003_auth_UNIT_TEST.md](./003_auth_UNIT_TEST.md) | UNIT_TEST | 完了 | 2026-05-22 | 全関数網羅 + 90% カバレッジ目標 |
 | 004 | — | E2E_TEST | スキップ (cross-cutting) | — | account/capture/billing で間接検証 |
-| 101 | [101_auth_IMPL_REPORT.md](./101_auth_IMPL_REPORT.md) | IMPL_REPORT | コア完了 | 2026-05-23 | errors/trial/rls/webhook 実装、React/Clerk/Vercel glue defer |
+| 101 | [101_auth_IMPL_REPORT.md](./101_auth_IMPL_REPORT.md) | IMPL_REPORT | 実装完了 | 2026-05-24 | コア + Milestone B glue (provider/guest-session/link/spam-guard/hooks + api 3 本) |
 | 102 | [102_auth_UNIT_TEST_REPORT.md](./102_auth_UNIT_TEST_REPORT.md) | UNIT_TEST_REPORT | 完了 | 2026-05-23 | 25 tests / 行 99.06% / 分岐 97.05% |
 
 ## サブフォルダ
@@ -30,7 +30,8 @@ Clerk Guest Users β + Google OAuth Linking。SDK 非依存コア (trial 抑止 
 - **被依存**: 全機能 (`legal`, `account`, `capture`, `notebook`, `billing`, `export`, `memory`)
 - 関連論点: [論点-001] パスキー (v2), [論点-006] 匿名 SPAM 抑止 (採用済), [論点-007] 匿名→リンク移行 (採用済)
 - 実装コード (コア): `src/shared/auth/{errors,trial,rls,webhook,index}.ts`
-- defer (app/api bootstrap): `provider.tsx` / `guest-session.ts` / `link.ts` / `hooks.ts` / `getFingerprint` / `api/clerk-webhook.ts` / `api/auth/spam-check.ts` / `api/_lib/clerk.ts`
+- 実装コード (Milestone B glue): `src/shared/auth/{provider.tsx,guest-session.ts,link.ts,spam-guard.ts,hooks.ts}` + `api/_lib/clerk.ts` / `api/clerk-webhook.ts` / `api/auth/spam-check.ts`
+- 残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)、fingerprint 永続化スキーマ ([論点-006] follow-up)
 
 ## AI アクセスガイド
 - 機能概要 → README.md

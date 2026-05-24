@@ -99,20 +99,21 @@
 
 <!-- AUTO-GENERATED:BEGIN scenario-cursor -->
 
-- **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **着手・Milestone A (foundation) 完了**。Phase 3 コア 14/14 は完遂済 (UI/SDK 非依存コア + 101/102 + Vitest 373)
-- **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa / @vercel/node) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**。検証: typecheck 0 / Vitest 373 green / `vite build` + PWA 生成 OK / dev server `GET / → 200`
-- **進行中ターゲット**: Phase 3.5 Milestone B — defer glue の module 単位 wiring (下記「defer 蓄積」)
-- **直前完了セッション**: D20260524_048 (§4.5.7 dev script 計画追記 + Phase 3.5 Milestone A foundation)
-- **最終更新時刻**: 2026-05-24T07:10:00+09:00
+- **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B 進行中 (auth module wiring 完了)**。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
+- **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**
+- **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
+- **進行中ターゲット**: Phase 3.5 Milestone B 残 module — **次=storage presign api** → ai (`identify-plant` + Upstash rate limit = SEC-001 closure) → analytics (api/cron + Sentry beforeSend = SEC-004 closure) → billing → 各画面 component
+- **直前完了セッション**: D20260524_049 (/flow:auto resume: iteration 5 finalize + legal style fix + 反復 6 auth glue Milestone B)
+- **最終更新時刻**: 2026-05-24T13:00:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
 - **次の推奨ステップ (優先順)**:
-  1. **Phase 3.5 Milestone B (SDK glue wiring)**: 各 SDK (Clerk / R2-S3 / OpenAI / Upstash / Sentry / Stripe + jsPDF / JSZip / DOMPurify) install → defer glue (provider / hook / api handler / component) を module 単位で wiring → jsdom + SDK mock テスト。推奨順 = auth (provider/guest-session/getFingerprint) → storage presign api → ai `api/identify-plant` (+ Upstash rate limit binding = SEC-001 closure) → analytics api/cron (+ Sentry beforeSend wiring = SEC-004 closure) → billing Stripe → capture/notebook/export/memory の画面 component
+  1. **Phase 3.5 Milestone B (SDK glue wiring)** 続行: 残 SDK (R2-S3 / OpenAI / Upstash / Sentry / Stripe + jsPDF / JSZip / DOMPurify) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。推奨順 = ✅auth (完了 D20260524_049) → **storage presign api (次)** → ai `api/identify-plant` (+ Upstash rate limit binding = SEC-001 closure) → analytics api/cron (+ Sentry beforeSend wiring = SEC-004 closure) → billing Stripe → capture/notebook/export/memory の画面 component
   2. **Milestone C**: E2E green (Playwright smoke ジャーニー、Vercel preview)
   3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装) + `security-review` L5
 - **app/api bootstrap defer 蓄積** (Milestone B で wiring):
   - analytics: `api/{check-quota,refresh-matview,export-revenue}.ts` + Sentry `beforeSend` wiring (`vercel.json` cron は配置済)
-  - auth: `provider.tsx`/`guest-session.ts`/`link.ts`/`hooks.ts`/`getFingerprint`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`
+  - ✅ auth (完了 D20260524_049): `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`。残=Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
   - storage: `api/storage/{upload-url,signed-url,delete}.ts`/`_lib/r2.ts`/`upload.ts`/`fetch.ts useSignedUrl`/`meta.ts`
   - ai: `api/identify-plant.ts`/`api/_lib/{openai,prompt,schema}.ts`/frontend `identify.ts`/Upstash binding
   - **横断方針**: 上記 glue は module 単位で wiring + jsdom/SDK mock テスト (Milestone A で stack install + shell は完了済)

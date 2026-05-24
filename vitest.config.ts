@@ -3,8 +3,9 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
+    // 既定は node。React component/hook テストはファイル先頭の `// @vitest-environment happy-dom` で上書きする。
     environment: 'node',
-    include: ['src/**/*.{test,spec}.ts'],
+    include: ['src/**/*.{test,spec}.{ts,tsx}', 'api/**/*.{test,spec}.ts'],
     exclude: ['node_modules', 'dist', 'drizzle'],
     coverage: {
       provider: 'v8',

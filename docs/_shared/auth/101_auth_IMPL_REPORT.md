@@ -42,3 +42,44 @@ _shared/auth: SDK 非依存コア (trial 抑止 + 認可 + Clerk webhook mapping
 ### テスト
 - 25 tests pass、auth 行 99.06% / 分岐 97.05% (errors/trial/rls/webhook 100%)
 - 全体 194/194 pass、typecheck clean
+
+---
+
+## Milestone B 追記: SDK glue wiring (2026-05-24, D20260524_049 /flow:auto 反復 6)
+
+Phase 3.5 (app/api bootstrap) で defer していた Clerk / fingerprint / Vercel Function glue を実装。
+SDK install: `@clerk/clerk-react@^5.61.7` / `@clerk/backend@^3.4.13` / `svix@^1.94.0` /
+`@fingerprintjs/fingerprintjs@^5.2.0` + テスト基盤 `happy-dom` / `@testing-library/react`。
+
+### 追加実装ファイル
+
+| ファイル | 責務 | テスト |
+|---|---|---|
+| `src/shared/auth/provider.tsx` | `<AuthProvider>` = ClerkProvider wrapper + publishableKey ガード | provider.test.tsx (happy-dom, 2) |
+| `src/shared/auth/guest-session.ts` | `ensureGuestSession` (single-flight lock + retry1 + AuthInitError) | guest-session.test.ts (6) |
+| `src/shared/auth/link.ts` | `linkWithGoogle` / `isLinked` / `getIdentities` / callback URL・state 検証 | link.test.ts (10) |
+| `src/shared/auth/spam-guard.ts` | `getFingerprint` (+弱 fallback) / `enforceTrialLimitRemote` | spam-guard.test.ts (6) |
+| `src/shared/auth/hooks.ts` | `useCurrentUser` / `useClerkUserId` (Clerk → ドメイン形) | hooks.test.tsx (happy-dom, 5) |
+| `api/_lib/clerk.ts` | `verifyClerkSession` (@clerk/backend verifyToken) + Bearer 抽出 | clerk.test.ts (6) |
+| `api/clerk-webhook.ts` | svix 検証 → `mapClerkWebhookEvent`/`applyUserSync` → drizzle upsert | clerk-webhook.test.ts (5) |
+| `api/auth/spam-check.ts` | `verifyClerkSession` + `checkTrialQuota` + fingerprint hard cap | spam-check.test.ts (6) |
+
+### 設計判断 / 既知の差分
+
+- **decouple 維持**: テスト可能なオーケストレーション/評価ロジック (`ensureGuestSession` /
+  `processClerkWebhook` / `evaluateSpamCheck` / link 純関数) を SDK 非依存で切り出し、Clerk β
+  呼出 (guest sign-in) と DB 接続は注入/遅延 import。Clerk Guest Users β の client API は
+  検証不能のため `signInAsGuest` を注入境界に置いた (実 wiring + E2E は Milestone C)。
+- **UNIT_TEST 計画の Supabase 残渣**: `003_auth_UNIT_TEST.md` は BaaS Pivot 前の
+  `session.ts`/`linkIdentity` 表現が残存。実装は `001/002` (Clerk) 準拠とし、テスト ID は
+  L01-L08 / G01-G08 / S01-S03 / E01-E02 へマッピング。
+- **api Web handler**: `@vercel/node` 削除済のため `(req: Request) => Response` の Web 形式 +
+  `export const config = { runtime: 'nodejs' }`。
+- **fingerprint hard cap (G08)**: 評価ロジックは実装・テスト済だが、fingerprint 永続化テーブルが
+  未導入のため `countUsersByFingerprint` は現状 0 を返すスタブ ([論点-006] follow-up、要スキーマ追加)。
+- **SEC-001/SEC-004 closure 進捗**: 本 wiring は auth glue。rate-limit (SEC-001) は ai api、
+  Sentry beforeSend (SEC-004) は analytics api の Milestone B 残タスク。
+
+### テスト (Milestone B 時点)
+- 全体 **419/419 pass** (auth/api 新規 46)、typecheck 0、eslint 0、prettier 整形済
+- auth 行 96.46% / 分岐 90.98%、api handler は default export wiring を除き純ロジック 100%
