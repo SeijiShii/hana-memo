@@ -21,6 +21,8 @@
     "db:seed": "tsx src/shared/db/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1053.0",
+    "@aws-sdk/s3-request-presigner": "^3.1053.0",
     "@clerk/backend": "^3.4.13",
     "@clerk/clerk-react": "^5.61.7",
     "@fingerprintjs/fingerprintjs": "^5.2.0",
