@@ -67,6 +67,11 @@ describe('selectLastYearMemories', () => {
     expect(selectLastYearMemories([], today)).toEqual([]);
     expect(selectLastYearMemories([d({ capturedAt: '2026-05-20T00:00:00Z' })], today)).toEqual([]);
   });
+
+  it('imageObjectKey を選定後も保持する (サムネ署名取得用)', () => {
+    const out = selectLastYearMemories([d({ id: 'k', imageObjectKey: 'user-1/x.webp' })], today);
+    expect(out[0]?.imageObjectKey).toBe('user-1/x.webp');
+  });
 });
 
 describe('hasMemories / memoryCacheKey', () => {

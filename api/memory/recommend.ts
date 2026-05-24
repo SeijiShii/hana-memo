@@ -23,7 +23,7 @@ function jsonResponse(body: unknown, status: number): Response {
 
 async function fetchMemories(userId: string, today: Date): Promise<MemoryDiscovery[]> {
   const { start, end } = lastYearWindow(today);
-  const [{ db }, { discoveries }, { eq, and, isNull, gte, lte }] = await Promise.all([
+  const [{ db }, { discoveries, images }, { eq, and, isNull, gte, lte }] = await Promise.all([
     import('../../src/shared/db/client'),
     import('../../src/shared/db/schema'),
     import('drizzle-orm'),
@@ -38,8 +38,10 @@ async function fetchMemories(userId: string, today: Date): Promise<MemoryDiscove
       season: discoveries.season,
       locationLat: discoveries.locationLat,
       locationLng: discoveries.locationLng,
+      imageObjectKey: images.r2ObjectKey, // 画像未添付は null (leftJoin)
     })
     .from(discoveries)
+    .leftJoin(images, eq(discoveries.imageId, images.id))
     .where(
       and(
         eq(discoveries.userId, userId), // [SEC-005]
@@ -58,6 +60,7 @@ async function fetchMemories(userId: string, today: Date): Promise<MemoryDiscove
       r.locationLat != null && r.locationLng != null
         ? { lat: r.locationLat, lng: r.locationLng }
         : null,
+    imageObjectKey: r.imageObjectKey,
   }));
   return selectLastYearMemories(mapped, today); // identified フィルタ + 最新順 + 上限 5
 }
@@ -73,7 +76,10 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
   } catch (err) {
-    return jsonResponse({ error: 'unauthorized' }, err instanceof UnauthorizedError ? err.status : 500);
+    return jsonResponse(
+      { error: 'unauthorized' },
+      err instanceof UnauthorizedError ? err.status : 500,
+    );
   }
   try {
     const userId = await resolveUserId(clerkUserId);

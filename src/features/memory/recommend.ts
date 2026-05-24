@@ -21,6 +21,8 @@ export type MemoryDiscovery = {
   capturedAt: string; // ISO 8601
   season: Season;
   location?: { lat: number; lng: number } | null;
+  /** 紐づく R2 画像の objectKey (images.r2_object_key)。未添付は null。サムネ署名取得用。 */
+  imageObjectKey?: string | null;
 };
 
 /** 前年同日 ±windowDays の日付範囲を返す。 */
