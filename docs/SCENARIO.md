@@ -102,20 +102,20 @@
 - **現在フェーズ**: Phase 3.5 (app/api bootstrap) — **Milestone B 進行中 (auth module wiring 完了)**。Milestone A (foundation) 完了済、Phase 3 コア 14/14 完遂済
 - **Milestone A 完了 (2026-05-24, D20260524_048)**: フロントスタック install (React18 / Vite5 / Tailwind3 / react-router-dom / vite-plugin-pwa) + app shell (`index.html` / `vite.config.ts` / `src/{main,App}.tsx` / `index.css` / `tailwind.config.ts` / `postcss.config.js`) + `api/health.ts` (smoke #2) + **`scripts/dev.sh` (O36 launcher、concept §4.5.7)**
 - **Milestone B 進捗 (2026-05-24, D20260524_049 /flow:auto 反復 6)**: **auth module glue 完了** — install `@clerk/clerk-react`/`@clerk/backend`/`svix`/`@fingerprintjs/fingerprintjs` + `happy-dom`/`@testing-library/react`。実装: `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts` + `api/{_lib/clerk,clerk-webhook,auth/spam-check}.ts`。検証: typecheck 0 / **Vitest 419 green** (新規 46) / eslint 0。`src/vite-env.d.ts` 追加。残: Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
-- **進行中ターゲット**: Phase 3.5 Milestone B 残 module — ✅auth (D20260524_049) → ✅**storage glue (D20260524_050 反復1)** → **次=ai (`identify-plant` + Upstash rate limit binding = SEC-001 closure)** → analytics (api/cron + Sentry beforeSend = SEC-004 closure) → billing → 各画面 component
-- **直前完了セッション**: D20260524_050 (/flow:auto 反復 1: storage R2/S3 presign glue wiring、Vitest 464 green / 新規 45)
-- **最終更新時刻**: 2026-05-24T13:42:00+09:00
+- **進行中ターゲット**: Phase 3.5 Milestone B 残 module — ✅auth (D20260524_049) → ✅storage glue (D20260524_050 反復1) → ✅**ai glue (D20260524_050 反復2、[SEC-001] closed)** → **次=analytics (api/cron + Sentry beforeSend wiring = SEC-004 closure)** → billing → 各画面 component
+- **直前完了セッション**: D20260524_050 (/flow:auto 反復2: ai identify-plant + Upstash rate limit binding [SEC-001] closure、Vitest 486 green / 新規 22)
+- **最終更新時刻**: 2026-05-24T13:56:00+09:00
 - **完了フェーズ**: [Phase 1, Phase 2, Phase 2.5, Phase 3 (コア)]
 - **採用方針 (D20260523、ユーザー承認)**: 外部 SDK 依存の横断基盤・機能は **injectable パターンで UI/SDK 非依存コアを先行実装、SDK/React/Vercel glue は app/api bootstrap フェーズ (Phase 3.5) へ defer**
 - **次の推奨ステップ (優先順)**:
-  1. **Phase 3.5 Milestone B (SDK glue wiring)** 続行: 残 SDK (OpenAI / Upstash / Sentry / Stripe + jsPDF / JSZip / DOMPurify) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。推奨順 = ✅auth (D20260524_049) → ✅storage (D20260524_050、@aws-sdk/client-s3 + s3-request-presigner) → **ai `api/identify-plant` (次、+ Upstash rate limit binding = SEC-001 closure)** → analytics api/cron (+ Sentry beforeSend wiring = SEC-004 closure) → billing Stripe → capture/notebook/export/memory の画面 component
+  1. **Phase 3.5 Milestone B (SDK glue wiring)** 続行: 残 SDK (Sentry / Stripe + jsPDF / JSZip / DOMPurify) install → defer glue を module 単位で wiring → happy-dom + SDK mock テスト。推奨順 = ✅auth (D20260524_049) → ✅storage (D20260524_050、@aws-sdk) → ✅ai (D20260524_050、openai + @upstash、[SEC-001] closed) → **analytics api/cron (次、+ Sentry beforeSend wiring = SEC-004 closure)** → billing Stripe → capture/notebook/export/memory の画面 component
   2. **Milestone C**: E2E green (Playwright smoke ジャーニー、Vercel preview)
   3. その後 Phase 4 (α 公開準備): `/flow:tdd legal sentry-disclosure` (プラポリ実装) + `security-review` L5
 - **app/api bootstrap defer 蓄積** (Milestone B で wiring):
   - analytics: `api/{check-quota,refresh-matview,export-revenue}.ts` + Sentry `beforeSend` wiring (`vercel.json` cron は配置済)
   - ✅ auth (完了 D20260524_049): `provider.tsx`/`guest-session.ts`/`link.ts`/`spam-guard.ts`/`hooks.ts`/`api/clerk-webhook.ts`/`api/auth/spam-check.ts`/`api/_lib/clerk.ts`。残=Clerk Guest β 実 sign-in 配線 + E2E (Milestone C)
   - ✅ storage (完了 D20260524_050): `api/storage/{upload-url,signed-url,delete,meta}.ts`/`_lib/{r2,user}.ts`/`upload.ts`/`fetch.ts useSignedUrl`/`meta.ts`。残=E2E (Milestone C) + R2 bucket/CORS 手動運用
-  - ai: `api/identify-plant.ts`/`api/_lib/{openai,prompt,schema}.ts`/frontend `identify.ts`/Upstash binding
+  - ✅ ai (完了 D20260524_050、[SEC-001] closed): `api/identify-plant.ts` (runIdentify)/`api/_lib/{openai,ratelimit}.ts`/frontend `identify.ts`/Upstash binding。残=E2E (Milestone C)
   - **横断方針**: 上記 glue は module 単位で wiring + jsdom/SDK mock テスト (Milestone A で stack install + shell は完了済)
 - **PJ bootstrap 完了**: package.json / tsconfig / drizzle / vitest / .env.example (全 23 key) / CLAUDE.md / **frontend shell (Vite+React+Tailwind+PWA) + `scripts/dev.sh` (Phase 3.5 Milestone A、O36+O37 の dev.sh 基準を充足。CI yaml は Milestone C で配置)**
 - **secure findings 状況**:
@@ -124,7 +124,7 @@
   - SEC-003 (High SSRF): ✅ closed (`_shared/helpers/url.ts` assertSafeImageUrl + validateObjectKey、全消費)
   - SEC-007 (High drizzle SQLi): ✅ closed (drizzle-orm 0.45.2、audit high 0)
   - SEC-004 (High 法令必須 Sentry PII): scrubber コア実装済 (`_shared/analytics` D20260523_029)、開示設計済 (legal D20260524_046)。closure = api beforeSend wiring (Milestone B) + legal TDD (Phase 4)
-  - SEC-001 (Critical rate limit): 判定コア実装済 (`_shared/ai` rate-limit.ts)。closure = Upstash 実バインディング (Milestone B `api/identify-plant`)
+  - SEC-001 (Critical rate limit): ✅ closed (D20260524_050 反復2、`api/_lib/ratelimit.ts` Upstash binding + `api/identify-plant` runIdentify で強制)。残 = 実 Redis E2E smoke (Milestone C)
 
 <!-- AUTO-GENERATED:END scenario-cursor -->
 

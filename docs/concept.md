@@ -805,11 +805,11 @@ public/               # PWA manifest / icons
 
 ### [論点-011] レート制限の具体的実装 (SEC-001、Critical)
 
-- **status**: `dispatched-to-revise` (TDD rate-limit 判定コア実装完了、closure は Upstash binding + Vercel handler wiring 待ち)
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 (TDD 待機中、status は実装完了まで維持) → 2026-05-23 17:58 **TDD rate-limit 判定コア実装完了** (`/flow:tdd _shared/ai` D20260523_032: `src/shared/ai/rate-limit.ts` `checkIdentifyRateLimit` + `IDENTIFY_RATE_LIMIT` 10/min、RateLimiter DI、行 100%)
+- **status**: `closed` (Upstash binding + identify-plant handler wiring 完了。残 E2E 実 Redis smoke は Milestone C 検証)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:29 dispatched-to-revise → 2026-05-23 09:55 revise 設計反映完了 → 2026-05-23 17:58 TDD rate-limit 判定コア実装完了 (`/flow:tdd _shared/ai` D20260523_032: `rate-limit.ts` `checkIdentifyRateLimit` + `IDENTIFY_RATE_LIMIT` 10/min、RateLimiter DI) → 2026-05-24 13:55 **closed** (`/flow:auto` 反復2 D20260524_050: `api/_lib/ratelimit.ts` Upstash `createIdentifyRateLimiter` (slidingWindow 10/60s) + `api/identify-plant.ts` `runIdentify` で `checkIdentifyRateLimit` を最初に強制、超過時 RateLimitedError→429。unit test で rate-limit 超過時 OpenAI/quota 不実行を検証)
 - **dispatch 先**: `docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/` (4 文書完了)
 - **seed**: `docs/_pending_archive/sec_001-003_rate_limit_ssrf/000_TRIGGER.md` (revise 完了で `_pending/` → `_pending_archive/` 移動)
-- **対応 commit (revise)**: 後続コミットで追記。**closure 残**: `@upstash/ratelimit` 実バインディング + `api/identify-plant.ts` handler への middleware wiring (app/api bootstrap フェーズ)
+- **対応 commit**: revise (D20260523_022) + closure (D20260524_050 反復2、`feat(ai): Phase 3.5 Milestone B`)。**closure 残**: 実 Upstash Redis への E2E smoke (Milestone C、Vercel preview)
 - **影響範囲**: §3 NFR / §4.3 / §4.6.2 / `_shared/ai` / `_shared/auth` / `_shared/db` / `billing`
 - **観点 ID**: O27_rate_limit_scope
 - **severity**: Critical

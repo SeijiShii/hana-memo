@@ -76,3 +76,29 @@ context-heavy で `.flow-needs-compact` を書き込み → ユーザー `/exit`
 
 > 反復 1 (storage) 完了。SCENARIO §5 次ターゲット = ai module (`api/identify-plant` + Upstash rate limit binding = [SEC-001] closure)。
 
+### 反復 2: P3 — /flow:tdd _shared/ai (SDK glue wiring + [SEC-001] closure)
+
+```yaml
+- id: D20260524-050-004
+  question: 反復2 の auto-pick (storage 完了後の再評価)
+  chosen: P3 — ai module glue (api/identify-plant + Upstash rate limit binding)
+  chosen_type: auto-recommended
+  context: >
+    再評価: P1 open Critical/High SEC=0 (SEC-001/004 は dispatched-to-revise、closure は当 Milestone wiring)、
+    P2 中断=0、P3 scenario §5 次=ai。資源最大化のため heavy boundary で .flow-needs-compact 書込後も継続。
+- id: D20260524-050-005
+  question: ai glue 実装 + [SEC-001] closure 判定
+  chosen: 完了 — typecheck 0 / eslint 0 / Vitest 486 green (新規 22) / [SEC-001] closed
+  chosen_type: auto-recommended
+  context: >
+    install openai + @upstash/ratelimit + @upstash/redis。
+    resolveUserId を api/_lib/user.ts へ relocate (storage と共有、refactor commit 49d5854)。
+    新規: api/_lib/{ratelimit,openai}.ts + api/identify-plant.ts (runIdentify 純オーケストレーション) +
+    src/shared/ai/identify.ts + 各 test。barrel に identify 追加。
+    [SEC-001] closure: runIdentify が最初に checkIdentifyRateLimit を強制 (超過時 presign/quota/OpenAI 不実行、unit 検証)。
+    concept §8 [論点-011] status → closed。ai 101/102/INDEX + docs/INDEX + SCENARIO 更新。
+  完了ステップ: [relocate resolveUserId, ratelimit binding, openai wrapper, runIdentify handler, frontend identify, レポート/INDEX/concept §8 更新]
+```
+
+> 反復 2 (ai) 完了。[SEC-001] Critical closed。SCENARIO §5 次ターゲット = analytics module (api/cron + Sentry beforeSend wiring = [SEC-004] closure)。
+

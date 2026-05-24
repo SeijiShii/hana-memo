@@ -1,7 +1,14 @@
-# 単体テストレポート: _shared/ai (SDK 非依存コア)
+# 単体テストレポート: _shared/ai (コア + Phase 3.5 glue)
 
 ## 実施日時
-2026-05-23 17:58 (JST)
+2026-05-23 17:58 (JST) コア / 2026-05-24 13:55 (JST) glue 追記
+
+> **Phase 3.5 Milestone B glue (2026-05-24, /flow:auto 反復2)**: 新規 22 件追加 (全体 486 green)。
+> - `api/_lib/ratelimit.test.ts` (4): loadUpstashConfig / toRateLimiter (reset→resetAtMs) [SEC-001]
+> - `api/_lib/openai.test.ts` (3): buildIdentifyRequest (detail=low/json_schema) / callIdentifyVision / 空応答→AiServiceError
+> - `api/identify-plant.test.ts` (8): parseIdentifyBody + runIdentify (正常 / **[SEC-001] rate-limit 超過→presign/OpenAI 不実行** / 他 user objectKey→ValidationError / quota 0→QuotaExceededError / OpenAI 失敗→retry→throw)
+> - `src/shared/ai/identify.test.ts` (7): UT-AI-F01〜F06 (402→QuotaExceeded / 401→LinkRequired / 5xx→AiService / network→AiService+console.error / 429→RateLimited / retryIdentify 同payload)
+> - handler default export (Clerk/SDK/DB) は E2E (Milestone C) で検証。
 
 ## 関連ドキュメント
 - [003_ai_UNIT_TEST.md](./003_ai_UNIT_TEST.md) + [revise.../003_REVISE_UNIT_TEST.md](./revise_sec_001-003_rate_limit_ssrf_20260523/003_REVISE_UNIT_TEST.md)
