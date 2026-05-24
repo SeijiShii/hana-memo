@@ -1,6 +1,6 @@
-// memory feature barrel (UI 非依存コア)
+// memory feature barrel (コア + app bootstrap glue)
 // 関連: docs/memory/001_memory_SPEC.md
-// 「去年の今頃」バッジ + カルーセル React UI / localStorage キャッシュ / 実 DB は app bootstrap フェーズで追加
+// データ層 (recommend api + localStorage cache + useMemories) wiring 済。バッジ/カルーセル UI は Milestone C
 export {
   MEMORY_WINDOW_DAYS,
   MEMORY_MAX_ITEMS,
@@ -10,3 +10,10 @@ export {
   memoryCacheKey,
   type MemoryDiscovery,
 } from './recommend';
+export {
+  fetchMemories,
+  readMemoryCache,
+  writeMemoryCache,
+  type MemoryApiOptions,
+} from './memoryApi';
+export { useMemories, type UseMemoriesOptions } from './hooks';
