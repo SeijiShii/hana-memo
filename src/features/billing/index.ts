@@ -55,3 +55,8 @@ export {
 } from './components/PwywSelector';
 export { BillingPage, type BillingPageProps, type BillingProduct } from './pages/BillingPage';
 export { BillingSuccessPage, type BillingSuccessPageProps } from './pages/BillingSuccessPage';
+export { BillingContainer, type BillingContainerProps } from './BillingContainer';
+export {
+  BillingSuccessContainer,
+  type BillingSuccessContainerProps,
+} from './BillingSuccessContainer';

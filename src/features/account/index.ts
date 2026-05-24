@@ -30,3 +30,4 @@ export {
   type SettingsView,
   type SettingsPatch,
 } from './pages/SettingsPage';
+export { SettingsContainer, type SettingsContainerProps } from './SettingsContainer';

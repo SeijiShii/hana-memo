@@ -26,3 +26,5 @@ export { CaptureButton, type CaptureButtonProps } from './components/CaptureButt
 export { QuotaModal, type QuotaModalProps, type QuotaModalReason } from './components/QuotaModal';
 export { CapturePage, type CapturePageProps } from './pages/CapturePage';
 export { PreviewPage, type PreviewPageProps } from './pages/PreviewPage';
+export { CaptureContainer, type CaptureContainerProps } from './CaptureContainer';
+export { PreviewContainer, type PreviewContainerProps } from './PreviewContainer';

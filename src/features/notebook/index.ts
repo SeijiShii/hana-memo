@@ -50,3 +50,4 @@ export {
 } from './components/MapView';
 export { FigureView, type FigureViewProps } from './components/FigureView';
 export { NotebookPage, type NotebookPageProps, type NotebookViewMode } from './pages/NotebookPage';
+export { NotebookContainer, type NotebookContainerProps } from './NotebookContainer';
