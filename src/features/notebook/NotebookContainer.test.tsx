@@ -5,7 +5,7 @@
  * 由来: app-integration wiring (NotebookContainer)
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { NotebookDiscovery } from './types';
 
@@ -84,24 +84,17 @@ describe('NotebookContainer', () => {
     expect(useMemoriesMock).toHaveBeenCalledWith(expect.objectContaining({ token: 'tok' }));
   });
 
-  it('exportProps を配線 → 書き出しボタン表示、CSV 書き出しで exportCsv 起動', async () => {
+  it('エクスポートは UI 非表示 (2026-05-25 ユーザー判断) → 書き出しボタンを出さない', () => {
+    // exportProps を渡さない方針 = ヘッダの「書き出す」ボタンが描画されない (可逆: exportProps 再注入で復活)。
     useNotebookMock.mockReturnValue({
       discoveries: [disc('a', 'タンポポ')],
       loading: false,
       error: null,
     });
-    exportCsvMock.mockResolvedValue(undefined);
     renderContainer('tok');
-    // ダイアログ未表示時は ExportButton (ヘッダの「書き出す」) のみ存在する → 押して開く。
-    fireEvent.click(screen.getByRole('button', { name: '書き出す' }));
-    // ダイアログ内の確定「書き出す」を押す → exportCsv (CSV が初期フォーマット)。
-    const dialog = screen.getByRole('dialog', { name: 'データを書き出す' });
-    fireEvent.click(within(dialog).getByRole('button', { name: '書き出す' }));
-    expect(exportCsvMock).toHaveBeenCalledTimes(1);
-    // useExport に token と pdfUnlocked を渡している。
-    expect(useExportMock).toHaveBeenCalledWith(
-      expect.objectContaining({ token: 'tok', pdfUnlocked: false }),
-    );
+    expect(screen.getByText('タンポポ')).toBeTruthy(); // 一覧は描画
+    expect(screen.queryByRole('button', { name: '書き出す' })).toBeNull(); // 書き出すは非表示
+    expect(useExportMock).not.toHaveBeenCalled(); // export hook も起動しない
   });
 
   it('token なし → データ hook を起動せず空状態を描画する', () => {

@@ -25,8 +25,6 @@ import { useNotebook } from './hooks';
 import { useSignedThumbnails } from './useSignedThumbnails';
 import { NotebookPage } from './pages/NotebookPage';
 import { useMemories } from '../memory';
-import { useExport } from '../export';
-import { usePdfUnlocked } from '../billing';
 import { useAuthToken } from '../../app/useAuthToken';
 
 export type NotebookContainerProps = {
@@ -39,14 +37,14 @@ function AuthedNotebook({ token }: { token: string }) {
   const navigate = useNavigate();
   const { discoveries, loading, error } = useNotebook({ token });
   const { memories, loading: memoriesLoading } = useMemories({ token });
-  const { unlocked } = usePdfUnlocked({ token });
-  const pdfUnlocked = unlocked === true;
-  const { exportCsv, exporting, error: exportError } = useExport({ token, pdfUnlocked });
 
   // 実サムネ署名 URL を解決 (revise_001、resolveThumbnail seam に配線)。
   const { resolveThumbnail } = useSignedThumbnails(discoveries, { token });
   const { resolveThumbnail: resolveMemoryThumbnail } = useSignedThumbnails(memories, { token });
 
+  // エクスポート (書き出す) は当面 UI 非表示 (2026-05-25 ユーザー判断、可逆)。
+  // exportProps を渡さない = NotebookPage がボタン + ダイアログを描画しない。
+  // export feature コード / api/export / billing PWYW-PDF / concept UC3 は休眠で維持 (復活は exportProps 再注入)。
   return (
     <NotebookPage
       discoveries={discoveries}
@@ -58,14 +56,6 @@ function AuthedNotebook({ token }: { token: string }) {
       resolveMemoryThumbnail={resolveMemoryThumbnail}
       onSelect={(d) => navigate(`/notebook/${d.id}`)}
       onSelectMemory={(m) => navigate(`/notebook/${m.id}`)}
-      exportProps={{
-        onExportCsv: () => exportCsv(),
-        // PDF / 画像 ZIP の実 jsPDF/JSZip レンダラ注入は Milestone C (未配線 = ダイアログで「準備中」表示)。
-        pdfUnlocked,
-        onUnlock: () => navigate('/billing'),
-        exporting,
-        error: exportError,
-      }}
     />
   );
 }
