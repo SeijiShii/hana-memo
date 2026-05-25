@@ -52,7 +52,7 @@ function jsonResponse(body: unknown, status: number): Response {
 export const config = { runtime: 'nodejs' };
 
 /** Vercel Web handler。 */
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
     return new Response('Method Not Allowed', { status: 405 });
   }
@@ -85,3 +85,5 @@ export default async function handler(req: Request): Promise<Response> {
   const quota = evaluateSpamCheck({ user, fingerprintUserCount });
   return jsonResponse(quota, 200);
 }
+
+export default { fetch: handler };

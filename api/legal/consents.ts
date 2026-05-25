@@ -171,6 +171,8 @@ export async function handleConsents(req: Request, deps: ConsentsDeps = {}): Pro
 }
 
 /** Vercel Web handler。 */
-export default function handler(req: Request): Promise<Response> {
+function handler(req: Request): Promise<Response> {
   return handleConsents(req);
 }
+
+export default { fetch: handler };

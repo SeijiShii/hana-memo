@@ -16,6 +16,12 @@
 |---|---|---|---|
 | D20260525-054 | ループ実行ブランチ | concept 修正を main に FF マージ → main をベースに継続 | explicit-choice |
 | D20260525-055 | 反復1 auto-pick | P4.4(b) Design gate → /flow:design --review-only | auto-recommended |
+| D20260525-057 | 反復2 auto-pick | P4.7 Handoff gate (no-key 枯渇) → /flow:handoff | auto-recommended |
+
+## 反復ログ
+
+- **反復1** (P4.4b Design gate): `/flow:design --review-only` → 完了。視覚 PASS / O38 PASS、notebook タブ折返し修正 (865 green)。commit `bf00c47` (D20260525_055)
+- **反復2** (P4.7 Handoff gate): no-key/Class-A 変種枯渇を確認 (design 完了 / legal 実装済 / ローカル E2E green / 残 runtime 配線は SCENARIO が実 runtime 検証後に defer)。`.env.local` 存在だが実キー未検証 + 残検証は実サービス必須 → 停止せず `/flow:handoff` dispatch
 
 ## 起動時 PJ 状態スキャン
 

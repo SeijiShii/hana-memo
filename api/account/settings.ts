@@ -194,6 +194,8 @@ export async function handleSettings(req: Request, deps: SettingsDeps = {}): Pro
 }
 
 /** Vercel Web handler。 */
-export default function handler(req: Request): Promise<Response> {
+function handler(req: Request): Promise<Response> {
   return handleSettings(req);
 }
+
+export default { fetch: handler };

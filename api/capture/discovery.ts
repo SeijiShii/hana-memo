@@ -82,7 +82,7 @@ async function deleteDiscovery(userId: string, discoveryId: string): Promise<voi
 export const config = { runtime: 'nodejs' };
 
 /** Vercel Web handler。 */
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
   let clerkUserId: string;
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
@@ -130,3 +130,5 @@ export default async function handler(req: Request): Promise<Response> {
 
   return new Response('Method Not Allowed', { status: 405 });
 }
+
+export default { fetch: handler };

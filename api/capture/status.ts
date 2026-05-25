@@ -57,7 +57,7 @@ async function fetchStatus(userId: string, discoveryId: string): Promise<Discove
 export const config = { runtime: 'nodejs' };
 
 /** Vercel Web handler。 */
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
   if (req.method !== 'GET') {
     return new Response('Method Not Allowed', { status: 405 });
   }
@@ -85,3 +85,5 @@ export default async function handler(req: Request): Promise<Response> {
     return jsonResponse({ error: 'internal' }, 500);
   }
 }
+
+export default { fetch: handler };
