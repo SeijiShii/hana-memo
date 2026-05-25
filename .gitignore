@@ -46,3 +46,6 @@ test-results/
 .flow-loop-active
 .flow-needs-compact
 .vercel
+
+# stale env backup (renamed by release Phase 2 fix, contains secrets — never commit)
+.env.stale.bak

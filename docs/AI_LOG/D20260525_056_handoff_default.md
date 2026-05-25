@@ -124,3 +124,64 @@
 - **判断**: release 原則#8 = Phase 2 で Class A 実装バグ → **deploy せず fix seed → loop へ返す**。本バグは 21-23 handler + 実 contract を捕捉する regression test を要するため `/flow:fix` 案件
 - vercel dev は再検証用に起動継続 (bg id beqbytrzi、localhost:3001)
 - 状態: Phase 2 **BLOCKED** (critical handler-signature バグ)。release は fix 完了後に再開 (Phase 2 再検証 → Phase 3 deploy)
+
+---
+
+## 再開 4: handler-signature fix 完了 → Phase 2 再開 (2026-05-25 14:10)
+
+- `/flow:fix` (D20260525_058) で 23 handler を `export default { fetch: handler }` 形に修正 + 契約テスト追加。commit `349697b`。890 unit green
+- **vercel dev 全 core-flow endpoint が hang→正常応答** に回復: upload-url/identify-plant/capture-discovery/notebook-list/billing-checkout すべて **401 (1.7-3s)** (no-auth で正常)。API 層は機能するようになった
+- → release Phase 2 (デプロイ前ローカル動作確認、軽め+課金系) 再開可能。次: ユーザーが browser で実フロー (guest session→撮影→AI識別[実 OpenAI ~$0.002]→図鑑保存) を目視
+- localhost:3001 (vercel dev、port 3000 は stale bare-vite が占有のため 3001 fallback)。WSL2 の localhost は Windows ブラウザから自動到達
+- 状態: Phase 2 進行中 (ユーザー browser 目視待ち)
+
+---
+
+## 再開 5: /flow:release --resume (2026-05-25 14:15、/flow:auto D20260525_059 反復1 から dispatch)
+
+- 前回 (再開4) 後に `vercel dev` プロセスが死亡 (port 3001/3000/5173 すべて free、ps に vercel/vite なし)。git は本 AI_LOG の WIP のみ、handler fix は commit 349697b 済
+- **Phase 2 復帰のため vercel dev を再起動**: `PORT=3000 bash scripts/dev.sh` (nohup detached, /tmp/hana-dev.log)。今回は port 3000 が空いており 3000 で起動成功 (`/api/health` = 200, Vite v5.4.21 ready)
+- **handler fix (349697b) の永続性を fresh process で再確認**: `/api/storage/upload-url` (POST) / `/api/identify-plant` (POST) / `/api/notebook/list` (GET) / `/api/legal/consents` (GET) すべて **401 (no-auth 正常) ~1.2s** — hang(000) なし。API 層は機能継続
+- env 再スキャン: core-flow キー (OpenAI/Neon/Clerk test/R2/Upstash) 全 SET、`.env.local` gitignore 済。Stripe/Sentry/Clerk-webhook は PLACEHOLDER のまま (billing/監視、core flow には不要で defer 継続)
+- → **Phase 2.4 human browser 目視ゲート**に到達。dev server = http://localhost:3000 (WSL2 localhost は Windows ブラウザから自動到達、撮影は `<input type=file capture>` で localhost desktop 可・HTTPS/phone 不要)。実 OpenAI Vision 呼び出し (~$0.002) を含むため B-4 まとめ確認をユーザーに提示。loop marker 保持 (human 確認 pause、終了ではない)
+- 状態: Phase 2 進行中 (ユーザー browser 目視待ち — vercel dev は localhost:3000 で起動済)
+
+---
+
+## 再開 5b: Phase 2 browser 目視で **stale `.env` shadow バグ検出・修正** (2026-05-25 18:20)
+
+- ユーザー browser (Windows, localhost:3000) で2件のエラー報告:
+  - (1) `net::ERR_NETWORK_CHANGED` 一斉 (複数 `/src/*.tsx` モジュール) → **一過性のブラウザ/OS ネットワークイベント** (WSL2 NIC flap or 初回 Vite dep 最適化)。全モジュールを並列 curl して 200 安定配信を確認 = サーバー側正常、reload で解消。コードバグではない
+  - (2) **`@clerk/clerk-react: publishableKey invalid (key=pk_test_xxxx…)`** → ClerkProvider throw → 白画面。これが Phase 2 の真の blocker
+- **根本原因**: project root に **stale `.env`** (09:36 作成、gitignored+untracked) が存在。`.env.local` (12:28、real keys) とは別物で、`VITE_CLERK_PUBLISHABLE_KEY` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_ACCOUNT_ID` / `UPSTASH_REDIS_REST_TOKEN` 等が **PLACEHOLDER**。`vercel dev` が `.env` を process.env にロード → **Vite は既存 process.env を最優先し `.env.local` で上書きしない** (documented behavior) → placeholder が real key を shadow。served module に `pk_test_…xxxx` が inline されていたことを curl で実証
+- **影響範囲**: Clerk (白画面) だけでなく R2 upload / Upstash rate limiter も placeholder で動作不能だった (Phase 2 全体の隠れ blocker)
+- **修正 (Class A, reversible)**: `mv .env .env.stale.bak` (削除でなく退避、gitignored+untracked で repo 無影響、real 値はすべて `.env.local` に存在することを事前確認) → vercel dev 再起動。**served module が `pk_test_…V2JA` (real, .env.local 由来) を inline するよう変化を curl で実証**。endpoints は 401 (no-auth 正常) 継続
+- 環境クリーンアップ (code bug でない) のため `/flow:fix` seed は不要。project 規約は `.env.example` (template) + `.env.local` (real) のみで `.env` は本来不要
+- 状態: Phase 2 進行中 (修正後の browser 再目視待ち — ユーザーに hard-reload を依頼)
+
+---
+
+## 再開 5c: Phase 2 で **アーキテクチャ blocker 検出 — 匿名 (guest) sign-in が設計通り実装不能** (2026-05-25 18:40)
+
+- Clerk 修正後ユーザーが core flow 続行 → 「『これでよい』押下 → 図鑑に移るが何も保存されていない」報告
+- **トレース結果 (コードバグでなく未実装 + 設計前提の誤り)**:
+  - `PreviewContainer.tsx`: `token`/`userId` が null の間は `onConfirm` を渡さず「これでよい」は /notebook 遷移のみ (偽保存しない設計)。実 save (createDiscovery→R2 upload→identify) は発火しない
+  - `useAuthToken` は「sign-in 済前提」。未 sign-in なら `token=null`。`useCurrentUser().clerkUserId` も null
+  - `ensureGuestSession` (guest sign-in オーケストレーション) は実装 + UT 済だが **barrel export のみで app から一切 consume されていない**。boot 時に `signInAsGuest` を呼ぶ React アダプタ (`useGuestSession`) が未配線 (SCENARIO の defer 項目「Clerk guest β sign-in」)
+  - → 誰も sign-in しない → session 無し → save/notebook fetch すべて skip → **図鑑空・未保存**
+- **根本 blocker (設計前提の誤り)**: concept §4 が core UX を「起動時 Clerk **Guest Users (β)** で自動 UUID 発行 → 匿名で撮影・保存」と規定 (0 タップ, 気軽さ最優先) だが、**`@clerk/clerk-react` 5.61.7 含む全 Clerk パッケージに `signInAsGuest`/anonymous/guest sign-in API が存在しない**。「Clerk Guest Users β」は実在しない Clerk 機能で、設計全体に誤前提として伝播していた。server 側 (`api/_lib/clerk.ts`) も JWT verify のみで guest user 生成 path なし
+- **実装可能な Clerk-native 代替を検証済**: `@clerk/backend` に `users.createUser` + `signInTokens.createSignInToken` 実在、frontend `signIn.create({strategy:'ticket'})` で session 確立可能。spam-guard (fingerprintjs 5.2.0 + `api/auth/spam-check`) も配備済 = 匿名 user 量産の MAU 濫用対策あり
+- **判断**: release 原則#8 = Phase 2 で Class-A 実装 blocker → **deploy せず loop へ返す**。ただし設計前提 (Clerk Guest Users β 実在) が誤りのため、loop が自動実装する前に**認証アーキテクチャの意思決定 (1 問)** をユーザーに提示する必要あり (= 有効な mechanical path が無い hard blocker、auto-pick の対象外)
+- vercel dev は localhost:3000 で起動継続 (実装後の再検証用)
+- 状態: Phase 2 **BLOCKED** (匿名 auth アーキテクチャ決定待ち)。決定後に実装 (revise/fix → tdd) → Phase 2 再検証 → Phase 3 deploy
+
+---
+
+## 再開 5d: ユーザー決定 = Option A (Clerk + ticket) → release は deploy せず loop へ返す (2026-05-25 18:55)
+
+- **ユーザー決定 (AskUserQuestion → 中断 + 明示回答)**: **Option 1 = Clerk + 招待トークン方式** を採用。バックエンドで匿名 Clerk user 発行 (`users.createUser` email 無 + `signInTokens.createSignInToken`) → フロント `signIn.create({strategy:'ticket'})` で session 確立。Clerk + Neon + 既存 JWT verify/userId スコープを全維持、concept の 0 タップ UX 維持。spam-guard (fingerprintjs + spam-check) で MAU 濫用抑止
+- **追加ユーザー指示**: 「ほとんどのマイクロサービスは匿名ログインを設計に含むので、この留意点を flow 系コマンドに追加」→ **完了**: `perspectives.md` O22_guest_progressive_auth を拡張 (採用プロバイダの匿名 API 実現性を設計確定時に具体 API 名で検証する必須ステップ + Clerk/Auth0 は非対応で backend createUser+ticket fallback 必須 + hana-memo 教訓)。flow:concept/feature/secure が読む SoT に反映
+- **release 原則#8 適用**: Phase 2 で Class-A 実装 blocker → **deploy しない**。設計確定 (decision 済) のため loop へ返し、loop が実装を dispatch
+- **次 dispatch**: `/flow:revise _shared/auth` — 既存 auth SPEC/コードの「Clerk Guest Users β / signInAsGuest」誤前提を Option A 機構 (backend createUser+ticket) に改修した REVISE_SPEC/PLAN/UNIT_TEST/E2E を生成 → `/flow:tdd` で実装。concept §4 auth 行の誤記も整合修正対象
+- vercel dev は localhost:3000 起動継続 (実装後の Phase 2 再検証用)
+- 状態: Phase 2 保留のまま loop へ復帰 (revise → tdd 実装 → Phase 2 再検証 → Phase 3 deploy)
