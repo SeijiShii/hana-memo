@@ -21,6 +21,10 @@ export function ClerkAuthBridge({ children }: { children: ReactNode }) {
       userId: userId ?? null,
       email: user?.primaryEmailAddress?.emailAddress ?? null,
       hasExternalAccount: (user?.externalAccounts?.length ?? 0) > 0,
+      // 匿名判定は publicMetadata.isAnonymous を権威ソースに (guest 発行時設定、fix_001)。
+      // email 有無では判定しない (guest は合成 email を持つため誤判定する)。
+      isAnonymous:
+        (user?.publicMetadata as { isAnonymous?: boolean } | undefined)?.isAnonymous === true,
       getToken: async () => (await getToken()) ?? null,
     }),
     [isLoaded, isSignedIn, userId, user, getToken],
