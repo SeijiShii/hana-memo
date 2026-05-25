@@ -51,6 +51,12 @@
 | amount (PWYW) 100–10000 検証 | 有効 | **削除** |
 | quantity 検証 | 1–10 整数 | 1 のみ (上限 ¥100) |
 
+<!-- spec-review R5: `link_required` typed error (src/shared/types/api.ts) の去就 — identify は 402 化・checkout は requireLinked 撤廃のため、変更後に link_required を返す到達経路を確認し、無ければ型 union + FE 分岐から除去する。Phase 1/4 で判定 -->
+<!-- spec-review R7: quantity=1 固定 (¥100=10回上限) のため、使い切り後の **再購入導線** (QuotaModal から 1 タップで再度 ¥100 購入) を §7.1 UC に含める -->
+<!-- spec-review R6: requireLinked 撤廃で匿名が create-checkout-session に到達可能になるため、Stripe Checkout Session 乱造防止に当エンドポイントのレート制限 (Upstash、guest 発行と同様) を確認・必要なら付与 (§7.5 NFR) -->
+<!-- これら R5/R6/R7 の詳細は ./905_SPEC_REVIEW.md を参照 -->
+
+
 ## 3. 影響範囲
 
 | 対象 | 影響度 | 説明 |
@@ -137,12 +143,13 @@
 
 ## 9. 未決事項
 
-### [論点-R001] `spam-check.ts` の fingerprint-cap 表現
+### [論点-R001] `spam-check.ts` の fingerprint-cap 表現 — **RESOLVED (spec-review R2)**
 - **影響範囲**: `api/auth/spam-check.ts:31`, identify 経路
 - **詰めるべき問い**: cap 到達時に `mustLink` を返していた挙動を、`mustLink` 廃止後どう表現するか。
-- **候補案**: (a) 濫用制御を guest-provision (発行レート制限 + cap) に一元化し、identify からは cap→mustLink を除去 (推奨)。(b) cap 到達は識別自体を 429/403 で拒否。
-- **推奨**: (a)。発行段階で cap を効かせれば identify 時に追加判定は不要。O47 (防御は安価 ID の発行・枠で行う) と整合。
-- **判断期限**: 実装 (Phase 2) 着手前。
+- **候補案**: (a) 濫用制御を guest-provision (発行レート制限 + cap) に一元化し、identify からは cap→mustLink を除去。(b) cap 到達は識別自体を 429/403 で拒否。
+- **結論 (spec-review auto-pick D2)**: **(a) 採用**。fingerprint-cap の enforcement を guest-provision (発行レート制限 + cap で新規ゲスト発行を拒否) に一元化し、identify 時の cap→mustLink 経路は除去する。O47 (濫用防御は安価 ID の発行・枠で行う) と整合。Phase 5 (spam-check 整理) で実施。
+<!-- spec-review R2: [論点-R001] を (a) で確定。mustLink 廃止に伴う濫用制御の移譲先を明示 -->
+- **判断期限**: ~~実装着手前~~ → 解決済 (Phase 5 で実装)。
 
 ## 10. 更新履歴
 | 日付 | 変更概要 | 実行者 |

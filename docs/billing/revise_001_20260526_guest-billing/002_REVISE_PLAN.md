@@ -27,6 +27,12 @@
 | `src/shared/types/{billing,domain,api}.ts` | `pdf_unlock` / `pdfUnlocked` / `mustLink` 型除去 | 中 (型波及) | §2.3 |
 | docs: `001_billing_SPEC.md` / `002` / `004` | UC2/E-BL-002/007/PWYW を新仕様に追従 (基準 SPEC 側も更新) | 低 | — |
 | `docs/concept.md` | §1.3 課金 (¥100=10回)、§5 データ (pdf_unlocked 削除)、UC3 (export) の記述更新 | 低 | — |
+<!-- spec-review R1/R3: 影響範囲の列挙漏れを追補 (実コード grep)。mustLink/link_required の全 consumer を以下に追加 -->
+| `src/shared/auth/trial.ts` | **mustLink の第2系統** (`TrialQuota.mustLink` + `requireTrial`→LinkRequiredError)。R3 で identify enforcement 経路 (effectiveQuota のみ使用) と分離確認 → 呼出元を Phase 1 で grep し flip/維持を判定 | 中 | R3 |
+| `src/shared/auth/spam-guard.ts` | `requireTrial`→LinkRequiredError の遠隔判定。呼出元確定後に方針決定 (guest-provision 用途なら濫用制御として維持) | 中 | R2/R3 |
+| `src/shared/types/api.ts` | `{ error: 'link_required' }` union メンバ。変更後の到達経路を確認し不要なら除去 (R5) | 中 | R5 |
+| `src/features/billing/hooks.ts` / `api.ts` | `mustLink` DTO 露出 (hooks.ts:65,73 / api.ts:63) を除去 | 中 | R1 |
+| `src/features/capture/CaptureContainer.tsx` / `CaptureButton.tsx` / `pages/CapturePage.tsx` | `linkRequired = mustLink` → reason 分岐 → QuotaModal。**reason='link_required'(連携誘導) を購入導線へ flip** (中核 UX) | 中 | R1 |
 
 ## 2. 新規ファイル一覧
 

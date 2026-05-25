@@ -1,7 +1,7 @@
 # AI_LOG インデックス — hana-memo
 
 **最終更新**: 2026-05-26 (+09:00)
-**総セッション数**: 65 (ファイル実数。※ 056〜064 はセッション一覧表に未反映の drift あり、要 backfill)
+**総セッション数**: 67 (ファイル実数。※ 056〜064 はセッション一覧表に未反映の drift あり、要 backfill — AUDIT-structure-001)
 **総 decision 数**: 316+ (056 以降未集計)
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
@@ -16,6 +16,8 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260526_067_spec-review_billing.md](./D20260526_067_spec-review_billing.md) | 2026-05-26 | /flow:spec-review (auto-pick) | billing revise_001 実装前レビュー。High2(consumer列挙漏れ/論点-R001未解決)/Med2/Low2/Info1。905_SPEC_REVIEW + 001/002 反映。P29 追加 | D20260526-015〜018 | 完了 |
+| [D20260526_066_audit_light.md](./D20260526_066_audit_light.md) | 2026-05-26 | /flow:audit (light) | プロダクト全体 #1-#3 整合性監査。Critical0/High0/Medium2/Low3/Info2。AI_LOG/INDEX 056-064 欠落 (M) + 論点-006 が revise_001/O46/O47 と要整合 (M)。AUDIT_20260526_0828.md | D20260526-011〜014 | 完了 |
 | [D20260526_065_revise_billing_001.md](./D20260526_065_revise_billing_001.md) | 2026-05-26 | /flow:revise billing guest-billing | ゲストのまま ¥100=AI10回 単発課金 (ログイン不要)、quota 匿名 credits 対応 + mustLink 廃止、pricing ¥100=10、pdf_unlock/PWYW/export 全廃。O46/O47 適用 | D20260526-001/002/007/009/010 | 完了 (設計) |
 | (056〜064 未反映: handoff/auto/fix/claim/revise notebook — backfill 待ち) | — | — | — | — | drift |
 | [D20260525_055_design_review.md](./D20260525_055_design_review.md) | 2026-05-25 | /flow:design --review-only | 6 画面 headless 視覚レビュー: 視覚 PASS / O38 コピー PASS。notebook タブ折返し修正 (865 green)、legal 見出し jargon は法務時 defer。/flow:auto 反復1 から dispatch | D20260525-056 | 完了 |
