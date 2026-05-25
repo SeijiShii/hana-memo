@@ -17,7 +17,7 @@
 | 3 | ❌ | [account](./account/) | **実装完了** (設定画面 + 削除確認 + `api/account/settings` 永続化済) | 2026-05-22 → 2026-05-25 | 0 | 0 | 0 | [INDEX](./account/INDEX.md) |
 | 4 | ❌ | [capture](./capture/) | **実装完了** (撮影画面 presentation + routing 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./capture/INDEX.md) |
 | 4 | ❌ | [notebook](./notebook/) | **実装完了** (4-mode view + 実サムネ + 発見詳細閲覧 /notebook/:id 済) | 2026-05-22 → 2026-05-25 | 1 | 0 | 0 | [INDEX](./notebook/INDEX.md) |
-| 4 | ❌ | [billing](./billing/) | **実装完了** (PWYW 課金画面 + glue 済) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./billing/INDEX.md) |
+| 4 | ❌ | [billing](./billing/) | **実装完了** + 改修設計中 (revise_001 ゲスト課金) | 2026-05-22 → 2026-05-26 | 1 | 0 | 0 | [INDEX](./billing/INDEX.md) |
 | 5 | ❌ | [export](./export/) | **実装完了** (書き出しダイアログ済、実 PDF/ZIP は app/E2E) | 2026-05-22 → 2026-05-24 | 0 | 0 | 0 | [INDEX](./export/INDEX.md) |
 | 5 | ❌ | [memory](./memory/) | **実装完了** (去年の今頃 carousel/badge + recommend 応答 imageObjectKey 済) | 2026-05-22 → 2026-05-25 | 0 | 0 | 0 | [INDEX](./memory/INDEX.md) |
 
