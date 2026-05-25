@@ -22,7 +22,7 @@ Clerk Guest Users β + Google OAuth Linking。SDK 非依存コア (trial 抑止 
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
-| [revise_001_20260525_clerk-ticket-guest-auth/](./revise_001_20260525_clerk-ticket-guest-auth/) | revise | 001 / clerk-ticket-guest-auth | 設計完了 (tdd 待ち) | 匿名サインインを実在しない Clerk Guest β → backend createUser+ticket 方式へ置換 | [INDEX](./revise_001_20260525_clerk-ticket-guest-auth/INDEX.md) |
+| [revise_001_20260525_clerk-ticket-guest-auth/](./revise_001_20260525_clerk-ticket-guest-auth/) | revise | 001 / clerk-ticket-guest-auth | 実装完了 (unit 919 green、runtime 検証待ち) | 匿名サインインを実在しない Clerk Guest β → backend createUser+ticket 方式へ置換 | [INDEX](./revise_001_20260525_clerk-ticket-guest-auth/INDEX.md) |
 
 ## 関連
 - 親 concept: `../../concept.md` §1.2, §1.3.2, §3, §4.1, §6
