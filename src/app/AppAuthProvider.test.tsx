@@ -15,6 +15,9 @@ vi.mock('@clerk/clerk-react', () => ({
   // ClerkAuthBridge が読む hooks (キーあり時のみマウントされる)。
   useAuth: () => ({ isLoaded: true, isSignedIn: false, userId: null, getToken: async () => null }),
   useUser: () => ({ user: null }),
+  // GuestSessionGate → useGuestSession が読む。isLoaded:false で effect を早期 return させ、
+  // 本テスト (キー分岐の検証) で guest sign-in の副作用 (fetch) を起こさない。
+  useSignIn: () => ({ isLoaded: false, signIn: undefined, setActive: undefined }),
 }));
 
 import { AppAuthProvider } from './AppAuthProvider';
