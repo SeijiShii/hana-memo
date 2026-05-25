@@ -1,20 +1,15 @@
 // @vitest-environment happy-dom
 /**
- * CaptureContainer 単体テスト — billing (useAiCredits) / auth 由来の quota・連携状態を CapturePage に配線する。
- * 由来: app-integration wiring (CaptureContainer)
+ * CaptureContainer 単体テスト — billing (useIdentifyQuota) 由来の実効 quota・連携状態を CapturePage に配線する。
+ * 由来: app-integration wiring (CaptureContainer) / fix_001 (実効 quota へ切替)
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-const useAiCreditsMock = vi.fn();
-const useCurrentUserMock = vi.fn();
+const useIdentifyQuotaMock = vi.fn();
 
-vi.mock('../billing', () => ({ useAiCredits: (...a: unknown[]) => useAiCreditsMock(...a) }));
-vi.mock('../../shared/auth/hooks', () => ({
-  useCurrentUser: () => useCurrentUserMock(),
-  useClerkUserId: () => null,
-}));
+vi.mock('../billing', () => ({ useIdentifyQuota: (...a: unknown[]) => useIdentifyQuotaMock(...a) }));
 vi.mock('../../app/useAuthToken', () => ({
   useAuthToken: () => ({ token: null, isLoaded: true, isSignedIn: false }),
 }));
@@ -30,30 +25,32 @@ function renderContainer(token: string | null) {
 }
 
 beforeEach(() => {
-  useAiCreditsMock.mockReset();
-  useCurrentUserMock.mockReset();
-  useAiCreditsMock.mockReturnValue({ credits: 5 });
-  useCurrentUserMock.mockReturnValue({ isSignedIn: true, isAnonymous: false, clerkUserId: 'u1' });
+  useIdentifyQuotaMock.mockReset();
+  useIdentifyQuotaMock.mockReturnValue({ remaining: 3, mustLink: false });
 });
 
 describe('CaptureContainer', () => {
-  it('token あり, quota>0 → 撮影ボタンを描画し useAiCredits に token を渡す', () => {
+  it('token あり, 実効 quota>0 → 撮影ボタンを描画し useIdentifyQuota に token を渡す', () => {
     renderContainer('tok');
     expect(screen.getByLabelText('植物を撮影 / 画像を選択')).toBeTruthy();
-    expect(useAiCreditsMock).toHaveBeenCalledWith(expect.objectContaining({ token: 'tok' }));
+    expect(useIdentifyQuotaMock).toHaveBeenCalledWith(expect.objectContaining({ token: 'tok' }));
   });
 
-  it('匿名 user かつ残 0 → linkRequired で連携誘導 (撮影ボタンを出さない)', () => {
-    useAiCreditsMock.mockReturnValue({ credits: 0 });
-    useCurrentUserMock.mockReturnValue({ isSignedIn: true, isAnonymous: true, clerkUserId: 'g1' });
+  it('fix_001: 新規匿名 (remaining=3, mustLink=false) → 撮影ボタンを描画する (「使い切り」を出さない)', () => {
+    useIdentifyQuotaMock.mockReturnValue({ remaining: 3, mustLink: false });
     renderContainer('tok');
-    // linkRequired 時、CaptureButton は撮影 input ではなく連携導線を出す。
+    expect(screen.getByLabelText('植物を撮影 / 画像を選択')).toBeTruthy();
+  });
+
+  it('匿名 trial 使い切り (mustLink=true) → linkRequired で連携誘導 (撮影ボタンを出さない)', () => {
+    useIdentifyQuotaMock.mockReturnValue({ remaining: 0, mustLink: true });
+    renderContainer('tok');
     expect(screen.queryByLabelText('植物を撮影 / 画像を選択')).toBeNull();
   });
 
-  it('token なし → useAiCredits を起動せず既定の CapturePage を描画する', () => {
+  it('token なし → useIdentifyQuota を起動せず既定の CapturePage を描画する', () => {
     renderContainer(null);
-    expect(useAiCreditsMock).not.toHaveBeenCalled();
+    expect(useIdentifyQuotaMock).not.toHaveBeenCalled();
     expect(screen.getByLabelText('植物を撮影 / 画像を選択')).toBeTruthy();
   });
 });

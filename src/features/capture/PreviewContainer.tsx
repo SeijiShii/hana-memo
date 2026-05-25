@@ -6,7 +6,7 @@
  * はアプリ層で導出する (userId=Clerk user id、capturedAt=now、season=getCurrentSeason)。
  *
  * checkQuota / isAiConsentActive は pipeline の事前ガード:
- *   - checkQuota: useAiCredits 由来の残クレジット>0 を返す (token 未解決時は通す近似)。
+ *   - checkQuota: useIdentifyQuota 由来の実効残数>0 を返す (token 未解決時は通す近似、fix_001)。
  *   - isAiConsentActive: user_settings 取得 Function が未実装のため既定 true を返す seam
  *     (設定取得 API 配線後 Milestone C に isAiConsentActive を流し込む)。
  *
