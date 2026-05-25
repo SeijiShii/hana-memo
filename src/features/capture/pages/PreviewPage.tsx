@@ -16,10 +16,19 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { MAX_USER_NOTE, sanitizeUserNote } from '../note';
+import { CaptureProgress } from '../components/CaptureProgress';
+import type { CaptureStage } from '../flow';
 
 export type PreviewPageProps = {
-  /** 「これでよい」押下時の確定処理 (実体は useCaptureFlow を配線)。整形済みメモを渡す。 */
-  onConfirm?: (file: File, userNote?: string) => void | Promise<void>;
+  /**
+   * 「これでよい」押下時の確定処理 (実体は useCaptureFlow を配線)。整形済みメモを渡す。
+   * onStage は体感段階の通知 (進捗オーバーレイ用、O45)。
+   */
+  onConfirm?: (
+    file: File,
+    userNote?: string,
+    onStage?: (stage: CaptureStage) => void,
+  ) => void | Promise<void>;
 };
 
 type PreviewLocationState = { file?: File } | null;
@@ -33,6 +42,7 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
 
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [stage, setStage] = useState<CaptureStage | null>(null);
 
   // File からプレビュー URL を生成 (File が無い場合は使われない)。
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
@@ -44,16 +54,19 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
 
   const handleConfirm = async () => {
     setSubmitting(true);
+    setStage('preparing');
     try {
-      await onConfirm?.(file, sanitizeUserNote(note));
+      await onConfirm?.(file, sanitizeUserNote(note), setStage);
       navigate('/notebook');
     } finally {
       setSubmitting(false);
+      setStage(null);
     }
   };
 
   return (
     <main className="flex min-h-dvh flex-col items-center gap-6 bg-paper p-6 text-ink">
+      {submitting ? <CaptureProgress stage={stage ?? 'preparing'} /> : null}
       <h1 className="text-xl font-bold text-moss-dark">この写真でよいですか？</h1>
       {previewUrl ? (
         <img

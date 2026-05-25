@@ -22,6 +22,7 @@
  */
 import { PreviewPage } from './pages/PreviewPage';
 import { useCaptureFlow, useImageConvert } from './hooks';
+import type { CaptureStage } from './flow';
 import { useIdentifyQuota } from '../billing';
 import { useCurrentUser } from '../../shared/auth/hooks';
 import { useAuthToken } from '../../app/useAuthToken';
@@ -48,15 +49,24 @@ function AuthedPreview({ token, userId }: { token: string; userId: string }) {
     isAiConsentActive: () => true,
   });
 
-  const onConfirm = async (file: File, userNote?: string) => {
+  const onConfirm = async (
+    file: File,
+    userNote?: string,
+    onStage?: (stage: CaptureStage) => void,
+  ) => {
+    onStage?.('preparing'); // 画像変換中 (O45 進捗の最初の段階)
     const blob = await convert(file);
     const now = new Date();
-    await capture(blob, {
-      userId,
-      capturedAt: now.toISOString(),
-      season: getCurrentSeason(now),
-      userNote,
-    });
+    await capture(
+      blob,
+      {
+        userId,
+        capturedAt: now.toISOString(),
+        season: getCurrentSeason(now),
+        userNote,
+      },
+      onStage,
+    );
   };
 
   return <PreviewPage onConfirm={onConfirm} />;
