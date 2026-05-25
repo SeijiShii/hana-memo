@@ -8,8 +8,16 @@
  */
 import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
 import { resolveUserId, UserNotFoundError } from '../_lib/user';
+import { fetchEffectiveQuota } from '../_lib/quota';
 
-export type BillingStatus = { aiCreditsRemaining: number; pdfUnlocked: boolean };
+export type BillingStatus = {
+  aiCreditsRemaining: number;
+  pdfUnlocked: boolean;
+  /** identify に使える実効残数 (匿名 trial / 登録 月次無料+credits)。フロント quota ゲート用 (fix_001)。 */
+  quotaRemaining: number;
+  /** 匿名で無料枠を使い切った = Google リンク誘導。 */
+  mustLink: boolean;
+};
 
 function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
@@ -30,9 +38,12 @@ async function fetchStatus(userId: string): Promise<BillingStatus> {
     .where(eq(users.id, userId))
     .limit(1);
   const row = rows[0];
+  const quota = await fetchEffectiveQuota(userId);
   return {
     aiCreditsRemaining: row?.aiCreditsRemaining ?? 0,
     pdfUnlocked: row?.pdfUnlocked ?? false,
+    quotaRemaining: quota.remaining,
+    mustLink: quota.mustLink,
   };
 }
 
@@ -47,7 +58,10 @@ async function handler(req: Request): Promise<Response> {
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
   } catch (err) {
-    return jsonResponse({ error: 'unauthorized' }, err instanceof UnauthorizedError ? err.status : 500);
+    return jsonResponse(
+      { error: 'unauthorized' },
+      err instanceof UnauthorizedError ? err.status : 500,
+    );
   }
   try {
     const userId = await resolveUserId(clerkUserId);

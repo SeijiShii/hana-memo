@@ -12,12 +12,14 @@ import { resolveUserId, UserNotFoundError } from './_lib/user';
 import type { ChatCompletionFn } from './_lib/openai';
 import { callIdentifyVision } from './_lib/openai';
 import { checkIdentifyRateLimit, type RateLimiter } from '../src/shared/ai/rate-limit';
-import { consumeQuota } from '../src/shared/ai/quota';
+import { type EffectiveQuota, type QuotaConsumeSource } from '../src/shared/ai/quota';
+import { fetchEffectiveQuota } from './_lib/quota';
 import { buildIdentifyPrompt } from '../src/shared/ai/prompt';
 import { parseIdentifyResponse } from '../src/shared/ai/schema';
 import { withRetry } from '../src/shared/ai/retry';
 import {
   QuotaExceededError,
+  LinkRequiredError,
   RateLimitedError,
   SchemaValidationError,
 } from '../src/shared/ai/errors';
@@ -50,7 +52,11 @@ export function parseIdentifyBody(raw: unknown): IdentifyInput {
     capturedAt,
     season: b.season as Season,
   };
-  if (isObject(b.location) && typeof b.location.lat === 'number' && typeof b.location.lng === 'number') {
+  if (
+    isObject(b.location) &&
+    typeof b.location.lat === 'number' &&
+    typeof b.location.lng === 'number'
+  ) {
     out.location = { lat: b.location.lat, lng: b.location.lng };
   }
   if (typeof b.userNote === 'string') {
@@ -63,13 +69,13 @@ export type IdentifyDeps = {
   rateLimiter: RateLimiter;
   presign: PresignClient;
   complete: ChatCompletionFn;
-  /** 現在の AI quota 残を返す。 */
-  getQuotaRemaining: () => Promise<number>;
-  /** 同定結果 + 消費後 quota を永続化する。 */
+  /** 現在の実効 quota (匿名 trial / 登録 月次+credits) を返す (fix_001)。 */
+  getQuota: () => Promise<EffectiveQuota>;
+  /** 同定結果を永続化し、今回消費するカウンタ (trial/monthly/credits) を更新する。 */
   persist: (args: {
     discoveryId: string;
     result: IdentifyResult;
-    quotaRemaining: number;
+    consume: QuotaConsumeSource;
   }) => Promise<void>;
   /** retry backoff sleep (テスト注入)。 */
   sleep?: (ms: number) => Promise<void>;
@@ -86,8 +92,11 @@ export async function runIdentify(
 ): Promise<IdentifyResult> {
   await checkIdentifyRateLimit(deps.rateLimiter, userId); // [SEC-001] RateLimitedError
   validateObjectKey(input.imageObjectKey, userId); // 所有確認 ([SEC-003]/[SEC-005])
-  const remaining = await deps.getQuotaRemaining();
-  const quotaAfter = consumeQuota(remaining); // QuotaExceededError
+  const quota = await deps.getQuota(); // 実効 quota (匿名 trial / 登録 月次+credits)
+  if (quota.remaining <= 0) {
+    // 匿名は trial 使い切り → Google リンク誘導 (401)、登録は課金誘導 (402) (fix_001, SPEC §4 L100/L101)
+    throw quota.mustLink ? new LinkRequiredError() : new QuotaExceededError();
+  }
   const imageUrl = await createSignedUrl(deps.presign, {
     objectKey: input.imageObjectKey,
     userId,
@@ -98,7 +107,7 @@ export async function runIdentify(
     isRetryable: (err) => !(err instanceof SchemaValidationError),
   });
   const result = parseIdentifyResponse(content); // SchemaValidationError
-  await deps.persist({ discoveryId: input.discoveryId, result, quotaRemaining: quotaAfter });
+  await deps.persist({ discoveryId: input.discoveryId, result, consume: quota.consume });
   return result;
 }
 
@@ -113,6 +122,9 @@ function jsonResponse(body: unknown, status: number): Response {
 function mapError(err: unknown): Response {
   if (err instanceof RateLimitedError) {
     return jsonResponse({ error: 'rate_limited', retryAtMs: err.retryAtMs }, 429);
+  }
+  if (err instanceof LinkRequiredError) {
+    return jsonResponse({ error: 'link_required' }, 401); // 匿名 trial 超過 (fix_001)
   }
   if (err instanceof QuotaExceededError) {
     return jsonResponse({ error: 'quota_exceeded' }, 402);
@@ -139,30 +151,16 @@ async function buildRealDeps(userId: string): Promise<IdentifyDeps> {
     rateLimiter: createIdentifyRateLimiter(),
     presign: createR2PresignClient(),
     complete: createChatCompletionFn(),
-    getQuotaRemaining: () => fetchQuotaRemaining(userId),
+    getQuota: () => fetchEffectiveQuota(userId),
     persist: (args) => persistIdentify(userId, args),
   };
 }
 
-async function fetchQuotaRemaining(userId: string): Promise<number> {
-  const [{ db }, { users }, { eq }] = await Promise.all([
-    import('../src/shared/db/client'),
-    import('../src/shared/db/schema'),
-    import('drizzle-orm'),
-  ]);
-  const rows = await db
-    .select({ remaining: users.aiCreditsRemaining })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  return rows[0]?.remaining ?? 0;
-}
-
 async function persistIdentify(
   userId: string,
-  args: { discoveryId: string; result: IdentifyResult; quotaRemaining: number },
+  args: { discoveryId: string; result: IdentifyResult; consume: QuotaConsumeSource },
 ): Promise<void> {
-  const [{ db }, { discoveries, users, apiUsage }, { eq, and }] = await Promise.all([
+  const [{ db }, { discoveries, users, apiUsage }, { eq, and, sql }] = await Promise.all([
     import('../src/shared/db/client'),
     import('../src/shared/db/schema'),
     import('drizzle-orm'),
@@ -182,10 +180,25 @@ async function persistIdentify(
       updatedAt: new Date(),
     })
     .where(and(eq(discoveries.id, args.discoveryId), eq(discoveries.userId, userId)));
-  await db.update(users).set({ aiCreditsRemaining: args.quotaRemaining }).where(eq(users.id, userId));
-  await db
-    .insert(apiUsage)
-    .values({ userId, service: 'openai', endpoint: 'identify-plant', imageCount: 1, success: true });
+  // 消費カウンタ更新 (fix_001): trial=匿名生涯枠++ / credits=購入クレジット-- / monthly=api_usage 行が実体で counter 更新なし
+  if (args.consume === 'trial') {
+    await db
+      .update(users)
+      .set({ trialUsedCount: sql`${users.trialUsedCount} + 1` })
+      .where(eq(users.id, userId));
+  } else if (args.consume === 'credits') {
+    await db
+      .update(users)
+      .set({ aiCreditsRemaining: sql`greatest(${users.aiCreditsRemaining} - 1, 0)` })
+      .where(eq(users.id, userId));
+  }
+  await db.insert(apiUsage).values({
+    userId,
+    service: 'openai',
+    endpoint: 'identify-plant',
+    imageCount: 1,
+    success: true,
+  });
 }
 
 export const config = { runtime: 'nodejs' };
@@ -200,7 +213,10 @@ async function handler(req: Request): Promise<Response> {
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
   } catch (err) {
-    return jsonResponse({ error: 'unauthorized' }, err instanceof UnauthorizedError ? err.status : 500);
+    return jsonResponse(
+      { error: 'unauthorized' },
+      err instanceof UnauthorizedError ? err.status : 500,
+    );
   }
 
   let input: IdentifyInput;

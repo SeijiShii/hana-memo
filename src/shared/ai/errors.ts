@@ -4,11 +4,19 @@
  *      docs/_shared/ai/revise_sec_001-003_rate_limit_ssrf_20260523/001_REVISE_SPEC.md §7.4 (E-AI-007)
  */
 
-/** quota 超過 (E-AI-005、402) */
+/** quota 超過 (E-AI-005、402、登録ユーザーが月次無料 + 購入クレジットを使い切り → 課金誘導) */
 export class QuotaExceededError extends Error {
   constructor(message = 'AI quota exceeded') {
     super(message);
     this.name = 'QuotaExceededError';
+  }
+}
+
+/** 匿名 trial 超過 (E-AI-008 / SPEC §4 L101、401、Google リンク誘導。fix_001) */
+export class LinkRequiredError extends Error {
+  constructor(message = 'anonymous trial exhausted, link required') {
+    super(message);
+    this.name = 'LinkRequiredError';
   }
 }
 
