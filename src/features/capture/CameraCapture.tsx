@@ -43,10 +43,10 @@ export function CameraCapture({ onCapture, disabled }: CameraCaptureProps) {
         aria-label="植物を撮影 / 画像を選択"
         disabled={disabled}
         onChange={handleChange}
-        className="block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-green-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+        className="block w-full text-sm text-ink-soft file:mr-3 file:rounded-pill file:border-0 file:bg-moss file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
       />
       {!cameraReady ? (
-        <p className="text-xs text-neutral-400">
+        <p className="text-xs text-ink-faint">
           カメラが利用できません。フォルダから画像を選択してください。
         </p>
       ) : null}

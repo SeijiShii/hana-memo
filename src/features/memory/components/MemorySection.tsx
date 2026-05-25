@@ -40,9 +40,13 @@ export function MemorySection({
   // 取得中かつ未取得 → 控えめなローディング (空白を尊重しつつページは壊さない)。
   if (loading && memories.length === 0) {
     return (
-      <section id={MEMORY_SECTION_ANCHOR_ID} aria-label="去年の今頃" className="flex flex-col gap-2">
-        <h2 className="text-sm font-semibold text-green-700">去年の今頃</h2>
-        <p className="py-4 text-center text-xs text-neutral-400">読み込み中…</p>
+      <section
+        id={MEMORY_SECTION_ANCHOR_ID}
+        aria-label="去年の今頃"
+        className="flex flex-col gap-2"
+      >
+        <h2 className="text-sm font-semibold text-moss-dark">去年の今頃</h2>
+        <p className="py-4 text-center text-xs text-ink-faint">読み込み中…</p>
       </section>
     );
   }
@@ -54,7 +58,7 @@ export function MemorySection({
 
   return (
     <section id={MEMORY_SECTION_ANCHOR_ID} aria-label="去年の今頃" className="flex flex-col gap-2">
-      <h2 className="text-sm font-semibold text-green-700">去年の今頃</h2>
+      <h2 className="text-sm font-semibold text-moss-dark">去年の今頃</h2>
       <ul
         className={cn(
           'flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1',

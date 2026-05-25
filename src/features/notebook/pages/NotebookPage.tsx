@@ -22,6 +22,7 @@ import { MapView } from '../components/MapView';
 import { FigureView } from '../components/FigureView';
 import { MemoryBadge, MemorySection, type MemoryDiscovery } from '../../memory';
 import { ExportButton, ExportDialog, type ExportDialogProps } from '../../export';
+import { SproutSpot } from '../../../components/illustrations/Botanical';
 import type { NotebookDiscovery } from '../types';
 
 export type NotebookViewMode = 'timeline' | 'calendar' | 'map' | 'figure';
@@ -88,13 +89,18 @@ export function NotebookPage({
   const renderBody = () => {
     // 取得中かつ未取得 → ローディング。取得済みでの追加ロード中は一覧を出し続ける。
     if (loading && discoveries.length === 0) {
-      return <p className="py-12 text-center text-sm text-neutral-400">読み込み中…</p>;
+      return <p className="py-12 text-center text-sm text-ink-faint">読み込み中…</p>;
     }
     if (error) {
       return <p className="py-12 text-center text-sm text-red-500">発見の取得に失敗しました</p>;
     }
     if (discoveries.length === 0) {
-      return <p className="py-12 text-center text-sm text-neutral-400">まだ発見がありません</p>;
+      return (
+        <div className="flex flex-col items-center gap-3 py-12 text-center">
+          <SproutSpot size={72} aria-hidden />
+          <p className="text-sm text-ink-faint">まだ発見がありません</p>
+        </div>
+      );
     }
     switch (mode) {
       case 'timeline':
@@ -121,9 +127,9 @@ export function NotebookPage({
   };
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-paper p-4 text-ink">
       <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl font-bold text-green-700">発見ノート</h1>
+        <h1 className="text-xl font-bold text-moss-dark">発見ノート</h1>
         <div className="flex items-center gap-2">
           <MemoryBadge count={memories.length} />
           {exportProps ? (
@@ -137,7 +143,7 @@ export function NotebookPage({
         resolveThumbnail={resolveMemoryThumbnail}
         onSelect={onSelectMemory}
       />
-      <nav className="flex gap-1 rounded-xl bg-neutral-100 p-1" aria-label="表示モード">
+      <nav className="flex gap-1 rounded-xl bg-surface-soft p-1" aria-label="表示モード">
         {MODE_TABS.map((tab) => (
           <button
             key={tab.mode}
@@ -147,8 +153,8 @@ export function NotebookPage({
             className={cn(
               'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold',
               mode === tab.mode
-                ? 'bg-white text-green-700 shadow-sm'
-                : 'text-neutral-500 hover:text-neutral-700',
+                ? 'bg-surface text-moss-dark shadow-sm'
+                : 'text-ink-faint hover:text-ink-soft',
             )}
           >
             {tab.label}

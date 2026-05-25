@@ -26,6 +26,7 @@
  *       docs/billing/002_billing_PLAN.md §1 (BillingPage / AiCreditsPurchasePage / PdfUnlockPage)
  */
 import { useState } from 'react';
+import { CreditCard } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { OAuthRequiredModal } from '../OAuthRequiredModal';
 import { PwywSelector, formatJpy } from '../components/PwywSelector';
@@ -138,16 +139,16 @@ export function BillingPage({
   const shownError = checkoutError ?? localError;
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
-      <h1 className="text-xl font-bold text-green-700">クレジット購入</h1>
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-paper p-4 text-ink">
+      <h1 className="text-xl font-bold text-moss-dark">クレジット購入</h1>
 
       {/* 現在のステータス表示 (UC4) */}
       <section
         aria-label="現在のステータス"
-        className="rounded-xl bg-neutral-50 p-4 text-sm text-neutral-700"
+        className="rounded-xl bg-surface-soft p-4 text-sm text-ink-soft"
       >
         {statusLoading && !status ? (
-          <p className="text-neutral-400">読み込み中…</p>
+          <p className="text-ink-faint">読み込み中…</p>
         ) : statusError ? (
           <p role="alert" className="text-red-500">
             ステータスの取得に失敗しました
@@ -158,7 +159,7 @@ export function BillingPage({
             <p>PDF アンロック: {status.pdfUnlocked ? 'アンロック済み' : '未アンロック'}</p>
           </div>
         ) : (
-          <p className="text-neutral-400">ステータス未取得</p>
+          <p className="text-ink-faint">ステータス未取得</p>
         )}
       </section>
 
@@ -166,14 +167,14 @@ export function BillingPage({
       {checkoutComplete ? (
         <p
           role="status"
-          className="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-700"
+          className="rounded-lg bg-moss-light px-4 py-2 text-sm font-semibold text-moss-dark"
         >
           購入が完了しました。ありがとうございます。
         </p>
       ) : null}
 
       {/* 購入種別タブ */}
-      <nav className="flex gap-1 rounded-xl bg-neutral-100 p-1" aria-label="購入種別">
+      <nav className="flex gap-1 rounded-xl bg-surface-soft p-1" aria-label="購入種別">
         {PRODUCT_TABS.map((tab) => (
           <button
             key={tab.product}
@@ -187,8 +188,8 @@ export function BillingPage({
             className={cn(
               'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold disabled:opacity-50',
               product === tab.product
-                ? 'bg-white text-green-700 shadow-sm'
-                : 'text-neutral-500 hover:text-neutral-700',
+                ? 'bg-surface text-moss-dark shadow-sm'
+                : 'text-ink-faint hover:text-ink-soft',
             )}
           >
             {tab.label}
@@ -199,11 +200,11 @@ export function BillingPage({
       {/* 購入種別ごとの入力 */}
       {product === 'ai_credits' ? (
         <section aria-label="AI 識別クレジット購入" className="flex flex-col gap-3">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-ink-soft">
             1 セット {formatJpy(aiCreditsAmountJpy(1))} で AI 識別が {AI_CREDITS_PER_UNIT}{' '}
             回追加されます。
           </p>
-          <label className="flex flex-col gap-1 text-sm text-neutral-600">
+          <label className="flex flex-col gap-1 text-sm text-ink-soft">
             数量 ({AI_QTY_MIN}〜{AI_QTY_MAX} セット)
             <input
               type="number"
@@ -216,11 +217,11 @@ export function BillingPage({
                 setQty(Number.isNaN(next) ? AI_QTY_MIN : next);
               }}
               aria-label="数量"
-              className="rounded-lg border border-neutral-200 px-3 py-2 text-base text-neutral-800 focus:border-green-600 focus:outline-none"
+              className="rounded-lg border border-line px-3 py-2 text-base text-ink focus:border-moss focus:outline-none"
             />
           </label>
           {qtyValid ? (
-            <p className="text-sm font-semibold text-neutral-700">
+            <p className="text-sm font-semibold text-ink-soft">
               合計 {formatJpy(aiCreditsAmountJpy(qty))}（{aiCreditsGranted(qty)} 回追加）
             </p>
           ) : (
@@ -231,12 +232,12 @@ export function BillingPage({
         </section>
       ) : (
         <section aria-label="PDF アンロック購入" className="flex flex-col gap-3">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-ink-soft">
             お好きな金額で PDF エクスポートを永続的にアンロックできます（最低 {formatJpy(100)}、推奨{' '}
             {formatJpy(PWYW_PRESET_JPY)}）。
           </p>
           {pdfAlreadyUnlocked ? (
-            <p className="rounded-lg bg-neutral-100 px-4 py-2 text-center text-sm text-neutral-500">
+            <p className="rounded-lg bg-surface-soft px-4 py-2 text-center text-sm text-ink-faint">
               すでにアンロック済みです
             </p>
           ) : (
@@ -257,8 +258,9 @@ export function BillingPage({
         onClick={handlePurchase}
         disabled={!canPurchase}
         aria-busy={checkoutPending}
-        className="rounded-lg bg-green-600 px-4 py-3 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+        className="btn-primary"
       >
+        <CreditCard size={18} aria-hidden />
         {checkoutPending ? '処理中…' : '購入する'}
       </button>
 

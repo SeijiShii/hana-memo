@@ -6,6 +6,7 @@
  *
  * 関連: docs/export/001_export_SPEC.md §1 UC1/UC2/UC4 §6.1, docs/export/002_export_PLAN.md §1/§6
  */
+import { Download } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
 export type ExportButtonProps = {
@@ -25,12 +26,12 @@ export function ExportButton({ onClick, disabled = false, label = '書き出す'
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center gap-1 rounded-lg border border-green-600 px-3 py-1.5',
-        'text-xs font-semibold text-green-700 hover:bg-green-50',
+        'inline-flex items-center gap-1 rounded-pill border border-moss px-3 py-1.5',
+        'text-xs font-semibold text-moss-dark hover:bg-moss-light',
         'disabled:cursor-not-allowed disabled:opacity-50',
       )}
     >
-      <span aria-hidden="true">⬇</span>
+      <Download size={14} aria-hidden />
       <span>{label}</span>
     </button>
   );

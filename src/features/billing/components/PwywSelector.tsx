@@ -11,12 +11,7 @@
  */
 import { cn } from '../../../lib/utils';
 import { InvalidAmountError } from '../errors';
-import {
-  PWYW_MIN_JPY,
-  PWYW_MAX_JPY,
-  PWYW_PRESET_JPY,
-  validatePwywAmount,
-} from '../pricing';
+import { PWYW_MIN_JPY, PWYW_MAX_JPY, PWYW_PRESET_JPY, validatePwywAmount } from '../pricing';
 
 /** 推奨金額チップ (PLAN §6: 最低 / 推奨 / もう一声)。 */
 export const PWYW_SUGGESTED_JPY: readonly number[] = [PWYW_MIN_JPY, PWYW_PRESET_JPY, 1000];
@@ -73,10 +68,10 @@ export function PwywSelector({ value, onChange, onValidChange }: PwywSelectorPro
             onClick={() => emit(amount)}
             aria-pressed={value === amount}
             className={cn(
-              'flex-1 rounded-lg border px-2 py-2 text-sm font-semibold',
+              'flex-1 rounded-pill border px-2 py-2 text-sm font-semibold',
               value === amount
-                ? 'border-green-600 bg-green-50 text-green-700'
-                : 'border-neutral-200 text-neutral-600 hover:border-neutral-300',
+                ? 'border-moss bg-moss-light text-moss-dark'
+                : 'border-line text-ink-soft hover:border-ink-faint',
             )}
           >
             {formatJpy(amount)}
@@ -84,7 +79,7 @@ export function PwywSelector({ value, onChange, onValidChange }: PwywSelectorPro
         ))}
       </div>
 
-      <label className="flex flex-col gap-1 text-sm text-neutral-600">
+      <label className="flex flex-col gap-1 text-sm text-ink-soft">
         カスタム金額 (円)
         <input
           type="number"
@@ -95,7 +90,7 @@ export function PwywSelector({ value, onChange, onValidChange }: PwywSelectorPro
           onChange={(e) => handleInput(e.target.value)}
           aria-label="カスタム金額 (円)"
           aria-invalid={!valid}
-          className="rounded-lg border border-neutral-200 px-3 py-2 text-base text-neutral-800 focus:border-green-600 focus:outline-none"
+          className="rounded-lg border border-line px-3 py-2 text-base text-ink focus:border-moss focus:outline-none"
         />
       </label>
 

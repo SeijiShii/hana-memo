@@ -23,7 +23,12 @@ export type ConsentCheckboxProps = {
 };
 
 /** 単一の同意チェックボックス。label とリンクで構成し、checked は親が制御する。 */
-export function ConsentCheckbox({ docType, checked, onChange, disabled = false }: ConsentCheckboxProps) {
+export function ConsentCheckbox({
+  docType,
+  checked,
+  onChange,
+  disabled = false,
+}: ConsentCheckboxProps) {
   const meta = LEGAL_DOC_META[docType];
   const inputId = `consent-${docType}`;
   return (
@@ -34,16 +39,13 @@ export function ConsentCheckbox({ docType, checked, onChange, disabled = false }
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 h-4 w-4 shrink-0 rounded border-neutral-300 text-green-600 focus:ring-green-600 disabled:opacity-50"
+        className="mt-1 h-4 w-4 shrink-0 rounded border-line text-moss focus:ring-moss disabled:opacity-50"
       />
-      <label htmlFor={inputId} className="text-sm text-neutral-700">
-        <span className="font-semibold text-neutral-800">{meta.label}</span>
+      <label htmlFor={inputId} className="text-sm text-ink-soft">
+        <span className="font-semibold text-ink">{meta.label}</span>
         <span>に同意します</span>
         {meta.path ? (
-          <Link
-            to={meta.path}
-            className="ml-2 text-green-700 underline hover:text-green-800"
-          >
+          <Link to={meta.path} className="ml-2 text-moss-dark underline hover:text-moss">
             全文を見る
           </Link>
         ) : null}

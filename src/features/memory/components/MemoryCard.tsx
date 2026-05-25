@@ -9,6 +9,7 @@
  *
  * 関連: docs/memory/001_memory_SPEC.md §1 UC2, docs/memory/002_memory_PLAN.md §1 (MemoryCard)
  */
+import { Leaf } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { MemoryDiscovery } from '../recommend';
 
@@ -35,26 +36,22 @@ export function MemoryCard({ memory, resolveThumbnail, onSelect }: MemoryCardPro
       type="button"
       onClick={() => onSelect?.(memory)}
       className={cn(
-        'flex w-32 shrink-0 snap-start flex-col gap-1 rounded-xl border border-neutral-200 bg-white p-2 text-left',
-        'hover:bg-neutral-50',
+        'flex w-32 shrink-0 snap-start flex-col gap-1 rounded-card border border-line bg-surface p-2 text-left',
+        'hover:bg-surface-soft',
       )}
     >
       {thumb ? (
-        <img
-          src={thumb}
-          alt={name}
-          className="aspect-square w-full rounded-lg object-cover"
-        />
+        <img src={thumb} alt={name} className="aspect-square w-full rounded-lg object-cover" />
       ) : (
         <span
           aria-hidden="true"
-          className="flex aspect-square w-full items-center justify-center rounded-lg bg-green-50 text-2xl"
+          className="flex aspect-square w-full items-center justify-center rounded-lg bg-moss-light text-moss"
         >
-          🌿
+          <Leaf size={28} aria-hidden />
         </span>
       )}
-      <span className="truncate text-sm font-medium text-neutral-800">{name}</span>
-      <span className="text-xs text-neutral-400">{dateLabel(memory.capturedAt)}</span>
+      <span className="truncate text-sm font-medium text-ink">{name}</span>
+      <span className="text-xs text-ink-faint">{dateLabel(memory.capturedAt)}</span>
     </button>
   );
 }

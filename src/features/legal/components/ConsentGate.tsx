@@ -28,6 +28,7 @@
  *       revise_sentry_disclosure_20260524/001_REVISE_SPEC.md
  */
 import { useMemo, useState } from 'react';
+import { Check, X } from 'lucide-react';
 import type { DocType } from '../../../shared/types/domain';
 import { LATEST_VERSIONS, needsReConsent } from '../versions';
 import { ConsentCheckbox } from './ConsentCheckbox';
@@ -114,17 +115,15 @@ export function ConsentGate({
         aria-label="サービスを利用できません"
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       >
-        <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl">
-          <h2 className="text-lg font-bold text-neutral-800">サービスを利用できません</h2>
-          <p className="mt-2 text-sm text-neutral-600">
-            同意がいただける場合は再度起動してください。
-          </p>
+        <div className="w-full max-w-sm rounded-card bg-surface p-6 text-center shadow-lift">
+          <h2 className="text-lg font-bold text-ink">サービスを利用できません</h2>
+          <p className="mt-2 text-sm text-ink-soft">同意がいただける場合は再度起動してください。</p>
           <button
             type="button"
             onClick={() => {
               setRejected(false);
             }}
-            className="mt-5 rounded-lg px-4 py-2 text-sm text-green-700 hover:bg-green-50"
+            className="mt-5 rounded-pill px-4 py-2 text-sm text-moss-dark hover:bg-moss-light"
           >
             同意画面に戻る
           </button>
@@ -142,9 +141,9 @@ export function ConsentGate({
       aria-label={isInitial ? 'ご利用にあたっての同意' : '規約改訂への再同意'}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="flex max-h-[90dvh] w-full max-w-sm flex-col overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div className="flex max-h-[90dvh] w-full max-w-sm flex-col overflow-y-auto rounded-card bg-surface p-6 shadow-lift">
         <div className="flex items-start justify-between gap-2">
-          <h2 className="text-lg font-bold text-neutral-800">
+          <h2 className="text-lg font-bold text-ink">
             {isInitial ? 'ご利用にあたって' : '規約が改訂されました'}
           </h2>
           <button
@@ -152,13 +151,13 @@ export function ConsentGate({
             onClick={handleReject}
             disabled={submitting}
             aria-label="閉じる"
-            className="-mr-2 -mt-2 rounded-lg px-2 py-1 text-xl leading-none text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 disabled:opacity-50"
+            className="-mr-2 -mt-2 rounded-lg px-2 py-1 leading-none text-ink-faint hover:bg-surface-soft hover:text-ink-soft disabled:opacity-50"
           >
-            ×
+            <X size={20} aria-hidden />
           </button>
         </div>
 
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-ink-soft">
           {isInitial
             ? '本サービスを利用するには、以下のすべてに同意いただく必要があります。各全文をご確認ください。'
             : '以下の文書が改訂されました。続けてご利用いただくには、再度ご確認・同意ください。'}
@@ -182,9 +181,7 @@ export function ConsentGate({
           ))}
         </div>
 
-        {!allChecked ? (
-          <p className="mt-3 text-xs text-neutral-400">全項目に同意が必要です</p>
-        ) : null}
+        {!allChecked ? <p className="mt-3 text-xs text-ink-faint">全項目に同意が必要です</p> : null}
 
         <div className="mt-5 flex flex-col gap-2">
           <button
@@ -192,8 +189,9 @@ export function ConsentGate({
             onClick={handleAgree}
             disabled={!allChecked || submitting}
             aria-busy={submitting}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+            className="btn-primary"
           >
+            <Check size={18} aria-hidden />
             {submitting ? '処理中…' : isInitial ? '同意して始める' : '同意して続ける'}
           </button>
         </div>

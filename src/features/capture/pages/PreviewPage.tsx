@@ -14,6 +14,7 @@
  */
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import { MAX_USER_NOTE, sanitizeUserNote } from '../note';
 
 export type PreviewPageProps = {
@@ -34,10 +35,7 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
   const [submitting, setSubmitting] = useState(false);
 
   // File からプレビュー URL を生成 (File が無い場合は使われない)。
-  const previewUrl = useMemo(
-    () => (file ? URL.createObjectURL(file) : null),
-    [file],
-  );
+  const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
 
   // deep link / 直アクセスで File が無い → 撮影画面へ戻す。
   if (!file) {
@@ -55,8 +53,8 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
   };
 
   return (
-    <main className="flex min-h-dvh flex-col items-center gap-6 bg-white p-6 text-neutral-800">
-      <h1 className="text-xl font-bold text-green-700">この写真でよいですか？</h1>
+    <main className="flex min-h-dvh flex-col items-center gap-6 bg-paper p-6 text-ink">
+      <h1 className="text-xl font-bold text-moss-dark">この写真でよいですか？</h1>
       {previewUrl ? (
         <img
           src={previewUrl}
@@ -64,7 +62,7 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
           className="max-h-80 w-full max-w-sm rounded-2xl object-cover"
         />
       ) : null}
-      <label className="flex w-full max-w-sm flex-col gap-1 text-sm text-neutral-600">
+      <label className="flex w-full max-w-sm flex-col gap-1 text-sm text-ink-soft">
         補助メモ (任意)
         <textarea
           value={note}
@@ -72,26 +70,22 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
           maxLength={MAX_USER_NOTE}
           rows={3}
           placeholder="気づいたこと (例: 道端に咲いていた)"
-          className="rounded-lg border border-neutral-300 p-2 text-sm text-neutral-800"
+          className="rounded-lg border border-line p-2 text-sm text-ink"
         />
-        <span className="self-end text-xs text-neutral-400">
+        <span className="self-end text-xs text-ink-faint">
           {note.length} / {MAX_USER_NOTE}
         </span>
       </label>
       <div className="flex w-full max-w-sm flex-col gap-2">
-        <button
-          type="button"
-          disabled={submitting}
-          onClick={handleConfirm}
-          className="rounded-lg bg-green-600 px-4 py-3 text-base font-semibold text-white hover:bg-green-700 disabled:opacity-50"
-        >
+        <button type="button" disabled={submitting} onClick={handleConfirm} className="btn-primary">
+          <Check size={18} aria-hidden />
           これでよい
         </button>
         <button
           type="button"
           disabled={submitting}
           onClick={() => navigate('/capture')}
-          className="rounded-lg px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 disabled:opacity-50"
+          className="rounded-pill px-4 py-2 text-sm text-ink-faint hover:bg-surface-soft disabled:opacity-50"
         >
           撮り直し
         </button>

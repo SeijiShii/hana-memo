@@ -26,27 +26,27 @@ export type LegalPageProps = {
 export function LegalPage({ doc }: LegalPageProps) {
   const body = LEGAL_DOC_BODY[doc];
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-paper p-4 text-ink">
       <div>
-        <Link to="/" className="text-sm text-green-700 hover:text-green-800">
+        <Link to="/" className="text-sm text-moss-dark hover:text-moss">
           ← 戻る
         </Link>
       </div>
 
       <header className="flex flex-col gap-1">
-        <h1 className="text-xl font-bold text-green-700">
+        <h1 className="text-xl font-bold text-moss-dark">
           {body.label} {body.version}
         </h1>
-        <p className="text-sm text-neutral-600">{body.lead}</p>
+        <p className="text-sm text-ink-soft">{body.lead}</p>
       </header>
 
       <section aria-label="本文" className="flex flex-col gap-3">
         {body.sections.map((heading, i) => (
-          <article key={heading} className="border-l-2 border-neutral-100 pl-3">
-            <h2 className="text-sm font-semibold text-neutral-800">
+          <article key={heading} className="border-l-2 border-line pl-3">
+            <h2 className="text-sm font-semibold text-ink">
               {i + 1}. {heading}
             </h2>
-            <p className="mt-1 text-sm text-neutral-400">（本文は公開前に確定）</p>
+            <p className="mt-1 text-sm text-ink-faint">（本文は公開前に確定）</p>
           </article>
         ))}
       </section>

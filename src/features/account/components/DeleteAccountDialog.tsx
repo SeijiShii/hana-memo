@@ -16,6 +16,7 @@
  *       docs/account/004_account_E2E_TEST.md (E-AC-5)
  */
 import { useState } from 'react';
+import { AlertTriangle, Trash2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { MAX_DELETION_REASON, sanitizeDeletionReason } from '../deletion';
 
@@ -93,11 +94,14 @@ export function DeleteAccountDialog({
       aria-label="アカウント削除"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="flex max-h-[90dvh] w-full max-w-sm flex-col overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+      <div className="flex max-h-[90dvh] w-full max-w-sm flex-col overflow-y-auto rounded-card bg-surface p-6 shadow-lift">
         {step === 'warn' ? (
           <>
-            <h2 className="text-lg font-bold text-red-600">アカウントを削除しますか？</h2>
-            <p className="mt-2 text-sm text-neutral-600">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-red-600">
+              <AlertTriangle size={20} aria-hidden />
+              アカウントを削除しますか？
+            </h2>
+            <p className="mt-2 text-sm text-ink-soft">
               発見 {discoveryCount} 件、画像 {imageCount} 枚が 30 日後に完全に削除されます。
               それまでは取消して復元できます。
             </p>
@@ -108,14 +112,15 @@ export function DeleteAccountDialog({
               <button
                 type="button"
                 onClick={() => setStep('confirm')}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+                className="inline-flex items-center justify-center gap-2 rounded-pill bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
               >
+                <Trash2 size={16} aria-hidden />
                 削除を予約
               </button>
               <button
                 type="button"
                 onClick={handleClose}
-                className="rounded-lg px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100"
+                className="rounded-pill px-4 py-2 text-sm text-ink-faint hover:bg-surface-soft"
               >
                 キャンセル
               </button>
@@ -124,11 +129,11 @@ export function DeleteAccountDialog({
         ) : (
           <>
             <h2 className="text-lg font-bold text-red-600">本当に削除しますか？</h2>
-            <p className="mt-2 text-sm text-neutral-600">
+            <p className="mt-2 text-sm text-ink-soft">
               よろしければ理由をお聞かせください（任意）。確認のうえ削除を予約します。
             </p>
 
-            <label className="mt-4 flex flex-col gap-1 text-sm text-neutral-600">
+            <label className="mt-4 flex flex-col gap-1 text-sm text-ink-soft">
               削除理由（任意）
               <textarea
                 value={reason}
@@ -136,11 +141,11 @@ export function DeleteAccountDialog({
                 maxLength={MAX_DELETION_REASON}
                 rows={3}
                 aria-label="削除理由"
-                className="rounded-lg border border-neutral-200 px-3 py-2 text-base text-neutral-800 focus:border-green-600 focus:outline-none"
+                className="rounded-lg border border-line px-3 py-2 text-base text-ink focus:border-moss focus:outline-none"
               />
             </label>
 
-            <label className="mt-4 flex items-start gap-2 text-sm text-neutral-700">
+            <label className="mt-4 flex items-start gap-2 text-sm text-ink-soft">
               <input
                 type="checkbox"
                 checked={acknowledged}
@@ -158,7 +163,7 @@ export function DeleteAccountDialog({
             ) : null}
 
             {!acknowledged ? (
-              <p className="mt-3 text-xs text-neutral-400">削除するには上記の同意が必要です</p>
+              <p className="mt-3 text-xs text-ink-faint">削除するには上記の同意が必要です</p>
             ) : null}
 
             <div className="mt-5 flex flex-col gap-2">
@@ -168,17 +173,18 @@ export function DeleteAccountDialog({
                 disabled={!acknowledged || pending}
                 aria-busy={pending}
                 className={cn(
-                  'rounded-lg px-4 py-2 text-sm font-semibold text-white',
+                  'inline-flex items-center justify-center gap-2 rounded-pill px-4 py-2 text-sm font-semibold text-white',
                   'bg-red-600 hover:bg-red-700 disabled:opacity-50',
                 )}
               >
+                <Trash2 size={16} aria-hidden />
                 {pending ? '処理中…' : '確認しました、削除します'}
               </button>
               <button
                 type="button"
                 onClick={handleClose}
                 disabled={pending}
-                className="rounded-lg px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 disabled:opacity-50"
+                className="rounded-pill px-4 py-2 text-sm text-ink-faint hover:bg-surface-soft disabled:opacity-50"
               >
                 キャンセル
               </button>

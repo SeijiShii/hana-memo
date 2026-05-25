@@ -12,6 +12,7 @@
  * 関連: docs/notebook/001_notebook_SPEC.md §1 UC2 (カレンダー)
  */
 import { useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { sortByCapturedAtDesc } from '../grouping';
 import { resolveDisplayName } from '../edit';
@@ -93,24 +94,24 @@ export function CalendarView({ discoveries, month, onSelect }: CalendarViewProps
           type="button"
           onClick={() => goMonth(-1)}
           aria-label="前の月"
-          className="rounded-lg px-3 py-1 text-sm text-neutral-500 hover:bg-neutral-100"
+          className="rounded-lg px-3 py-1 text-sm text-ink-faint hover:bg-surface-soft"
         >
-          ‹
+          <ChevronLeft size={18} aria-hidden />
         </button>
-        <span className="text-sm font-semibold text-neutral-700">{currentMonth}</span>
+        <span className="text-sm font-semibold text-ink-soft">{currentMonth}</span>
         <button
           type="button"
           onClick={() => goMonth(1)}
           aria-label="次の月"
-          className="rounded-lg px-3 py-1 text-sm text-neutral-500 hover:bg-neutral-100"
+          className="rounded-lg px-3 py-1 text-sm text-ink-faint hover:bg-surface-soft"
         >
-          ›
+          <ChevronRight size={18} aria-hidden />
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center">
         {WEEKDAY_LABELS.map((w) => (
-          <span key={w} className="text-xs text-neutral-400">
+          <span key={w} className="text-xs text-ink-faint">
             {w}
           </span>
         ))}
@@ -128,14 +129,12 @@ export function CalendarView({ discoveries, month, onSelect }: CalendarViewProps
               key={dateStr}
               type="button"
               onClick={() => setSelectedDate(dateStr)}
-              aria-label={
-                hasDiscovery ? `${dateStr} (${count}件の発見)` : dateStr
-              }
+              aria-label={hasDiscovery ? `${dateStr} (${count}件の発見)` : dateStr}
               className={cn(
                 'flex aspect-square flex-col items-center justify-center rounded-lg text-sm',
-                'hover:bg-neutral-100',
-                isSelected && 'bg-green-100',
-                hasDiscovery ? 'font-semibold text-neutral-800' : 'text-neutral-400',
+                'hover:bg-surface-soft',
+                isSelected && 'bg-moss-light',
+                hasDiscovery ? 'font-semibold text-ink' : 'text-ink-faint',
               )}
             >
               {day}
@@ -143,7 +142,7 @@ export function CalendarView({ discoveries, month, onSelect }: CalendarViewProps
                 <span
                   data-testid={`marker-${dateStr}`}
                   aria-hidden="true"
-                  className="mt-0.5 h-1.5 w-1.5 rounded-full bg-green-600"
+                  className="mt-0.5 h-1.5 w-1.5 rounded-full bg-moss"
                 />
               ) : null}
             </button>
@@ -153,7 +152,7 @@ export function CalendarView({ discoveries, month, onSelect }: CalendarViewProps
 
       {selectedDate ? (
         <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-semibold text-neutral-500">{selectedDate}</h3>
+          <h3 className="text-sm font-semibold text-ink-faint">{selectedDate}</h3>
           {selectedItems.length > 0 ? (
             <ul className="flex flex-col gap-1">
               {selectedItems.map((d) => (
@@ -161,7 +160,7 @@ export function CalendarView({ discoveries, month, onSelect }: CalendarViewProps
                   <button
                     type="button"
                     onClick={() => onSelect?.(d)}
-                    className="w-full rounded-lg border border-neutral-200 bg-white p-2 text-left text-sm text-neutral-800 hover:bg-neutral-50"
+                    className="w-full rounded-lg border border-line bg-surface p-2 text-left text-sm text-ink hover:bg-surface-soft"
                   >
                     {resolveDisplayName(d)}
                   </button>
@@ -169,7 +168,7 @@ export function CalendarView({ discoveries, month, onSelect }: CalendarViewProps
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-neutral-400">この日の発見はありません</p>
+            <p className="text-sm text-ink-faint">この日の発見はありません</p>
           )}
         </div>
       ) : null}

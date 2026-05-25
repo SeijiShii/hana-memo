@@ -9,6 +9,7 @@
  * 関連: docs/capture/001_capture_SPEC.md §1 UC1 / §4, docs/capture/002_capture_PLAN.md §1
  */
 import { Link, useNavigate } from 'react-router-dom';
+import { Settings } from 'lucide-react';
 import { CaptureButton } from '../components/CaptureButton';
 
 export type CapturePageProps = {
@@ -33,11 +34,11 @@ export function CapturePage({
   };
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-white p-6 text-neutral-800">
-      <h1 className="text-xl font-bold text-green-700">植物を撮影</h1>
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-paper p-6 text-ink">
+      <h1 className="text-xl font-bold text-moss-dark">植物を撮影</h1>
       {aiConsentActive ? (
         <>
-          <p className="max-w-sm text-center text-sm text-neutral-500">
+          <p className="max-w-sm text-center text-sm text-ink-faint">
             草花を 1 枚撮ると AI が名前を推定します。
           </p>
           <CaptureButton
@@ -48,11 +49,9 @@ export function CapturePage({
         </>
       ) : (
         <div className="flex max-w-sm flex-col items-center gap-3 text-center">
-          <p className="text-sm text-neutral-600">AI 同意が必要です</p>
-          <Link
-            to="/settings"
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-          >
+          <p className="text-sm text-ink-soft">AI 同意が必要です</p>
+          <Link to="/settings" className="btn-primary">
+            <Settings size={18} aria-hidden />
             設定画面へ
           </Link>
         </div>

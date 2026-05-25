@@ -9,6 +9,7 @@
  *
  * 関連: docs/notebook/001_notebook_SPEC.md §1 UC1, §1 UC2 (timeline)
  */
+import { Leaf } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { sortByCapturedAtDesc } from '../grouping';
 import { resolveDisplayName } from '../edit';
@@ -52,7 +53,7 @@ export function TimelineView({ discoveries, resolveThumbnail, onSelect }: Timeli
     <ul className="flex flex-col gap-6" aria-label="タイムライン">
       {groups.map((group) => (
         <li key={group.date} className="flex flex-col gap-2">
-          <h3 className="text-sm font-semibold text-neutral-500">{group.date}</h3>
+          <h3 className="text-sm font-semibold text-ink-faint">{group.date}</h3>
           <ul className="flex flex-col gap-2">
             {group.items.map((d) => {
               const thumb = resolveThumbnail?.(d) ?? null;
@@ -62,8 +63,8 @@ export function TimelineView({ discoveries, resolveThumbnail, onSelect }: Timeli
                     type="button"
                     onClick={() => onSelect?.(d)}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-xl border border-neutral-200 bg-white p-2 text-left',
-                      'hover:bg-neutral-50',
+                      'flex w-full items-center gap-3 rounded-card border border-line bg-surface p-2 text-left',
+                      'hover:bg-surface-soft',
                     )}
                   >
                     {thumb ? (
@@ -75,16 +76,16 @@ export function TimelineView({ discoveries, resolveThumbnail, onSelect }: Timeli
                     ) : (
                       <span
                         aria-hidden="true"
-                        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-green-50 text-xl"
+                        className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-moss-light text-moss"
                       >
-                        🌿
+                        <Leaf size={22} aria-hidden />
                       </span>
                     )}
                     <span className="flex min-w-0 flex-col">
-                      <span className="truncate text-sm font-medium text-neutral-800">
+                      <span className="truncate text-sm font-medium text-ink">
                         {resolveDisplayName(d)}
                       </span>
-                      <span className="text-xs text-neutral-400">{timeLabel(d.capturedAt)}</span>
+                      <span className="text-xs text-ink-faint">{timeLabel(d.capturedAt)}</span>
                     </span>
                   </button>
                 </li>

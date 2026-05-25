@@ -11,6 +11,7 @@
  *       docs/capture/002_capture_PLAN.md §1 (components/CaptureButton.tsx)
  */
 import { useState } from 'react';
+import { Camera } from 'lucide-react';
 import { CameraCapture } from '../CameraCapture';
 import { QuotaModal } from './QuotaModal';
 
@@ -43,8 +44,9 @@ export function CaptureButton({
           type="button"
           disabled={disabled}
           onClick={() => setModalOpen(true)}
-          className="rounded-lg bg-green-600 px-6 py-3 text-base font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+          className="btn-primary"
         >
+          <Camera size={18} aria-hidden />
           撮影する
         </button>
         <QuotaModal open={modalOpen} reason={reason} onClose={() => setModalOpen(false)} />

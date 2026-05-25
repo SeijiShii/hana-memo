@@ -9,6 +9,7 @@
  *       docs/capture/002_capture_PLAN.md §1 (components/QuotaModal.tsx)
  */
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 export type QuotaModalReason = 'quota' | 'link_required';
 
@@ -21,10 +22,7 @@ export type QuotaModalProps = {
   onClose: () => void;
 };
 
-const COPY: Record<
-  QuotaModalReason,
-  { title: string; body: string; cta: string; to: string }
-> = {
+const COPY: Record<QuotaModalReason, { title: string; body: string; cta: string; to: string }> = {
   quota: {
     title: '今月の識別回数を使い切りました',
     body: 'AI 識別の残り回数がありません。クレジットを追加すると引き続き識別できます。',
@@ -53,21 +51,18 @@ export function QuotaModal({ open, reason, onClose }: QuotaModalProps) {
       aria-label={copy.title}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-bold text-neutral-800">{copy.title}</h2>
-        <p className="mt-2 text-sm text-neutral-600">{copy.body}</p>
+      <div className="w-full max-w-sm rounded-card bg-surface p-6 shadow-lift">
+        <h2 className="text-lg font-bold text-ink">{copy.title}</h2>
+        <p className="mt-2 text-sm text-ink-soft">{copy.body}</p>
         <div className="mt-5 flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(copy.to)}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-          >
+          <button type="button" onClick={() => navigate(copy.to)} className="btn-primary">
             {copy.cta}
+            <ArrowRight size={18} aria-hidden />
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100"
+            className="rounded-pill px-4 py-2 text-sm text-ink-faint hover:bg-surface-soft"
           >
             あとで
           </button>

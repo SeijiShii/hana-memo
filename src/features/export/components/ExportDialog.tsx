@@ -16,6 +16,7 @@
  *       docs/export/002_export_PLAN.md §1, docs/export/004_export_E2E_TEST.md (E-EX-1/3/4)
  */
 import { useState } from 'react';
+import { Download, Lock } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
 /** 書き出しフォーマット。CSV (無料) / PDF (unlock 必須) / 画像 ZIP (無料)。 */
@@ -115,10 +116,10 @@ export function ExportDialog({
       aria-label="データを書き出す"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-bold text-neutral-800">データを書き出す</h2>
+      <div className="w-full max-w-sm rounded-card bg-surface p-6 shadow-lift">
+        <h2 className="text-lg font-bold text-ink">データを書き出す</h2>
 
-        <nav className="mt-4 flex gap-1 rounded-xl bg-neutral-100 p-1" aria-label="書き出し形式">
+        <nav className="mt-4 flex gap-1 rounded-xl bg-surface-soft p-1" aria-label="書き出し形式">
           {FORMAT_TABS.map((tab) => (
             <button
               key={tab.format}
@@ -132,8 +133,8 @@ export function ExportDialog({
               className={cn(
                 'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold disabled:opacity-50',
                 format === tab.format
-                  ? 'bg-white text-green-700 shadow-sm'
-                  : 'text-neutral-500 hover:text-neutral-700',
+                  ? 'bg-surface text-moss-dark shadow-sm'
+                  : 'text-ink-faint hover:text-ink-soft',
               )}
             >
               {tab.label}
@@ -141,7 +142,7 @@ export function ExportDialog({
           ))}
         </nav>
 
-        <p className="mt-3 text-sm text-neutral-600">{FORMAT_DESCRIPTION[format]}</p>
+        <p className="mt-3 text-sm text-ink-soft">{FORMAT_DESCRIPTION[format]}</p>
 
         {shownError ? (
           <p role="alert" className="mt-3 text-sm text-red-500">
@@ -152,11 +153,8 @@ export function ExportDialog({
         <div className="mt-5 flex flex-col gap-2">
           {pdfLocked ? (
             // E-EX-004: 未 unlock の PDF はアンロック誘導に置き換える。
-            <button
-              type="button"
-              onClick={onUnlock}
-              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-            >
+            <button type="button" onClick={onUnlock} className="btn-primary">
+              <Lock size={18} aria-hidden />
               アンロックする (¥500 PWYW)
             </button>
           ) : action ? (
@@ -165,13 +163,14 @@ export function ExportDialog({
               onClick={handleExport}
               disabled={exporting}
               aria-busy={exporting}
-              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+              className="btn-primary"
             >
+              <Download size={18} aria-hidden />
               {exporting ? '書き出し中…' : '書き出す'}
             </button>
           ) : (
             // PDF/画像 ZIP の実ジェネレータ未配線 (Milestone C)。
-            <p className="rounded-lg bg-neutral-100 px-4 py-2 text-center text-sm text-neutral-500">
+            <p className="rounded-lg bg-surface-soft px-4 py-2 text-center text-sm text-ink-faint">
               準備中です
             </p>
           )}
@@ -179,7 +178,7 @@ export function ExportDialog({
             type="button"
             onClick={onClose}
             disabled={exporting}
-            className="rounded-lg px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 disabled:opacity-50"
+            className="rounded-pill px-4 py-2 text-sm text-ink-faint hover:bg-surface-soft disabled:opacity-50"
           >
             閉じる
           </button>

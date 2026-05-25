@@ -7,6 +7,7 @@
  *
  * 関連: docs/notebook/001_notebook_SPEC.md §1 UC2 (図鑑)
  */
+import { Leaf } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { groupBySpecies } from '../grouping';
 import { resolveDisplayName } from '../edit';
@@ -32,7 +33,7 @@ export function FigureView({ discoveries, resolveThumbnail, onSelect }: FigureVi
         const heading = species === UNKNOWN_SPECIES_KEY ? '学名不明' : species;
         return (
           <section key={species} className="flex flex-col gap-2">
-            <h3 className="text-sm font-semibold italic text-neutral-500">{heading}</h3>
+            <h3 className="text-sm font-semibold italic text-ink-faint">{heading}</h3>
             <ul className="grid grid-cols-3 gap-2">
               {items.map((d) => {
                 const thumb = resolveThumbnail?.(d) ?? null;
@@ -42,8 +43,8 @@ export function FigureView({ discoveries, resolveThumbnail, onSelect }: FigureVi
                       type="button"
                       onClick={() => onSelect?.(d)}
                       className={cn(
-                        'flex w-full flex-col items-center gap-1 rounded-xl border border-neutral-200 bg-white p-2',
-                        'hover:bg-neutral-50',
+                        'flex w-full flex-col items-center gap-1 rounded-card border border-line bg-surface p-2',
+                        'hover:bg-surface-soft',
                       )}
                     >
                       {thumb ? (
@@ -55,12 +56,12 @@ export function FigureView({ discoveries, resolveThumbnail, onSelect }: FigureVi
                       ) : (
                         <span
                           aria-hidden="true"
-                          className="flex aspect-square w-full items-center justify-center rounded-lg bg-green-50 text-2xl"
+                          className="flex aspect-square w-full items-center justify-center rounded-lg bg-moss-light text-moss"
                         >
-                          🌿
+                          <Leaf size={28} aria-hidden />
                         </span>
                       )}
-                      <span className="w-full truncate text-center text-xs text-neutral-700">
+                      <span className="w-full truncate text-center text-xs text-ink-soft">
                         {resolveDisplayName(d)}
                       </span>
                     </button>

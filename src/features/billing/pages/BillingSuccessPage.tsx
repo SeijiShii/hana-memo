@@ -16,6 +16,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { BookOpen } from 'lucide-react';
 import type { ConfirmResult } from '../api';
 
 export type BillingSuccessPageProps = {
@@ -61,15 +62,15 @@ export function BillingSuccessPage({ onConfirm }: BillingSuccessPageProps) {
   }, [sessionId, onConfirm]);
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-4 bg-white p-6 text-center text-neutral-800">
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-4 bg-paper p-6 text-center text-ink">
       {phase === 'confirming' ? (
-        <p role="status" className="text-sm text-neutral-500">
+        <p role="status" className="text-sm text-ink-faint">
           処理中…
         </p>
       ) : phase === 'confirmed' ? (
         <>
-          <h1 className="text-xl font-bold text-green-700">購入が完了しました</h1>
-          <p className="text-sm text-neutral-600">
+          <h1 className="text-xl font-bold text-moss-dark">購入が完了しました</h1>
+          <p className="text-sm text-ink-soft">
             {result?.type === 'ai_credits'
               ? `AI 識別の残り回数が ${result.aiCreditsRemaining} 回になりました。`
               : 'PDF エクスポートをアンロックしました。'}
@@ -77,16 +78,14 @@ export function BillingSuccessPage({ onConfirm }: BillingSuccessPageProps) {
         </>
       ) : (
         <>
-          <h1 className="text-xl font-bold text-neutral-800">処理中です</h1>
-          <p className="text-sm text-neutral-600">
+          <h1 className="text-xl font-bold text-ink">処理中です</h1>
+          <p className="text-sm text-ink-soft">
             決済の反映には少し時間がかかる場合があります。後ほどご確認ください。
           </p>
         </>
       )}
-      <Link
-        to="/notebook"
-        className="rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-white hover:bg-green-700"
-      >
+      <Link to="/notebook" className="btn-primary">
+        <BookOpen size={18} aria-hidden />
         発見ノートへ戻る
       </Link>
     </main>

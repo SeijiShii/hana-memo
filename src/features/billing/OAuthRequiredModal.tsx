@@ -6,6 +6,7 @@
  *
  * 関連: docs/billing/001_billing_SPEC.md §1 UC4, 002_billing_PLAN.md Phase 3 (UT-BL-OM01/OM02)
  */
+import { Link2 } from 'lucide-react';
 
 export type OAuthRequiredModalProps = {
   /** 匿名 user のとき true で表示する。 */
@@ -28,24 +29,22 @@ export function OAuthRequiredModal({ open, onLink, onClose }: OAuthRequiredModal
       aria-label="アカウント連携が必要です"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-bold text-neutral-800">アカウント連携が必要です</h2>
-        <p className="mt-2 text-sm text-neutral-600">
-          購入には Google アカウントの連携が必要です。連携すると購入履歴やクレジットが引き継がれます。
+      <div className="w-full max-w-sm rounded-card bg-surface p-6 shadow-lift">
+        <h2 className="text-lg font-bold text-ink">アカウント連携が必要です</h2>
+        <p className="mt-2 text-sm text-ink-soft">
+          購入には Google
+          アカウントの連携が必要です。連携すると購入履歴やクレジットが引き継がれます。
         </p>
         <div className="mt-5 flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={onLink}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-          >
+          <button type="button" onClick={onLink} className="btn-primary">
+            <Link2 size={18} aria-hidden />
             連携する
           </button>
           {onClose ? (
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100"
+              className="rounded-pill px-4 py-2 text-sm text-ink-faint hover:bg-surface-soft"
             >
               あとで
             </button>

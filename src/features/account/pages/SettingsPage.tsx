@@ -23,6 +23,7 @@
  *       docs/account/002_account_PLAN.md §1.1
  */
 import { useState } from 'react';
+import { Link2, LogOut, Trash2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { OAuthRequiredModal } from '../../billing/OAuthRequiredModal';
 import { DeleteAccountDialog } from '../components/DeleteAccountDialog';
@@ -170,11 +171,11 @@ export function SettingsPage({
   const shownError = saveError ?? localError;
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-white p-4 text-neutral-800">
-      <h1 className="text-xl font-bold text-green-700">設定</h1>
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col gap-4 bg-paper p-4 text-ink">
+      <h1 className="text-xl font-bold text-moss-dark">設定</h1>
 
       {settingsLoading && !settings ? (
-        <p className="text-neutral-400">読み込み中…</p>
+        <p className="text-ink-faint">読み込み中…</p>
       ) : settingsError ? (
         <p role="alert" className="text-red-500">
           設定の取得に失敗しました
@@ -184,7 +185,7 @@ export function SettingsPage({
           {saved ? (
             <p
               role="status"
-              className="rounded-lg bg-green-50 px-4 py-2 text-sm font-semibold text-green-700"
+              className="rounded-lg bg-moss-light px-4 py-2 text-sm font-semibold text-moss-dark"
             >
               保存しました
             </p>
@@ -199,34 +200,32 @@ export function SettingsPage({
           {/* アカウント section (UC2/UC6) */}
           <section
             aria-label="アカウント"
-            className="flex flex-col gap-2 rounded-xl bg-neutral-50 p-4"
+            className="flex flex-col gap-2 rounded-xl bg-surface-soft p-4"
           >
-            <h2 className="text-sm font-bold text-neutral-700">アカウント</h2>
+            <h2 className="text-sm font-bold text-ink-soft">アカウント</h2>
             {isLinked ? (
               <>
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-ink-soft">
                   Google アカウント連携済{linkedEmail ? `（${linkedEmail}）` : ''}
                 </p>
                 {onLogout ? (
                   <button
                     type="button"
                     onClick={onLogout}
-                    className="self-start rounded-lg border border-neutral-300 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-100"
+                    className="inline-flex items-center gap-1.5 self-start rounded-pill border border-line px-4 py-2 text-sm font-semibold text-ink-soft hover:bg-surface-soft"
                   >
+                    <LogOut size={16} aria-hidden />
                     ログアウト
                   </button>
                 ) : null}
               </>
             ) : (
               <>
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-ink-soft">
                   匿名で利用中です。連携すると別の端末でもデータを引き継げます。
                 </p>
-                <button
-                  type="button"
-                  onClick={handleLinkClick}
-                  className="self-start rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
-                >
+                <button type="button" onClick={handleLinkClick} className="btn-primary self-start">
+                  <Link2 size={18} aria-hidden />
                   Google で連携する
                 </button>
               </>
@@ -236,12 +235,12 @@ export function SettingsPage({
           {/* 位置情報精度 section (UC3) */}
           <section
             aria-label="位置情報精度"
-            className="flex flex-col gap-2 rounded-xl bg-neutral-50 p-4"
+            className="flex flex-col gap-2 rounded-xl bg-surface-soft p-4"
           >
-            <h2 className="text-sm font-bold text-neutral-700">位置情報精度</h2>
+            <h2 className="text-sm font-bold text-ink-soft">位置情報精度</h2>
             <fieldset disabled={saving} className="flex flex-col gap-2">
               {LOCATION_PRECISIONS.map((value) => (
-                <label key={value} className="flex items-center gap-2 text-sm text-neutral-700">
+                <label key={value} className="flex items-center gap-2 text-sm text-ink-soft">
                   <input
                     type="radio"
                     name="locationPrecision"
@@ -249,7 +248,7 @@ export function SettingsPage({
                     checked={settings?.locationPrecision === value}
                     disabled={saving}
                     onChange={() => handleLocationChange(value)}
-                    className="h-4 w-4 accent-green-600"
+                    className="h-4 w-4 accent-moss"
                   />
                   {LOCATION_PRECISION_LABELS[value]}
                 </label>
@@ -260,10 +259,10 @@ export function SettingsPage({
           {/* AI 同意 section (UC4) */}
           <section
             aria-label="AI 同意"
-            className="flex flex-col gap-2 rounded-xl bg-neutral-50 p-4"
+            className="flex flex-col gap-2 rounded-xl bg-surface-soft p-4"
           >
-            <h2 className="text-sm font-bold text-neutral-700">AI 利用同意</h2>
-            <label className="flex items-center justify-between gap-3 text-sm text-neutral-700">
+            <h2 className="text-sm font-bold text-ink-soft">AI 利用同意</h2>
+            <label className="flex items-center justify-between gap-3 text-sm text-ink-soft">
               <span>撮影した草花を AI で識別する</span>
               <button
                 type="button"
@@ -274,19 +273,19 @@ export function SettingsPage({
                 onClick={handleAiConsentToggle}
                 className={cn(
                   'relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50',
-                  aiConsentOn ? 'bg-green-600' : 'bg-neutral-300',
+                  aiConsentOn ? 'bg-moss' : 'bg-line',
                 )}
               >
                 <span
                   className={cn(
-                    'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all',
+                    'absolute top-0.5 h-5 w-5 rounded-full bg-surface transition-all',
                     aiConsentOn ? 'left-[22px]' : 'left-0.5',
                   )}
                 />
               </button>
             </label>
             {!aiConsentOn ? (
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-ink-faint">
                 AI
                 識別を停止しています。過去のデータは保持されますが、撮影時に名前を推定できません。
               </p>
@@ -296,10 +295,10 @@ export function SettingsPage({
           {/* プライバシー section (UC7) */}
           <section
             aria-label="プライバシー"
-            className="flex flex-col gap-2 rounded-xl bg-neutral-50 p-4"
+            className="flex flex-col gap-2 rounded-xl bg-surface-soft p-4"
           >
-            <h2 className="text-sm font-bold text-neutral-700">プライバシー</h2>
-            <label className="flex items-center justify-between gap-3 text-sm text-neutral-700">
+            <h2 className="text-sm font-bold text-ink-soft">プライバシー</h2>
+            <label className="flex items-center justify-between gap-3 text-sm text-ink-soft">
               <span>品質改善への協力（エラー情報の送信）</span>
               <button
                 type="button"
@@ -310,12 +309,12 @@ export function SettingsPage({
                 onClick={handleAnalyticsToggle}
                 className={cn(
                   'relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50',
-                  settings?.analyticsOptIn ? 'bg-green-600' : 'bg-neutral-300',
+                  settings?.analyticsOptIn ? 'bg-moss' : 'bg-line',
                 )}
               >
                 <span
                   className={cn(
-                    'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all',
+                    'absolute top-0.5 h-5 w-5 rounded-full bg-surface transition-all',
                     settings?.analyticsOptIn ? 'left-[22px]' : 'left-0.5',
                   )}
                 />
@@ -326,24 +325,25 @@ export function SettingsPage({
           {/* データ管理 section (UC5) */}
           <section
             aria-label="データ管理"
-            className="flex flex-col gap-2 rounded-xl bg-neutral-50 p-4"
+            className="flex flex-col gap-2 rounded-xl bg-surface-soft p-4"
           >
-            <h2 className="text-sm font-bold text-neutral-700">データ管理</h2>
+            <h2 className="text-sm font-bold text-ink-soft">データ管理</h2>
             {isLinked ? (
               <>
-                <p className="text-sm text-neutral-600">
+                <p className="text-sm text-ink-soft">
                   アカウントとすべてのデータを削除します。この操作は元に戻せません。
                 </p>
                 <button
                   type="button"
                   onClick={() => setDeleteOpen(true)}
-                  className="self-start rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                  className="inline-flex items-center gap-1.5 self-start rounded-pill border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
                 >
+                  <Trash2 size={16} aria-hidden />
                   アカウントを削除
                 </button>
               </>
             ) : (
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-ink-faint">
                 アカウントを削除するには、先に Google アカウントを連携してください。
               </p>
             )}

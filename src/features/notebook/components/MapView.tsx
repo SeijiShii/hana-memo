@@ -12,6 +12,7 @@
  *
  * 関連: docs/notebook/001_notebook_SPEC.md §1 UC2 (地図), 002_notebook_PLAN.md §8 (MapLibre 注意点)
  */
+import { MapPin } from 'lucide-react';
 import { resolveDisplayName } from '../edit';
 import type { NotebookDiscovery } from '../types';
 
@@ -21,12 +22,8 @@ export type DiscoveryWithCoords = NotebookDiscovery & {
 };
 
 /** location を持つ discovery だけを抽出する (null 除外、ピン化対象)。 */
-export function discoveriesWithCoords(
-  discoveries: NotebookDiscovery[],
-): DiscoveryWithCoords[] {
-  return discoveries.filter(
-    (d): d is DiscoveryWithCoords => d.location != null,
-  );
+export function discoveriesWithCoords(discoveries: NotebookDiscovery[]): DiscoveryWithCoords[] {
+  return discoveries.filter((d): d is DiscoveryWithCoords => d.location != null);
 }
 
 export type MapViewProps = {
@@ -40,14 +37,10 @@ export function MapView({ discoveries, onSelect }: MapViewProps) {
 
   return (
     <div className="flex flex-col gap-3" aria-label="地図">
-      <div className="flex flex-col items-center gap-1 rounded-2xl bg-neutral-100 p-6 text-center">
-        <span aria-hidden="true" className="text-3xl">
-          🗺️
-        </span>
-        <p className="text-sm font-semibold text-neutral-600">地図表示は準備中</p>
-        <p className="text-xs text-neutral-400">
-          位置情報のある発見 {withCoords.length} 件
-        </p>
+      <div className="flex flex-col items-center gap-1 rounded-2xl bg-surface-soft p-6 text-center">
+        <MapPin size={32} aria-hidden className="text-moss" />
+        <p className="text-sm font-semibold text-ink-soft">地図表示は準備中</p>
+        <p className="text-xs text-ink-faint">位置情報のある発見 {withCoords.length} 件</p>
       </div>
 
       {withCoords.length > 0 ? (
@@ -57,10 +50,10 @@ export function MapView({ discoveries, onSelect }: MapViewProps) {
               <button
                 type="button"
                 onClick={() => onSelect?.(d)}
-                className="flex w-full items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-white p-2 text-left text-sm hover:bg-neutral-50"
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-line bg-surface p-2 text-left text-sm hover:bg-surface-soft"
               >
-                <span className="truncate text-neutral-800">{resolveDisplayName(d)}</span>
-                <span className="shrink-0 text-xs text-neutral-400">
+                <span className="truncate text-ink">{resolveDisplayName(d)}</span>
+                <span className="shrink-0 text-xs text-ink-faint">
                   {d.location.lat.toFixed(4)}, {d.location.lng.toFixed(4)}
                 </span>
               </button>
@@ -68,7 +61,7 @@ export function MapView({ discoveries, onSelect }: MapViewProps) {
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-neutral-400">位置情報のある発見はまだありません</p>
+        <p className="text-sm text-ink-faint">位置情報のある発見はまだありません</p>
       )}
     </div>
   );

@@ -9,6 +9,7 @@
  *
  * 関連: docs/memory/001_memory_SPEC.md §1 UC1, docs/memory/002_memory_PLAN.md §1/§6
  */
+import { Flower } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { MEMORY_SECTION_ANCHOR_ID } from './MemorySection';
 
@@ -46,11 +47,11 @@ export function MemoryBadge({ count, onActivate }: MemoryBadgeProps) {
       aria-label={label}
       onClick={onActivate ?? scrollToSection}
       className={cn(
-        'inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700',
-        'hover:bg-green-100',
+        'inline-flex items-center gap-1 rounded-pill bg-moss-light px-3 py-1 text-xs font-semibold text-moss-dark',
+        'hover:bg-moss-light/70',
       )}
     >
-      <span aria-hidden="true">🌸</span>
+      <Flower size={14} aria-hidden />
       <span aria-hidden="true">去年の今頃 {formatCount(count)}</span>
     </button>
   );
