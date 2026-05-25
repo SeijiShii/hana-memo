@@ -22,7 +22,7 @@
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
-| (なし) |
+| [revise_001_20260525_detail-thumbnail/](./revise_001_20260525_detail-thumbnail/) | revise | 001 / detail-thumbnail | 実装完了 (952 green、実機目視待ち) | 実画像サムネ (署名 URL) + 発見詳細閲覧 (UC4 閲覧部、/notebook/:id)。編集/削除/再識別は follow-up | [INDEX](./revise_001_20260525_detail-thumbnail/INDEX.md) |
 
 ## 関連
 - 親 concept: `../concept.md` §1.1 UC2, §1.3.1 notebook 行, §4.8.2 製品内グロース
