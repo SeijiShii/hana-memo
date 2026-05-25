@@ -8,7 +8,7 @@
 | 解決する課題 | 散歩中に見つけた草花の名前を調べないまま忘れる / 既存アプリは「同定」が主役で「自分のノート」が脇役 |
 | 提供価値 | 「自分の発見ノート」を主役、AI 同定はそれを支える脇役。SNS 機能・競争・中毒性を排した自分のペースの発見体験 |
 | 現フェーズ | 企画 → MVP 設計中 |
-| 最終更新 | 2026-05-24 |
+| 最終更新 | 2026-05-25 |
 
 ---
 
@@ -31,7 +31,7 @@
 - 個人のノート閲覧 (タイムライン / 地図 / 図鑑)
 - 図鑑 PDF 出力 (PWYW)
 - 季節レコメンド (アプリ内バッジ)
-- **認証**: 起動時に Supabase Anonymous Auth で自動 UUID 発行 → 撮影・保存・10 回無料枠まで匿名で完結。「他端末で見たい」「課金したい」となった時に Google OAuth で**後リンク**して永続化
+- **認証**: 起動時に Clerk Guest Users (β) で自動 UUID 発行 → 撮影・保存・無料枠まで匿名で完結。「他端末で見たい」「課金したい」となった時に Google OAuth で**後リンク** (linkIdentity、同 uid 維持) して永続化
 - 法務書類 (プラポリ / 利用規約 / 特商法表記)
 
 **含まないもの（明示除外）**:
@@ -62,12 +62,12 @@
 
 | フォルダ | 責務 | 含む設計 | 依存 | 優先度 | 基盤 |
 |---|---|---|---|---|---|
-| `docs/_shared/db/` | DB スキーマ・マイグレーション・RLS ポリシー | テーブル定義 (users / plants / discoveries / images / api_usage) / インデックス / Supabase RLS | (なし) | 1 | ✅ |
-| `docs/_shared/types/` | TypeScript 共通型 | DTO / Supabase 型生成 / API 入出力型 | (なし) | 1 | ✅ |
+| `docs/_shared/db/` | DB スキーマ・マイグレーション・認可ポリシー | テーブル定義 (users / plants / discoveries / images / api_usage) / インデックス / Drizzle クエリ層認可 (`where user_id = ctx.userId`、Postgres RLS は補助) | (なし) | 1 | ✅ |
+| `docs/_shared/types/` | TypeScript 共通型 | DTO / Drizzle スキーマ由来型 / API 入出力型 | (なし) | 1 | ✅ |
 | `docs/_shared/helpers/` | ヘルパ・ユーティリティ | 日付処理 / 画像 WebP 変換 / EXIF 削除 / 位置情報丸め | (なし) | 1 | ✅ |
 | `docs/_shared/analytics/` | 計測基盤 (Sentry + 自前コストログ) | エラー報告 / OpenAI API call ログ / コスト集計 / .env 単価管理 | (なし) | 1 | ✅ |
-| `docs/_shared/auth/` | 認証・認可基盤 | Supabase Auth ラッパ / セッション管理 / RLS 連携 | `_shared/db` | 2 | ✅ |
-| `docs/_shared/storage/` | ストレージ | Supabase Storage ラッパ / 画像アップロード / private bucket / 署名 URL | `_shared/db` | 2 | ✅ |
+| `docs/_shared/auth/` | 認証・認可基盤 | Clerk ラッパ (Guest Users β + OAuth Linking) / セッション管理 / JWT → ctx.userId | `_shared/db` | 2 | ✅ |
+| `docs/_shared/storage/` | ストレージ | Cloudflare R2 (S3 互換) ラッパ / 画像アップロード / private bucket / Presigned URL | `_shared/db` | 2 | ✅ |
 | `docs/_shared/ai/` | AI クライアント | OpenAI Vision クライアント / プロンプト構築 (位置・季節・履歴注入) / 出力後処理 / フォールバック | `_shared/types`, `_shared/analytics` | 2 | ✅ |
 
 #### 1.3.3 依存・優先度・基盤の定義
@@ -83,37 +83,34 @@
 
 ### 1.4 実装コードフォルダ構成（たたき台）
 
-> Q11 で Vite + React + TypeScript + Supabase を確定したため、フロント SPA + BaaS テンプレートを採用。
-> あくまでたたき台。実装フェーズで詳細化・組み替えが起きることを前提に、**機能境界の名前は §1.3 機能フォルダと揃える**。
+> Q11 + BaaS Pivot (D20260522-114) で Vite + React + TypeScript + Neon (Drizzle) + Clerk + Cloudflare R2 + Vercel Functions を確定したため、フロント SPA + サーバーレス関数テンプレートを採用。
+> 既に実装が進行中 (Phase 3.5) のため、以下は**実装済み構成に追随**したもの。**機能境界の名前は §1.3 機能フォルダと揃える**。
 
 ```
 src/
-  features/           # 機能単位（§1.3.1 と命名統一）
-    account/
-    capture/
-    notebook/
-    export/
-    memory/
-    billing/
-    legal/
+  app/                # ルート統合・AppShell・Provider・Container (実 hook/SDK 配線)
+  features/           # 機能単位（§1.3.1 と命名統一、各 pages/ + components/）
+    account/ capture/ notebook/ export/ memory/ billing/ legal/
   shared/             # 横断（§1.3.2 と命名統一）
-    db/               # Supabase クライアント + 型
-    types/
-    helpers/          # 画像変換 / EXIF / 位置丸め / 日付
-    analytics/        # Sentry + コストログ
-    auth/             # Supabase Auth ラッパ
-    storage/          # Supabase Storage ラッパ
-    ai/               # OpenAI Vision クライアント
-  components/         # 共通 UI 部品 (shadcn/ui ベース)
-  hooks/              # 共通フック
-  routes/             # React Router or TanStack Router
-  pages/              # 各画面 (route handler を兼ねる場合あり)
-  main.tsx
-  App.tsx
-supabase/             # Supabase CLI 管理
-  migrations/         # SQL マイグレーション
-  functions/          # Edge Functions (画像処理補助等)
-  config.toml
+    db/               # Drizzle スキーマ + Neon クライアント
+    types/            # 共通型 (Drizzle スキーマ由来 + DTO)
+    helpers/          # 画像変換 / EXIF / 位置丸め / 日付 / URL guard
+    analytics/        # Sentry (beforeSend scrub) + コストログ
+    auth/             # Clerk ラッパ (Guest Users β + OAuth Linking)
+    storage/          # Cloudflare R2 (S3 互換) ラッパ
+    ai/               # OpenAI Vision クライアント + rate limit
+  components/         # 共通 UI 部品 (shadcn/ui ベース) + illustrations/
+  lib/                # cn 等 UI ユーティリティ
+  main.tsx / App.tsx
+api/                  # Vercel Functions (Node 20、旧 Supabase Edge Fn 相当)
+  _lib/               # 共通 (clerk / ratelimit / cron)
+  identify-plant.ts / health.ts / clerk-webhook.ts / check-quota.ts / export-revenue.ts ...
+  account/ auth/ billing/ capture/ export/ legal/ memory/ notebook/ storage/
+drizzle/              # Drizzle migration (旧 supabase/migrations 相当)
+  migrations/         # drizzle-kit generate 出力 SQL
+drizzle.config.ts
+e2e/                  # Playwright E2E
+scripts/              # dev.sh (O36 launcher)
 public/               # PWA manifest / icons
 ```
 
@@ -128,7 +125,7 @@ public/               # PWA manifest / icons
   - α 公開は招待制 (口コミ広がり想定)
   - SNS 機能は意図的に入れない (charter §2.2 競争・中毒性回避)
 - **技術制約**:
-  - Supabase 無料枠厳守 (DB 500MB / Storage 1GB / Auth 50K MAU)
+  - Neon 無料枠厳守 (DB 0.5GB×10 / コンピュート 191.9h/月) + Cloudflare R2 (Storage 10GB、エグレス無料) + Clerk (10K MAU)
   - Vercel Hobby 無料枠厳守 (帯域 100GB/月)
   - OpenAI API のみ従量課金 (gpt-4o-mini Vision、ユーザー月 10 回無料、超過は content-unlock 課金で吸収)
 - **体制・予算・納期**:
@@ -419,17 +416,17 @@ public/               # PWA manifest / icons
 
 #### 4.6.5 BEP (損益分岐点)
 
-- **固定費**: ドメイン $1-2/月 + (将来) Supabase Pro $25/月
+- **固定費**: ドメイン $1-2/月 + (将来) Neon Launch $19/月 (DB 0.5GB or コンピュート 191.9h 超過時)。Clerk Pro $25/月 は 10k MAU 超過時のみ (DAU 数百では発生しにくい)
 - **変動費**: OpenAI ($0.001/同定 × 件数) + Stripe 手数料 (3.6% + ¥40)
 - **想定 ARPU**: 100 円 × 月 1 回課金 = ¥100/月/課金者
-- **BEP 例 (Supabase Pro 移行後)**: 月 $25 + ドメイン $2 = $27 ÷ ARPU($0.66/月) ≒ 課金ユーザー 41 人 (DAU 100-200 程度)
+- **BEP 例 (Neon Launch 移行後)**: 月 $19 + ドメイン $2 = $21 ÷ ARPU($0.66/月) ≒ 課金ユーザー 32 人 (DAU 100-200 程度)
 - **BEP 到達予測**: α 公開 → 6 ヶ月後 (粗い見立て、運用で再計算)
 
 #### 4.6.6 レビューサイクル
 
 | サイクル | 内容 | 参加者 |
 |---|---|---|
-| 日次 (自動) | OpenAI 使用量 + Supabase 無料枠 + Sentry エラー件数アラート | システム自動 |
+| 日次 (自動) | OpenAI 使用量 + Neon / R2 / Clerk / Vercel 無料枠 + Sentry エラー件数アラート | システム自動 |
 | 月次 (人間) | §4.6.3 コスト指標 + §4.6.4 収益指標 (商用到達後) + BEP 進捗 | seiji |
 | 四半期 (人間) | 中期トレンド + 撤退判断ゲート評価 + idea registry feedback (`~/ideas/feedback/`) | seiji |
 
@@ -439,7 +436,7 @@ public/               # PWA manifest / icons
 |---|---|---|
 | 継続 | コスト < $30/月 (MVP 期) または BEP 到達 (商用期) | 通常運用 |
 | 縮退 | OpenAI 月 $30 超過 + 課金回収率 < 100% | AI 機能を月 5 回無料に制限 / 課金単価見直し |
-| 一時停止 | Supabase 無料枠 100% 超過 + Pro 移行未決 | 新規受付停止 / 既存ユーザー優先 |
+| 一時停止 | Neon / Clerk 無料枠 100% 超過 + 有料移行未決 | 新規受付停止 / 既存ユーザー優先 |
 | 撤退 | DAU が 3 ヶ月連続 < 5 + 課金 0 + 改善見込みなし | サービス終了プロセス (データエクスポート提供 → 課金停止 → DB 削除) |
 
 **本 PJ の撤退基準**: 上表の通り。**個人ツールとして「楽しみながら作る」要素もあるため、撤退判断は経済性だけでなく『自分が使い続けたいか』も含めて四半期レビューで判断**。
@@ -466,12 +463,14 @@ public/               # PWA manifest / icons
 - **理由**: charter §1.1「無料で触り始められる」と整合、αフェーズで「使う人がいる」確証取れてからドメイン取得
 
 #### 4.7.2 公開構成パターン
-- **採用パターン**: **(A) PaaS 完結 (Vercel + Supabase)** — 運用負担ゼロ、最推奨
+- **採用パターン**: **(A) PaaS 完結 (Vercel + Neon + Clerk + R2)** — 運用負担ゼロ、最推奨
 - **構成図**:
   ```
   ユーザー → Vercel CDN (Frontend SPA, /legal/*, /auth/callback)
                    ↓
-                Supabase (Auth + DB + Storage + Edge Functions)
+                Vercel Functions (Node 20) ─┬─ Neon (Postgres + Drizzle)
+                                            ├─ Clerk (Auth、Guest β + OAuth)
+                                            └─ Cloudflare R2 (画像 private)
                    ↓
                 外部 API (OpenAI Vision, Stripe Checkout, Slack Webhook)
   ```
@@ -482,14 +481,14 @@ public/               # PWA manifest / icons
 
 #### 4.7.4 サブドメ命名規約
 - 現状 single-app のためサブドメ運用なし
-- 将来分割時: `api.hana-memo.app` (Supabase Edge Function ラッパ等) / `admin.hana-memo.app` (管理画面) / `staging.hana-memo.app` (ステージング)
+- 将来分割時: `api.hana-memo.app` (Vercel Functions API ラッパ等) / `admin.hana-memo.app` (管理画面) / `staging.hana-memo.app` (ステージング)
 
 #### 4.7.5 撤退時の手順 (撤退コスト最小化、§4.6.7 連携)
 1. ユーザーに事前通知 (アプリ内バナー + Email 通知、最低 30 日前)
 2. データエクスポート機能 (`/export` 機能の CSV + JSON + 画像 ZIP) を強くアナウンス
 3. 課金停止 (Stripe: 新規 Checkout 受付停止、過去購入の unlock は保持)
 4. **Vercel プロジェクト削除** (デフォルトドメインも同時失効)
-5. Supabase プロジェクト pause → 30 日後に delete (法務トレース性確保のため consent_logs 等は user_id null 化のみ)
+5. Neon DB / Clerk App / Cloudflare R2 Bucket を削除 (法務トレース性確保のため consent_logs 等は user_id null 化のみで保持、削除は告知期間終了後)
 6. OpenAI / Stripe / Sentry / Slack の API キー revoke
 7. データバックアップを 6 ヶ月保管 (個人情報保護法対応)
 8. `~/ideas/registry.jsonl` の `adopted_pj` を `status=retired` に更新 (将来実装)
@@ -500,7 +499,7 @@ public/               # PWA manifest / icons
 
 #### 4.7.7 ロールバック・障害復旧
 - Vercel: 過去 deploy へ instant rollback (ボタン 1 つ)
-- Supabase: Point-in-Time Recovery (Free 枠でも 7 日まで可)
+- Neon: Point-in-Time Recovery / branch restore (Free history retention 内)
 - DNS は Vercel デフォルトのため切替不要
 
 ### 4.8 サービス公開周知 / マーケティング戦略 (Q12.11 由来、perspectives O31)
@@ -765,7 +764,7 @@ public/               # PWA manifest / icons
 - **影響範囲**: §6 外部連携 / §4.3 認証 / `docs/account/` / `docs/_shared/auth/`
 - **前提変更**: D20260522-022 で「匿名スタート + 後リンク」採用。OAuth リンク = Google のみ MVP 提供、メールマジックリンクは見送り。パスキーは「OAuth リンク済 user の追加認証要素」として v2 検討
 - **詰めるべき問い**:
-  1. Supabase Auth のパスキーサポート (2025-Q4 β) は本 PJ 採用に耐えるか?
+  1. Clerk のパスキーサポート (Passkeys、Authentication Strategies) は本 PJ 採用に耐えるか?
   2. リンク済 user の追加認証として v2 で導入すべきか?
 - **推奨**: **MVP は Google OAuth リンクのみ、v2 でパスキー追加検討**
 - **判断期限**: v2 計画着手時
@@ -1007,3 +1006,4 @@ staging_exclude_paths: []
 | 2026-05-22 | **BaaS Pivot** (charter §0.2 + perspectives O32 連携): Supabase → Neon + Vercel + Clerk + Cloudflare R2 + Drizzle ORM に全面切替。§4.1〜4.3 / §4.5 / §4.6.2-3 / §5 (RLS は Drizzle 層に移行) / §6 / §10.7 を書き換え。理由: Supabase 無料 2 プロジェクト制約はマイクロサービス連発に不適合、Neon は無料 10 DB 並立 (D20260522-114〜119) | /flow:concept (UPDATE、BaaS Pivot) |
 | 2026-05-23 | `/flow:secure` プロダクト全体 L1+L2 実施。検出 6 件 (Critical 2 / High 2 / Medium 2) を [論点-011]〜[論点-014] として §8 に登録。L2 チェックリスト 5 件を `_shared/{auth,ai,storage,analytics,db}/902_*.md` に配置。L4 依存スキャンはロックファイル不在で skip (TDD 着手後に再実行) (D20260523-001〜018) | /flow:secure (プロダクト全体) |
 | 2026-05-24 | **§8 未決事項の棚卸し** (`AUDIT_20260523_1825.md` 推奨 #1-#2 + SEC-007 closure 反映)。解決済み 7 論点 ([論点-002/003/004/007] 機能設計で確定 + [論点-012/013/015] SEC-002/003/007 closed) を §7 決定事項ログへ移動 + §8 から削除。open 維持 = [論点-001/005/006/011/014]。memory SPEC 参照の [論点-008] 南半球 season drift を §8 に追記 (D20260524-024〜029) | /flow:concept (UPDATE、棚卸し) |
+| 2026-05-25 | **BaaS Pivot 伝播漏れの整合性修正** (冪等再実行 / 整合性チェック)。D20260522-114 の Supabase → Neon+Clerk+R2 切替で取り残された ~13 箇所を修正: §1.2 認証 (Clerk Guest β) / §1.3.2 横断責務 (Drizzle 認可・Clerk・R2) / §1.4 実装構成 (実装済み `api/` + `drizzle/` 構成に追随) / §2 無料枠 (Neon+R2+Clerk) / §4.6.5 BEP (Neon Launch $19 で再計算) / §4.6.6-7 アラート・撤退 / §4.7.2 構成図 (Vercel Fn→Neon/Clerk/R2) / §4.7.4-5-7 サブドメ・撤退手順・PITR / [論点-001] パスキー (Clerk)。履歴・§4.3 代替候補・§7 決定ログの Supabase は正当として保護 | /flow:concept (再実行、drift 修正) |
