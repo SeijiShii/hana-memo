@@ -151,7 +151,7 @@ export function NotebookPage({
             onClick={() => setMode(tab.mode)}
             aria-pressed={mode === tab.mode}
             className={cn(
-              'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold',
+              'flex-1 whitespace-nowrap rounded-lg px-1 py-1.5 text-[11px] font-semibold',
               mode === tab.mode
                 ? 'bg-surface text-moss-dark shadow-sm'
                 : 'text-ink-faint hover:text-ink-soft',

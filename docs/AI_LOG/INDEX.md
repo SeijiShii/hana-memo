@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
 **最終更新**: 2026-05-25 (+09:00)
-**総セッション数**: 53
-**総 decision 数**: 313
+**総セッション数**: 55
+**総 decision 数**: 316
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,8 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260525_055_design_review.md](./D20260525_055_design_review.md) | 2026-05-25 | /flow:design --review-only | 6 画面 headless 視覚レビュー: 視覚 PASS / O38 コピー PASS。notebook タブ折返し修正 (865 green)、legal 見出し jargon は法務時 defer。/flow:auto 反復1 から dispatch | D20260525-056 | 完了 |
+| [D20260525_054_auto_continuous.md](./D20260525_054_auto_continuous.md) | 2026-05-25 | /flow:auto continuous | 反復1 = P4.4(b) Design gate → /flow:design --review-only。concept 修正 main FF マージ後 main ベースで実行 | D20260525-054〜055 | 進行中 |
 | [D20260525_053_concept_drift_fix.md](./D20260525_053_concept_drift_fix.md) | 2026-05-25 | /flow:concept (再実行) | 整合性チェック: BaaS Pivot (D20260522-114) 伝播漏れ ~13 箇所修正 (§1.2/§1.3.2/§1.4/§2/§4.6.5-7/§4.7/[論点-001] の Supabase→Neon+Clerk+R2)。Step 2 全 Q skip | D20260525-053 | 完了 |
 | [D20260525_052_auto_continuous.md](./D20260525_052_auto_continuous.md) | 2026-05-25 | /flow:auto continuous | 反復1-4 = Phase 3.5 MS-C 残 Class-A backend seam: `api/legal/consents` (GET/POST) + `api/account/settings` (GET/PATCH) + notebook/memory discovery `imageObjectKey` (images leftJoin)。810→853 green。残 runtime/Class-B gated で停止 | D20260525-052-001〜006 | 完了 |
 | [D20260524_051_auto_continuous.md](./D20260524_051_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復1-9 = Milestone C presentation: 全 7 feature 画面 + app 統合配線 + nav shell。607→810 green。§1.5.8 verification checkpoint で pause | D20260524-051-001〜018 | 完了 |
