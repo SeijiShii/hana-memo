@@ -22,6 +22,7 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { useNotebook } from './hooks';
+import { useSignedThumbnails } from './useSignedThumbnails';
 import { NotebookPage } from './pages/NotebookPage';
 import { useMemories } from '../memory';
 import { useExport } from '../export';
@@ -42,6 +43,10 @@ function AuthedNotebook({ token }: { token: string }) {
   const pdfUnlocked = unlocked === true;
   const { exportCsv, exporting, error: exportError } = useExport({ token, pdfUnlocked });
 
+  // 実サムネ署名 URL を解決 (revise_001、resolveThumbnail seam に配線)。
+  const { resolveThumbnail } = useSignedThumbnails(discoveries, { token });
+  const { resolveThumbnail: resolveMemoryThumbnail } = useSignedThumbnails(memories, { token });
+
   return (
     <NotebookPage
       discoveries={discoveries}
@@ -49,6 +54,10 @@ function AuthedNotebook({ token }: { token: string }) {
       error={error}
       memories={memories}
       memoriesLoading={memoriesLoading}
+      resolveThumbnail={resolveThumbnail}
+      resolveMemoryThumbnail={resolveMemoryThumbnail}
+      onSelect={(d) => navigate(`/notebook/${d.id}`)}
+      onSelectMemory={(m) => navigate(`/notebook/${m.id}`)}
       exportProps={{
         onExportCsv: () => exportCsv(),
         // PDF / 画像 ZIP の実 jsPDF/JSZip レンダラ注入は Milestone C (未配線 = ダイアログで「準備中」表示)。
