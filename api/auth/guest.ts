@@ -10,10 +10,7 @@
  *
  * 関連: docs/_shared/auth/revise_001_20260525_clerk-ticket-guest-auth/{001_REVISE_SPEC §7.2, 002_REVISE_PLAN}
  */
-import {
-  provisionGuest,
-  GuestRateLimitedError,
-} from './_lib/guest-provision';
+import { provisionGuest, GuestRateLimitedError } from './_lib/guest-provision';
 
 export const config = { runtime: 'nodejs' };
 
@@ -71,8 +68,19 @@ async function handler(req: Request): Promise<Response> {
           return { success: r.success };
         },
         createUser: async ({ externalId, publicMetadata }) => {
-          // [論点-002] Clerk は identifier 必須。externalId(UUID) を付与 (email/username を消費しない)。
-          const u = await clerkClient.users.createUser({ externalId, publicMetadata });
+          // [論点-002 resolved] この Clerk instance は createUser に email_address + password を必須
+          // とする (externalId 単体は 422 form_data_missing)。匿名 user 用に合成 email + 強ランダム
+          // password を発行する (どちらも実利用しない: sign-in は ticket、後で Google OAuth リンク)。
+          // skipPasswordChecks で強度ルールを回避。isAnonymous=true は publicMetadata + Neon で表現。
+          const email = `guest_${externalId}@guest.hana-memo.app`;
+          const password = nodeCrypto.randomBytes(24).toString('base64url');
+          const u = await clerkClient.users.createUser({
+            externalId,
+            emailAddress: [email],
+            password,
+            skipPasswordChecks: true,
+            publicMetadata,
+          });
           return { id: u.id };
         },
         upsertUser: async ({ clerkUserId, fingerprintHash }) => {
