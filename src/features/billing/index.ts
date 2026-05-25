@@ -43,6 +43,7 @@ export {
 export {
   useBillingStatus,
   useAiCredits,
+  useIdentifyQuota,
   usePdfUnlocked,
   type UseBillingStatusResult,
 } from './hooks';

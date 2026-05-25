@@ -5,11 +5,33 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
-import { useAiCredits, usePdfUnlocked } from './hooks';
+import { useAiCredits, usePdfUnlocked, useIdentifyQuota } from './hooks';
 
 function jsonRes(body: unknown): Response {
   return { ok: true, status: 200, json: async () => body } as Response;
 }
+
+describe('useIdentifyQuota (fix_001)', () => {
+  it('quotaRemaining / mustLink を status から返す', async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () =>
+      jsonRes({ aiCreditsRemaining: 0, pdfUnlocked: false, quotaRemaining: 3, mustLink: false }),
+    );
+    const { result } = renderHook(() => useIdentifyQuota({ token: 't', fetchFn }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.remaining).toBe(3);
+    expect(result.current.mustLink).toBe(false);
+  });
+
+  it('quotaRemaining 欠落 (旧 server 互換) → remaining=null', async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () =>
+      jsonRes({ aiCreditsRemaining: 0, pdfUnlocked: false }),
+    );
+    const { result } = renderHook(() => useIdentifyQuota({ token: 't', fetchFn }));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.remaining).toBeNull();
+    expect(result.current.mustLink).toBe(false);
+  });
+});
 
 describe('useAiCredits', () => {
   it('UT-BL-H01: 初回 mount → ai_credits_remaining を取得', async () => {

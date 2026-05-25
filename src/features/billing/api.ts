@@ -54,7 +54,14 @@ export async function createCheckout(
   throw new CheckoutFailedError(`checkout failed: ${res.status}`);
 }
 
-export type BillingStatus = { aiCreditsRemaining: number; pdfUnlocked: boolean };
+export type BillingStatus = {
+  aiCreditsRemaining: number;
+  pdfUnlocked: boolean;
+  /** identify 実効残数 (匿名 trial / 登録 月次無料+credits)。fix_001。旧 server 互換のため optional。 */
+  quotaRemaining?: number;
+  /** 匿名で無料枠を使い切った = Google リンク誘導。 */
+  mustLink?: boolean;
+};
 
 /** 課金ステータス (残クレジット / PDF unlock) を取得する (UT-BL-H01)。 */
 export async function fetchBillingStatus(opts: BillingApiOptions): Promise<BillingStatus> {
@@ -71,7 +78,12 @@ export async function fetchBillingStatus(opts: BillingApiOptions): Promise<Billi
 
 export type ConfirmResult =
   | { found: false }
-  | { found: true; type: 'ai_credits' | 'pdf_unlock'; aiCreditsRemaining: number; pdfUnlocked: boolean };
+  | {
+      found: true;
+      type: 'ai_credits' | 'pdf_unlock';
+      aiCreditsRemaining: number;
+      pdfUnlocked: boolean;
+    };
 
 export type ConfirmOptions = BillingApiOptions & {
   /** poll 間隔 (既定 1000ms)。 */

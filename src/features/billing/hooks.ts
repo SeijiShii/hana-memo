@@ -55,6 +55,28 @@ export function useAiCredits(opts: BillingApiOptions): {
   return { credits: status?.aiCreditsRemaining ?? null, loading, error, refresh };
 }
 
+/**
+ * identify の実効 quota を監視する (fix_001)。
+ * 匿名 trial / 登録 月次無料 + 購入クレジットを合算した残数 + リンク要求フラグを返す。
+ * 撮影前の quota ゲート (PreviewContainer.checkQuota) はこれを使う (ai_credits 単独でなく)。
+ */
+export function useIdentifyQuota(opts: BillingApiOptions): {
+  remaining: number | null;
+  mustLink: boolean;
+  loading: boolean;
+  error: Error | null;
+  refresh: () => Promise<void>;
+} {
+  const { status, loading, error, refresh } = useBillingStatus(opts);
+  return {
+    remaining: status?.quotaRemaining ?? null,
+    mustLink: status?.mustLink ?? false,
+    loading,
+    error,
+    refresh,
+  };
+}
+
 /** PDF unlock 状態を監視する (UT-BL-H03)。 */
 export function usePdfUnlocked(opts: BillingApiOptions): {
   unlocked: boolean | null;

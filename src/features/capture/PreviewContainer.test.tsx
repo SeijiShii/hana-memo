@@ -12,14 +12,16 @@ const convertMock = vi.fn();
 const captureMock = vi.fn();
 const useImageConvertMock = vi.fn();
 const useCaptureFlowMock = vi.fn();
-const useAiCreditsMock = vi.fn();
+const useIdentifyQuotaMock = vi.fn();
 const useCurrentUserMock = vi.fn();
 
 vi.mock('./hooks', () => ({
   useImageConvert: () => useImageConvertMock(),
   useCaptureFlow: (...a: unknown[]) => useCaptureFlowMock(...a),
 }));
-vi.mock('../billing', () => ({ useAiCredits: (...a: unknown[]) => useAiCreditsMock(...a) }));
+vi.mock('../billing', () => ({
+  useIdentifyQuota: (...a: unknown[]) => useIdentifyQuotaMock(...a),
+}));
 vi.mock('../../shared/auth/hooks', () => ({
   useCurrentUser: () => useCurrentUserMock(),
   useClerkUserId: () => null,
@@ -50,11 +52,11 @@ beforeEach(() => {
   captureMock.mockReset();
   useImageConvertMock.mockReset();
   useCaptureFlowMock.mockReset();
-  useAiCreditsMock.mockReset();
+  useIdentifyQuotaMock.mockReset();
   useCurrentUserMock.mockReset();
   useImageConvertMock.mockReturnValue({ convert: convertMock });
   useCaptureFlowMock.mockReturnValue({ capture: captureMock });
-  useAiCreditsMock.mockReturnValue({ credits: 5 });
+  useIdentifyQuotaMock.mockReturnValue({ remaining: 5, mustLink: false });
   useCurrentUserMock.mockReturnValue({ isSignedIn: true, isAnonymous: false, clerkUserId: 'u1' });
 });
 
