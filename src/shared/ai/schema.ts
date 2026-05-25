@@ -25,10 +25,20 @@ export const IDENTIFY_SCHEMA = {
           reason_for_likely: { type: 'string' },
         },
         required: ['common_name', 'reason_for_likely'],
+        // OpenAI Structured Outputs (strict) は入れ子オブジェクトにも additionalProperties:false 必須 (fix_002)
+        additionalProperties: false,
       },
     },
   },
-  required: ['common_name', 'scientific_name', 'family', 'genus', 'key_features', 'confidence', 'similar_species'],
+  required: [
+    'common_name',
+    'scientific_name',
+    'family',
+    'genus',
+    'key_features',
+    'confidence',
+    'similar_species',
+  ],
   additionalProperties: false,
 } as const;
 
