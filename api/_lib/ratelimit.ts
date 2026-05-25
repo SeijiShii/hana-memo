@@ -48,8 +48,26 @@ export function createIdentifyRateLimiter(deps: IdentifyRateLimiterDeps = {}): R
   const redis = deps.redis ?? new Redis(loadUpstashConfig(deps.env));
   const upstash = new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(IDENTIFY_RATE_LIMIT.limit, `${IDENTIFY_RATE_LIMIT.windowSec} s`),
+    limiter: Ratelimit.slidingWindow(
+      IDENTIFY_RATE_LIMIT.limit,
+      `${IDENTIFY_RATE_LIMIT.windowSec} s`,
+    ),
     prefix: 'ratelimit:identify',
+    analytics: false,
+  });
+  return toRateLimiter(upstash);
+}
+
+/** /api/auth/guest の上限 (匿名 user 量産 = Clerk MAU 濫用の防止 [SEC-001])。10 req / 10 min / key。 */
+export const GUEST_RATE_LIMIT = { limit: 10, windowSec: 600 } as const;
+
+/** /api/auth/guest 用の sliding-window レートリミッタを生成する (key = fingerprint or IP)。 */
+export function createGuestRateLimiter(deps: IdentifyRateLimiterDeps = {}): RateLimiter {
+  const redis = deps.redis ?? new Redis(loadUpstashConfig(deps.env));
+  const upstash = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(GUEST_RATE_LIMIT.limit, `${GUEST_RATE_LIMIT.windowSec} s`),
+    prefix: 'ratelimit:guest',
     analytics: false,
   });
   return toRateLimiter(upstash);
