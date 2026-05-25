@@ -23,6 +23,7 @@ OpenAI gpt-4o-mini Vision クライアント。SDK 非依存コア (プロンプ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
 | `revise_sec_001-003_rate_limit_ssrf_20260523/` | revise | sec_001-003_rate_limit_ssrf | 実装完了 (TDD fold-in) | [SEC-001] rate limit コア (rate-limit.ts) + [SEC-003] SSRF (helpers/url.ts 再利用) | [INDEX](./revise_sec_001-003_rate_limit_ssrf_20260523/INDEX.md) |
+| `claim_001_20260525_guest-trial-quota/` | claim | 001 | 判定完了 → fix 分岐 | **バグ**: identify quota が SPEC §4「ai_credits_remaining or trial」の trial 分岐を欠落 → 新規ゲストが無料枠 0 回で弾かれる | [INDEX](./claim_001_20260525_guest-trial-quota/INDEX.md) |
 
 ## 関連
 - 親 concept: `../../concept.md` §1.3.2, §3, §6
