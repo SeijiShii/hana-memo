@@ -26,7 +26,7 @@ describe('CameraCapture', () => {
   it('UT-CA-E01: mediaDevices 非対応 → フォルダ選択 fallback メッセージ', () => {
     vi.stubGlobal('navigator', {});
     render(<CameraCapture onCapture={vi.fn()} />);
-    expect(screen.getByText(/カメラが利用できません/)).toBeTruthy();
+    expect(screen.getByText(/カメラが利用できない端末/)).toBeTruthy();
   });
 
   it('disabled で input 無効化', () => {
