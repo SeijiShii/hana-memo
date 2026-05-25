@@ -16,9 +16,6 @@ import type { ReactNode } from 'react';
 import { AuthProvider } from '../shared/auth/provider';
 import { ClerkAuthBridge } from '../shared/auth/ClerkAuthBridge';
 
-/** frontend 公開可能キー。未設定なら keyless モードで children を素通しする。 */
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
-
 export type AppAuthProviderProps = {
   children: ReactNode;
   /** テスト用にキーを明示注入する (省略時は VITE_ 環境変数)。 */
@@ -30,7 +27,8 @@ export type AppAuthProviderProps = {
  * 後者は keyless dev / テストでツリーをクラッシュさせないための fallback。
  */
 export function AppAuthProvider({ children, publishableKey }: AppAuthProviderProps) {
-  const key = publishableKey ?? PUBLISHABLE_KEY;
+  // 公開可能キーは呼び出し時に env から読む (keyless 分岐をテスト env で制御可能にする)。
+  const key = publishableKey ?? (import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined);
   if (!key) {
     // キーレス起動: 認証コンテキストなしで children を描画する (要件 #1: graceful degradation)。
     return (

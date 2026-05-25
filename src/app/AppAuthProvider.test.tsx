@@ -3,7 +3,7 @@
  * AppAuthProvider 単体テスト — Clerk キー有無の分岐 (graceful degradation 要件 #1)。
  * 由来: app-integration wiring (missing-Clerk-key の graceful handling)
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 
@@ -20,6 +20,11 @@ vi.mock('@clerk/clerk-react', () => ({
 import { AppAuthProvider } from './AppAuthProvider';
 import { useCurrentUser } from '../shared/auth/hooks';
 import { useAuthToken } from './useAuthToken';
+
+// 環境非依存化: keyless ケースは ambient .env の VITE_CLERK_PUBLISHABLE_KEY に依存せず env を制御する
+// (実 .env に実キーがあっても keyless 分岐のテストが壊れないように)。keyed ケースは publishableKey prop が優先。
+beforeEach(() => vi.stubEnv('VITE_CLERK_PUBLISHABLE_KEY', ''));
+afterEach(() => vi.unstubAllEnvs());
 
 /** 実ドメイン hooks を呼ぶ子。keyless で provider 不在でも throw しないことの回帰検証用。 */
 function AuthConsumingChild() {
