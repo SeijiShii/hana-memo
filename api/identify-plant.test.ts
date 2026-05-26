@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { parseIdentifyBody, runIdentify, type IdentifyDeps } from './identify-plant';
 import { ValidationError } from '../src/shared/helpers/url';
-import { RateLimitedError, QuotaExceededError, LinkRequiredError } from '../src/shared/ai/errors';
+import { RateLimitedError, QuotaExceededError } from '../src/shared/ai/errors';
 import type { PresignClient } from '../src/shared/storage/presign';
 
 const validBody = {
@@ -121,13 +121,21 @@ describe('runIdentify', () => {
     expect(deps.persist).not.toHaveBeenCalled();
   });
 
-  it('匿名 trial 使い切り (mustLink=true) → LinkRequiredError 401 (fix_001)', async () => {
+  it('匿名 trial+credits 使い切り → QuotaExceededError 402 (購入導線、revise_001、リンク強制廃止)', async () => {
     const deps = makeDeps({
-      getQuota: vi.fn().mockResolvedValue({ remaining: 0, mustLink: true, consume: 'none' }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 0, mustLink: false, consume: 'none' }),
     });
-    await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(LinkRequiredError);
+    await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(QuotaExceededError);
     expect(deps.complete).not.toHaveBeenCalled();
     expect(deps.persist).not.toHaveBeenCalled();
+  });
+
+  it('匿名 trial 使い切り + 購入クレジット → consume=credits で persist (revise_001、ゲスト課金)', async () => {
+    const deps = makeDeps({
+      getQuota: vi.fn().mockResolvedValue({ remaining: 10, mustLink: false, consume: 'credits' }),
+    });
+    await runIdentify(userId, input, deps);
+    expect(deps.persist).toHaveBeenCalledWith(expect.objectContaining({ consume: 'credits' }));
   });
 
   it('匿名 trial 残あり → consume=trial で persist (fix_001)', async () => {

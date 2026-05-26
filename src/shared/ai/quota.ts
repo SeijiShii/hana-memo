@@ -19,11 +19,13 @@ export function consumeQuota(remaining: number): number {
 }
 
 /**
- * 実効 quota モデル (fix_001、claim_001 由来)。確定方針:
- * - 匿名ユーザー: ANON_TRIAL_MAX(3) 回 生涯無料 (trial_used_count)。使い切ったら Google リンク要求 (mustLink)。
+ * 実効 quota モデル (fix_001、claim_001 由来 / revise_001 guest-billing で更新)。確定方針:
+ * - 匿名ユーザー: ANON_TRIAL_MAX(3) 回 生涯無料 (trial_used_count) + 購入 ai_credits_remaining。
+ *   trial→credits の順で消費。**枯渇しても Google リンク強制せず購入導線へ (mustLink 廃止、revise_001)**。
  * - リンク済(登録)ユーザー: 月 MONTHLY_FREE_LIMIT(10) 回無料 (当月 identify 件数) + 購入 ai_credits_remaining。
  * これにより SPEC §4「quota 残あり (ai_credits_remaining or trial)」を identify 経路に正しく配線する。
  * 匿名上限 ANON_TRIAL_MAX は auth/trial.ts を単一の真実源として再利用する (二重定義の drift 回避)。
+ * NOTE: mustLink は revise_001 で常に false (恒久 vestigial)。FE/型からの完全除去は後続 Phase で実施。
  */
 export const MONTHLY_FREE_LIMIT = 10;
 
@@ -33,7 +35,7 @@ export type QuotaConsumeSource = 'trial' | 'monthly' | 'credits' | 'none';
 export type EffectiveQuota = {
   /** いま同定に使える総残数。 */
   remaining: number;
-  /** 匿名で無料枠を使い切った = Google リンク要求 (401 link_required)。 */
+  /** @deprecated revise_001 で常に false (リンク強制廃止)。FE/型からの除去は後続 Phase。 */
   mustLink: boolean;
   /** 今回 1 回消費する際に更新すべきカウンタ。remaining<=0 のときは 'none'。 */
   consume: QuotaConsumeSource;
@@ -61,12 +63,15 @@ export function effectiveQuota(
   const monthlyMax = opts.monthlyMax ?? MONTHLY_FREE_LIMIT;
 
   if (input.isAnonymous) {
-    const remaining = Math.max(0, anonMax - input.trialUsedCount);
-    return {
-      remaining,
-      mustLink: remaining <= 0,
-      consume: remaining > 0 ? 'trial' : 'none',
-    };
+    // revise_001 (guest-billing): 匿名でも購入クレジットを消費可。trial→credits の順で消費。
+    // 枯渇しても mustLink にせず (リンク強制を廃止)、購入導線 (quota_exceeded/402) に委ねる。
+    const trialRemaining = Math.max(0, anonMax - input.trialUsedCount);
+    const credits = Math.max(0, input.aiCreditsRemaining);
+    const remaining = trialRemaining + credits;
+    let consume: QuotaConsumeSource = 'none';
+    if (trialRemaining > 0) consume = 'trial';
+    else if (credits > 0) consume = 'credits';
+    return { remaining, mustLink: false, consume };
   }
 
   const monthlyRemaining = Math.max(0, monthlyMax - input.monthlyUsedCount);

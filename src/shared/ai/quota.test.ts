@@ -35,14 +35,36 @@ describe('effectiveQuota — 匿名 (fix_001)', () => {
     expect(q.consume).toBe('trial');
   });
 
-  it('匿名 trial 使い切り → remaining=0, mustLink=true, consume=none', () => {
+  it('匿名 trial 使い切り + credits 0 → remaining=0, mustLink=false, consume=none (購入導線へ、revise_001)', () => {
     const q = effectiveQuota({
       isAnonymous: true,
       trialUsedCount: ANON_TRIAL_MAX,
       monthlyUsedCount: 0,
-      aiCreditsRemaining: 99, // 匿名は購入クレジットを参照しない
+      aiCreditsRemaining: 0,
     });
-    expect(q).toEqual({ remaining: 0, mustLink: true, consume: 'none' });
+    expect(q).toEqual({ remaining: 0, mustLink: false, consume: 'none' });
+  });
+
+  it('匿名 trial 使い切り + 購入クレジットあり → credits を消費可 (revise_001、ゲスト課金)', () => {
+    const q = effectiveQuota({
+      isAnonymous: true,
+      trialUsedCount: ANON_TRIAL_MAX,
+      monthlyUsedCount: 0,
+      aiCreditsRemaining: 10,
+    });
+    expect(q).toEqual({ remaining: 10, mustLink: false, consume: 'credits' });
+  });
+
+  it('匿名 trial 残あり + credits → trial 優先消費、remaining=trial+credits (revise_001)', () => {
+    const q = effectiveQuota({
+      isAnonymous: true,
+      trialUsedCount: ANON_TRIAL_MAX - 1,
+      monthlyUsedCount: 0,
+      aiCreditsRemaining: 10,
+    });
+    expect(q.remaining).toBe(1 + 10);
+    expect(q.consume).toBe('trial');
+    expect(q.mustLink).toBe(false);
   });
 });
 

@@ -19,7 +19,6 @@ import { parseIdentifyResponse } from '../src/shared/ai/schema';
 import { withRetry } from '../src/shared/ai/retry';
 import {
   QuotaExceededError,
-  LinkRequiredError,
   RateLimitedError,
   SchemaValidationError,
 } from '../src/shared/ai/errors';
@@ -92,10 +91,10 @@ export async function runIdentify(
 ): Promise<IdentifyResult> {
   await checkIdentifyRateLimit(deps.rateLimiter, userId); // [SEC-001] RateLimitedError
   validateObjectKey(input.imageObjectKey, userId); // 所有確認 ([SEC-003]/[SEC-005])
-  const quota = await deps.getQuota(); // 実効 quota (匿名 trial / 登録 月次+credits)
+  const quota = await deps.getQuota(); // 実効 quota (匿名 trial+credits / 登録 月次+credits)
   if (quota.remaining <= 0) {
-    // 匿名は trial 使い切り → Google リンク誘導 (401)、登録は課金誘導 (402) (fix_001, SPEC §4 L100/L101)
-    throw quota.mustLink ? new LinkRequiredError() : new QuotaExceededError();
+    // revise_001: 匿名・登録とも枯渇は購入導線 (402)。Google リンク強制 (401) は廃止
+    throw new QuotaExceededError();
   }
   const imageUrl = await createSignedUrl(deps.presign, {
     objectKey: input.imageObjectKey,
@@ -122,9 +121,6 @@ function jsonResponse(body: unknown, status: number): Response {
 function mapError(err: unknown): Response {
   if (err instanceof RateLimitedError) {
     return jsonResponse({ error: 'rate_limited', retryAtMs: err.retryAtMs }, 429);
-  }
-  if (err instanceof LinkRequiredError) {
-    return jsonResponse({ error: 'link_required' }, 401); // 匿名 trial 超過 (fix_001)
   }
   if (err instanceof QuotaExceededError) {
     return jsonResponse({ error: 'quota_exceeded' }, 402);
