@@ -20,8 +20,10 @@
 
 | 区分 | 状態 | 内容 |
 |---|---|---|
-| **no-key スモーク (Class A)** | ✅ **GREEN** (8/8) | app boot / ランディング / 下部ナビ遷移 (撮影↔図鑑↔設定) / 公開 legal ページ / 空状態 / keyless graceful。`e2e/smoke.spec.ts` |
-| **実サービス依存ジャーニー** | 🚫 gated | 撮影→識別→保存 (実 R2+OpenAI) / OAuth 連携 / PWYW Checkout (実 Stripe) / guest sign-in (実 Clerk)。実 keys + (preview 実行は) Vercel = Class B が必須 |
+| **no-key スモーク (Class A)** | ✅ **GREEN** (11/11) | app boot / ランディング / 下部ナビ遷移 (撮影↔図鑑↔設定) / 公開 legal ページ / 空状態 / keyless graceful (`e2e/smoke.spec.ts` 8) + **billing guest-billing 購入導線 (¥100=10回 / mustLink 撤廃 / PWYW・PDF・export 廃止の回帰ガード)** (`e2e/billing.spec.ts` 3、revise_001) |
+| **実サービス依存ジャーニー** | 🚫 gated | 撮影→識別→保存 (実 R2+OpenAI) / OAuth 連携 / 単発 Checkout (実 Stripe test) / guest sign-in (実 Clerk) / `0003` migration の実 Neon apply。実 keys + (preview 実行は) Vercel = Class B が必須 |
+
+> **2026-05-26 更新 (D20260526_070 /flow:e2e billing)**: billing revise_001 の no-key ジャーニー 3 件を追加 (E2E-R-01 の「購入導線が出る・連携要求は出ない」意図を /billing ページレベルで検証)。あわせて `playwright.config.ts` の webServer ビルドを keyless 強制 (`VITE_CLERK_PUBLISHABLE_KEY=`) に修正 — `.env.local` の実 Clerk キーが build に inline され keyless graceful テストが揺れる環境起因不具合 [E2E-ENV-001] を解消。詳細: `docs/billing/revise_001_20260526_guest-billing/103_REVISE_E2E_REPORT.md`。
 
 §3 の 7 feature 104 ジャーニーのうち **認証/外部サービス不要の UI 統合部分は no-key スモークでカバー**。
 残りは実 keys + 実行環境を要する (本 headless env では達成不能)。

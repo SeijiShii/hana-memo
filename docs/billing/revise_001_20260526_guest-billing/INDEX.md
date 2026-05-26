@@ -2,7 +2,7 @@
 
 **issue / slug**: revise_001 / guest-billing
 **実施日**: 2026-05-26
-**状態**: 実装完了 (2026-05-26、unit 880 green / typecheck clean)
+**状態**: 実装完了 + E2E green (no-key) (2026-05-26、unit 880 green / typecheck clean / no-key E2E 11 green。実サービス E2E + migration apply は Class B gated)
 
 <!-- auto-generated-start -->
 
@@ -17,6 +17,7 @@
 | 005 | 005_REVISE_MIGRATION.md | マイグレーション計画 | 2026-05-26 |
 | 101 | 101_REVISE_IMPL_REPORT.md | 実装レポート | 2026-05-26 |
 | 102 | 102_REVISE_UNIT_TEST_REPORT.md | 単体テストレポート | 2026-05-26 |
+| 103 | 103_REVISE_E2E_REPORT.md | E2E レポート (no-key green) | 2026-05-26 |
 | 905 | 905_SPEC_REVIEW.md | spec-review | 2026-05-26 |
 
 ## 関連
