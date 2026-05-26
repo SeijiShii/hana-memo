@@ -1,8 +1,9 @@
 // @vitest-environment happy-dom
 /**
  * BillingPage 単体テスト
- * 由来: docs/billing/001_billing_SPEC.md §1 UC1/UC2 §4 (E-BL-001/002/007),
+ * 由来: docs/billing/001_billing_SPEC.md §1 UC1/UC2 §4 (E-BL-001/007),
  *       docs/billing/004_billing_E2E_TEST.md (E-BL-1/2/3/4)
+ * revise_001: 匿名でも購入可。OAuth リンク必須ゲート (旧 E-BL-002) は撤廃したためテスト削除。
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -47,21 +48,14 @@ describe('BillingPage', () => {
     );
   });
 
-  it('E-BL-002: 匿名 user (isLinked=false) で購入 → OAuth ゲート表示 + onCheckout 未起動', () => {
-    const onCheckout = vi.fn();
-    render(<BillingPage status={status()} isLinked={false} onCheckout={onCheckout} />);
+  it('revise_001: OAuth リンクゲートなしで購入が直接進む (連携モーダルを出さない)', async () => {
+    const onCheckout = vi.fn<(i: CheckoutInput) => void>();
+    render(<BillingPage status={status()} onCheckout={onCheckout} />);
+    fireEvent.click(screen.getByRole('button', { name: '購入する' }));
     expect(screen.queryByRole('dialog')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: '購入する' }));
-    expect(screen.getByRole('dialog', { name: 'アカウント連携が必要です' })).toBeTruthy();
-    expect(onCheckout).not.toHaveBeenCalled();
-  });
-
-  it('E-BL-002: OAuth ゲートの「連携する」で onLink を起動する', () => {
-    const onLink = vi.fn();
-    render(<BillingPage status={status()} isLinked={false} onLink={onLink} onCheckout={vi.fn()} />);
-    fireEvent.click(screen.getByRole('button', { name: '購入する' }));
-    fireEvent.click(screen.getByRole('button', { name: '連携する' }));
-    expect(onLink).toHaveBeenCalledOnce();
+    await waitFor(() =>
+      expect(onCheckout).toHaveBeenCalledWith({ type: 'ai_credits', quantity: 1 }),
+    );
   });
 
   it('statusLoading かつ未取得 → ローディング表示', () => {

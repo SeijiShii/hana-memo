@@ -4,8 +4,7 @@
  * 配線済み (実データ、fix_001):
  *   - quotaRemaining: useIdentifyQuota({ token }).remaining (実効残数 = 匿名 trial / 登録 月次+credits)。
  *     token 未解決 / 未取得 (null) は既定 (十分量) とみなす。ai_credits 単独だと新規匿名が trial 枠で
- *     撮影できず即ブロックされる (claim_001) ため、実効 quota を使う。
- *   - linkRequired: server 算出の mustLink (匿名が trial 使い切り)。
+ *     撮影できず即ブロックされる (claim_001) ため、実効 quota を使う。残 0 は購入導線へ (revise_001)。
  *
  * seam (未配線):
  *   - aiConsentActive: user_settings (ai_consent_revoked_at) 取得 Function が未実装のため既定 true。
@@ -25,16 +24,13 @@ export type CaptureContainerProps = {
 
 /** token がある場合に useIdentifyQuota を起動する内部 container。 */
 function AuthedCapture({ token }: { token: string }) {
-  const { remaining, mustLink } = useIdentifyQuota({ token });
+  const { remaining } = useIdentifyQuota({ token });
   // 実効残数が取れていればそれを quota とする。未取得 (null) は十分量とみなす (CapturePage 既定)。
   const quotaRemaining = remaining ?? Number.POSITIVE_INFINITY;
-  // 匿名が trial 使い切り → 連携必須 (server の effectiveQuota が算出した mustLink)。
-  const linkRequired = mustLink;
 
   return (
     <CapturePage
       quotaRemaining={quotaRemaining}
-      linkRequired={linkRequired}
       // aiConsentActive は設定取得 API 未実装のため既定 (true) に委ねる seam。
     />
   );

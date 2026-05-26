@@ -41,7 +41,6 @@ export {
   useIdentifyQuota,
   type UseBillingStatusResult,
 } from './hooks';
-export { OAuthRequiredModal, type OAuthRequiredModalProps } from './OAuthRequiredModal';
 export { BillingPage, type BillingPageProps } from './pages/BillingPage';
 export { BillingSuccessPage, type BillingSuccessPageProps } from './pages/BillingSuccessPage';
 export { BillingContainer, type BillingContainerProps } from './BillingContainer';

@@ -57,12 +57,12 @@ export function useAiCredits(opts: BillingApiOptions): {
 
 /**
  * identify の実効 quota を監視する (fix_001)。
- * 匿名 trial / 登録 月次無料 + 購入クレジットを合算した残数 + リンク要求フラグを返す。
+ * 匿名 trial / 登録 月次無料 + 購入クレジットを合算した残数を返す。
  * 撮影前の quota ゲート (PreviewContainer.checkQuota) はこれを使う (ai_credits 単独でなく)。
+ * 残 0 でも連携強制せず購入導線に委ねる (revise_001、リンク要求フラグ廃止)。
  */
 export function useIdentifyQuota(opts: BillingApiOptions): {
   remaining: number | null;
-  mustLink: boolean;
   loading: boolean;
   error: Error | null;
   refresh: () => Promise<void>;
@@ -70,7 +70,6 @@ export function useIdentifyQuota(opts: BillingApiOptions): {
   const { status, loading, error, refresh } = useBillingStatus(opts);
   return {
     remaining: status?.quotaRemaining ?? null,
-    mustLink: status?.mustLink ?? false,
     loading,
     error,
     refresh,

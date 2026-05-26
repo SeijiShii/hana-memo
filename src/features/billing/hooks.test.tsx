@@ -12,32 +12,26 @@ function jsonRes(body: unknown): Response {
 }
 
 describe('useIdentifyQuota (fix_001)', () => {
-  it('quotaRemaining / mustLink を status から返す', async () => {
+  it('quotaRemaining を status から返す', async () => {
     const fetchFn = vi.fn<typeof fetch>(async () =>
-      jsonRes({ aiCreditsRemaining: 0, quotaRemaining: 3, mustLink: false }),
+      jsonRes({ aiCreditsRemaining: 0, quotaRemaining: 3 }),
     );
     const { result } = renderHook(() => useIdentifyQuota({ token: 't', fetchFn }));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.remaining).toBe(3);
-    expect(result.current.mustLink).toBe(false);
   });
 
   it('quotaRemaining 欠落 (旧 server 互換) → remaining=null', async () => {
-    const fetchFn = vi.fn<typeof fetch>(async () =>
-      jsonRes({ aiCreditsRemaining: 0 }),
-    );
+    const fetchFn = vi.fn<typeof fetch>(async () => jsonRes({ aiCreditsRemaining: 0 }));
     const { result } = renderHook(() => useIdentifyQuota({ token: 't', fetchFn }));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.remaining).toBeNull();
-    expect(result.current.mustLink).toBe(false);
   });
 });
 
 describe('useAiCredits', () => {
   it('UT-BL-H01: 初回 mount → ai_credits_remaining を取得', async () => {
-    const fetchFn = vi.fn<typeof fetch>(async () =>
-      jsonRes({ aiCreditsRemaining: 40 }),
-    );
+    const fetchFn = vi.fn<typeof fetch>(async () => jsonRes({ aiCreditsRemaining: 40 }));
     const { result } = renderHook(() => useAiCredits({ token: 't', fetchFn }));
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.credits).toBe(40);

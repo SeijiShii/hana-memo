@@ -56,8 +56,6 @@ export type BillingStatus = {
   aiCreditsRemaining: number;
   /** identify 実効残数 (匿名 trial / 登録 月次無料+credits)。fix_001。旧 server 互換のため optional。 */
   quotaRemaining?: number;
-  /** 匿名で無料枠を使い切った = Google リンク誘導。 */
-  mustLink?: boolean;
 };
 
 /** 課金ステータス (残クレジット) を取得する (UT-BL-H01)。 */

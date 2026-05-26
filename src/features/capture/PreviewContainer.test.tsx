@@ -56,7 +56,7 @@ beforeEach(() => {
   useCurrentUserMock.mockReset();
   useImageConvertMock.mockReturnValue({ convert: convertMock });
   useCaptureFlowMock.mockReturnValue({ capture: captureMock });
-  useIdentifyQuotaMock.mockReturnValue({ remaining: 5, mustLink: false });
+  useIdentifyQuotaMock.mockReturnValue({ remaining: 5 });
   useCurrentUserMock.mockReturnValue({ isSignedIn: true, isAnonymous: false, clerkUserId: 'u1' });
 });
 

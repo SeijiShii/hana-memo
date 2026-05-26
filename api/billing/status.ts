@@ -14,8 +14,6 @@ export type BillingStatus = {
   aiCreditsRemaining: number;
   /** identify に使える実効残数 (匿名 trial / 登録 月次無料+credits)。フロント quota ゲート用 (fix_001)。 */
   quotaRemaining: number;
-  /** 匿名で無料枠を使い切った = Google リンク誘導。 */
-  mustLink: boolean;
 };
 
 function jsonResponse(body: unknown, status: number): Response {
@@ -41,7 +39,6 @@ async function fetchStatus(userId: string): Promise<BillingStatus> {
   return {
     aiCreditsRemaining: row?.aiCreditsRemaining ?? 0,
     quotaRemaining: quota.remaining,
-    mustLink: quota.mustLink,
   };
 }
 

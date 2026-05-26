@@ -23,7 +23,7 @@ export {
 } from './hooks';
 export { CameraCapture, type CameraCaptureProps } from './CameraCapture';
 export { CaptureButton, type CaptureButtonProps } from './components/CaptureButton';
-export { QuotaModal, type QuotaModalProps, type QuotaModalReason } from './components/QuotaModal';
+export { QuotaModal, type QuotaModalProps } from './components/QuotaModal';
 export { CapturePage, type CapturePageProps } from './pages/CapturePage';
 export { PreviewPage, type PreviewPageProps } from './pages/PreviewPage';
 export { CaptureContainer, type CaptureContainerProps } from './CaptureContainer';

@@ -7,11 +7,10 @@ export type ApiError =
   | { error: 'forbidden'; message?: string }
   | { error: 'rate_limited'; retry_at: number /* unix ms */ }
   | { error: 'quota_exceeded'; message?: string }
-  | { error: 'link_required'; message?: string }
   | { error: 'validation_error'; reason: string }
   | { error: 'internal_error'; message?: string };
 
-export type ApiResponse<T> = { ok: true; data: T } | { ok: false } & ApiError;
+export type ApiResponse<T> = { ok: true; data: T } | ({ ok: false } & ApiError);
 
 // 429 レスポンスヘッダ (`Retry-After` 秒) は HTTP ヘッダで送る、body は ApiError の rate_limited
 export const isRateLimitedError = (

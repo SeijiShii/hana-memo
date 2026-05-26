@@ -73,7 +73,7 @@ describe('runIdentify', () => {
       complete: vi
         .fn()
         .mockResolvedValue({ choices: [{ message: { content: JSON.stringify(MODEL_JSON) } }] }),
-      getQuota: vi.fn().mockResolvedValue({ remaining: 5, mustLink: false, consume: 'monthly' }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 5, consume: 'monthly' }),
       persist: vi.fn().mockResolvedValue(undefined),
       sleep: async () => {},
       ...overrides,
@@ -112,9 +112,9 @@ describe('runIdentify', () => {
     expect(deps.getQuota).not.toHaveBeenCalled();
   });
 
-  it('登録ユーザー quota 0 (mustLink=false) → QuotaExceededError 402 (OpenAI 不実行)', async () => {
+  it('登録ユーザー quota 0 → QuotaExceededError 402 (OpenAI 不実行)', async () => {
     const deps = makeDeps({
-      getQuota: vi.fn().mockResolvedValue({ remaining: 0, mustLink: false, consume: 'none' }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 0, consume: 'none' }),
     });
     await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(QuotaExceededError);
     expect(deps.complete).not.toHaveBeenCalled();
@@ -123,7 +123,7 @@ describe('runIdentify', () => {
 
   it('匿名 trial+credits 使い切り → QuotaExceededError 402 (購入導線、revise_001、リンク強制廃止)', async () => {
     const deps = makeDeps({
-      getQuota: vi.fn().mockResolvedValue({ remaining: 0, mustLink: false, consume: 'none' }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 0, consume: 'none' }),
     });
     await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(QuotaExceededError);
     expect(deps.complete).not.toHaveBeenCalled();
@@ -132,7 +132,7 @@ describe('runIdentify', () => {
 
   it('匿名 trial 使い切り + 購入クレジット → consume=credits で persist (revise_001、ゲスト課金)', async () => {
     const deps = makeDeps({
-      getQuota: vi.fn().mockResolvedValue({ remaining: 10, mustLink: false, consume: 'credits' }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 10, consume: 'credits' }),
     });
     await runIdentify(userId, input, deps);
     expect(deps.persist).toHaveBeenCalledWith(expect.objectContaining({ consume: 'credits' }));
@@ -140,7 +140,7 @@ describe('runIdentify', () => {
 
   it('匿名 trial 残あり → consume=trial で persist (fix_001)', async () => {
     const deps = makeDeps({
-      getQuota: vi.fn().mockResolvedValue({ remaining: 3, mustLink: false, consume: 'trial' }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 3, consume: 'trial' }),
     });
     await runIdentify(userId, input, deps);
     expect(deps.persist).toHaveBeenCalledWith(expect.objectContaining({ consume: 'trial' }));

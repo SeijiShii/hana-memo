@@ -11,9 +11,9 @@
  *   createCheckout + リダイレクト (location.assign 等) を配線した onCheckout を渡す想定。
  *   本画面は Stripe へのリダイレクトを一切行わず、onCheckout の呼び出しに留める。
  *
- * OAuth ゲート:
- *   匿名 (Guest) user は購入不可 (E-BL-002)。isLinked=false のとき購入操作で OAuthRequiredModal を開き、
- *   連携を促す (既存 OAuthRequiredModal を再利用、重複実装しない)。
+ * 購入の前提:
+ *   revise_001 (guest-billing): 匿名 (Guest) user も購入可。OAuth リンク必須ゲート (旧 E-BL-002) は撤廃し、
+ *   購入は連携状態にかかわらず直接 onCheckout を起動する。
  *
  * 状態表示:
  *   - statusLoading かつ未取得 → ローディング
@@ -22,12 +22,11 @@
  *   - checkoutError → 購入失敗フィードバック (E-BL-001)
  *   - 戻り (success) → checkoutComplete=true で受領確認 (BillingSuccessPage から or props)
  *
- * 関連: docs/billing/001_billing_SPEC.md §1 UC1 / §2.2 / §4 (E-BL-001/002),
+ * 関連: docs/billing/001_billing_SPEC.md §1 UC1 / §2.2 / §4 (E-BL-001),
  *       docs/billing/002_billing_PLAN.md §1 (BillingPage / AiCreditsPurchasePage)
  */
 import { useState } from 'react';
 import { CreditCard } from 'lucide-react';
-import { OAuthRequiredModal } from '../OAuthRequiredModal';
 import {
   AI_QTY_MIN,
   AI_QTY_MAX,
@@ -49,10 +48,6 @@ export type BillingPageProps = {
   statusLoading?: boolean;
   /** ステータス取得エラー。 */
   statusError?: Error | null;
-  /** OAuth リンク済か (_shared/auth.isLinked 由来)。既定 true。false で購入時にゲート表示 (E-BL-002)。 */
-  isLinked?: boolean;
-  /** 「連携する」押下時 (_shared/auth.linkWithGoogle を配線)。 */
-  onLink?: () => void;
   /**
    * 購入起動 (Stripe Checkout 作成 + リダイレクトの seam)。
    * アプリ層で createCheckout + location 遷移を配線する。本画面は呼ぶだけで実リダイレクトしない。
@@ -71,16 +66,12 @@ export function BillingPage({
   status = null,
   statusLoading = false,
   statusError = null,
-  isLinked = true,
-  onLink,
   onCheckout,
   checkoutPending = false,
   checkoutError = null,
   checkoutComplete = false,
 }: BillingPageProps) {
   const [qty, setQty] = useState<number>(AI_QTY_MIN);
-  // 購入操作で OAuth 未連携を検知したら開く (E-BL-002)。
-  const [gateOpen, setGateOpen] = useState(false);
   // 注入 onCheckout の reject を拾うローカルエラー (アプリ層 checkoutError と OR 表示)。
   const [localError, setLocalError] = useState<Error | null>(null);
 
@@ -92,11 +83,7 @@ export function BillingPage({
     if (!canPurchase) {
       return;
     }
-    // E-BL-002: 匿名 user は OAuth ゲートを出して購入を中断する。
-    if (!isLinked) {
-      setGateOpen(true);
-      return;
-    }
+    // revise_001: 匿名でも購入可。OAuth リンクゲートは撤廃し直接 Checkout を起動する。
     setLocalError(null);
     try {
       await onCheckout({ type: 'ai_credits', quantity: qty });
@@ -191,13 +178,6 @@ export function BillingPage({
         <CreditCard size={18} aria-hidden />
         {checkoutPending ? '処理中…' : '購入する'}
       </button>
-
-      {/* E-BL-002: 匿名 user 向け OAuth 連携ゲート (既存モーダルを再利用) */}
-      <OAuthRequiredModal
-        open={gateOpen}
-        onLink={() => onLink?.()}
-        onClose={() => setGateOpen(false)}
-      />
     </main>
   );
 }

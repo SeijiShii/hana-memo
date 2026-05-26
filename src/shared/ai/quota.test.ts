@@ -14,14 +14,14 @@ describe('checkQuota / consumeQuota (既存)', () => {
 });
 
 describe('effectiveQuota — 匿名 (fix_001)', () => {
-  it('新規匿名 (trial_used=0) → remaining=ANON_TRIAL_MAX, consume=trial, mustLink=false', () => {
+  it('新規匿名 (trial_used=0) → remaining=ANON_TRIAL_MAX, consume=trial', () => {
     const q = effectiveQuota({
       isAnonymous: true,
       trialUsedCount: 0,
       monthlyUsedCount: 0,
       aiCreditsRemaining: 0,
     });
-    expect(q).toEqual({ remaining: ANON_TRIAL_MAX, mustLink: false, consume: 'trial' });
+    expect(q).toEqual({ remaining: ANON_TRIAL_MAX, consume: 'trial' });
   });
 
   it('匿名 trial 残 1 → remaining=1, consume=trial', () => {
@@ -35,14 +35,14 @@ describe('effectiveQuota — 匿名 (fix_001)', () => {
     expect(q.consume).toBe('trial');
   });
 
-  it('匿名 trial 使い切り + credits 0 → remaining=0, mustLink=false, consume=none (購入導線へ、revise_001)', () => {
+  it('匿名 trial 使い切り + credits 0 → remaining=0, consume=none (購入導線へ、revise_001)', () => {
     const q = effectiveQuota({
       isAnonymous: true,
       trialUsedCount: ANON_TRIAL_MAX,
       monthlyUsedCount: 0,
       aiCreditsRemaining: 0,
     });
-    expect(q).toEqual({ remaining: 0, mustLink: false, consume: 'none' });
+    expect(q).toEqual({ remaining: 0, consume: 'none' });
   });
 
   it('匿名 trial 使い切り + 購入クレジットあり → credits を消費可 (revise_001、ゲスト課金)', () => {
@@ -52,7 +52,7 @@ describe('effectiveQuota — 匿名 (fix_001)', () => {
       monthlyUsedCount: 0,
       aiCreditsRemaining: 10,
     });
-    expect(q).toEqual({ remaining: 10, mustLink: false, consume: 'credits' });
+    expect(q).toEqual({ remaining: 10, consume: 'credits' });
   });
 
   it('匿名 trial 残あり + credits → trial 優先消費、remaining=trial+credits (revise_001)', () => {
@@ -64,7 +64,6 @@ describe('effectiveQuota — 匿名 (fix_001)', () => {
     });
     expect(q.remaining).toBe(1 + 10);
     expect(q.consume).toBe('trial');
-    expect(q.mustLink).toBe(false);
   });
 });
 
@@ -77,7 +76,6 @@ describe('effectiveQuota — 登録 (fix_001)', () => {
       aiCreditsRemaining: 5,
     });
     expect(q.remaining).toBe(MONTHLY_FREE_LIMIT + 5);
-    expect(q.mustLink).toBe(false);
     expect(q.consume).toBe('monthly');
   });
 
@@ -92,14 +90,14 @@ describe('effectiveQuota — 登録 (fix_001)', () => {
     expect(q.consume).toBe('credits');
   });
 
-  it('登録 + 月次使い切り + credits 0 → remaining=0, consume=none, mustLink=false (link でなく課金)', () => {
+  it('登録 + 月次使い切り + credits 0 → remaining=0, consume=none (link でなく課金)', () => {
     const q = effectiveQuota({
       isAnonymous: false,
       trialUsedCount: 0,
       monthlyUsedCount: MONTHLY_FREE_LIMIT,
       aiCreditsRemaining: 0,
     });
-    expect(q).toEqual({ remaining: 0, mustLink: false, consume: 'none' });
+    expect(q).toEqual({ remaining: 0, consume: 'none' });
   });
 
   it('opts で上限を上書きできる', () => {
