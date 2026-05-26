@@ -30,13 +30,6 @@ export type BillingUnlockOp =
       amountJpy: number;
       credits: number;
     }
-  | {
-      op: 'unlockPdf';
-      userId: string;
-      sessionId: string;
-      paymentIntent: string | null;
-      amountJpy: number;
-    }
   | { op: 'ignore'; reason: string };
 
 /** Stripe event を billing 操作に変換する (純関数)。 */
@@ -65,15 +58,12 @@ export function mapStripeEvent(event: StripeCheckoutEvent): BillingUnlockOp {
       credits: aiCreditsGranted(Number.isInteger(qty) ? qty : 1),
     };
   }
-  if (type === 'pdf_unlock') {
-    return { op: 'unlockPdf', userId, sessionId, paymentIntent, amountJpy };
-  }
   return { op: 'ignore', reason: `unknown metadata.type: ${type}` };
 }
 
 export type BillingUnlockRecord = {
   userId: string;
-  type: 'ai_credits' | 'pdf_unlock';
+  type: 'ai_credits';
   amountJpy: number;
   sessionId: string;
   paymentIntent: string | null;
@@ -86,14 +76,13 @@ export type BillingStore = {
   recordEvent(eventId: string, source: string): Promise<void>;
   insertUnlock(record: BillingUnlockRecord): Promise<void>;
   grantCredits(userId: string, credits: number): Promise<void>;
-  setPdfUnlocked(userId: string): Promise<void>;
 };
 
 /**
  * 検証済み Stripe webhook を idempotent に適用する。
  * - event.id 処理済み → applied=false (UT-BL-WH03 べき等性)
  * - ignore → event 記録のみ、applied=false
- * - grantCredits / unlockPdf → unlock INSERT + users 更新 + event 記録
+ * - grantCredits → unlock INSERT + users 更新 + event 記録
  */
 export async function applyBillingWebhook(
   store: BillingStore,
@@ -110,17 +99,13 @@ export async function applyBillingWebhook(
 
   await store.insertUnlock({
     userId: op.userId,
-    type: op.op === 'grantCredits' ? 'ai_credits' : 'pdf_unlock',
+    type: 'ai_credits',
     amountJpy: op.amountJpy,
     sessionId: op.sessionId,
     paymentIntent: op.paymentIntent,
   });
 
-  if (op.op === 'grantCredits') {
-    await store.grantCredits(op.userId, op.credits);
-  } else {
-    await store.setPdfUnlocked(op.userId);
-  }
+  await store.grantCredits(op.userId, op.credits);
 
   await store.recordEvent(event.id, 'stripe');
   return { applied: true };

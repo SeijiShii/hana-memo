@@ -71,9 +71,7 @@ export function BillingSuccessPage({ onConfirm }: BillingSuccessPageProps) {
         <>
           <h1 className="text-xl font-bold text-moss-dark">購入が完了しました</h1>
           <p className="text-sm text-ink-soft">
-            {result?.type === 'ai_credits'
-              ? `AI 識別の残り回数が ${result.aiCreditsRemaining} 回になりました。`
-              : 'PDF エクスポートをアンロックしました。'}
+            AI 識別の残り回数が {result?.aiCreditsRemaining ?? 0} 回になりました。
           </p>
         </>
       ) : (

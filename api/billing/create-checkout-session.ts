@@ -9,18 +9,12 @@
  */
 import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
 import { resolveUserId, UserNotFoundError } from '../_lib/user';
-import {
-  aiCreditsAmountJpy,
-  validatePwywAmount,
-  AI_CREDITS_PER_UNIT,
-} from '../../src/features/billing/pricing';
+import { aiCreditsAmountJpy, AI_CREDITS_PER_UNIT } from '../../src/features/billing/pricing';
 import { InvalidAmountError } from '../../src/features/billing/errors';
 import type { CheckoutSessionParams, CreateCheckoutFn } from './_lib/stripe';
 
-/** Checkout 発行のリクエスト入力 (type で分岐)。 */
-export type CheckoutInput =
-  | { type: 'ai_credits'; quantity: number }
-  | { type: 'pdf_unlock'; amountJpy: number };
+/** Checkout 発行のリクエスト入力 (ai_credits のみ)。 */
+export type CheckoutInput = { type: 'ai_credits'; quantity: number };
 
 /** request body を CheckoutInput に検証・正規化する (純関数)。 */
 export function parseCheckoutBody(raw: unknown): CheckoutInput {
@@ -28,10 +22,7 @@ export function parseCheckoutBody(raw: unknown): CheckoutInput {
   if (b.type === 'ai_credits') {
     return { type: 'ai_credits', quantity: Number(b.quantity ?? Number.NaN) };
   }
-  if (b.type === 'pdf_unlock') {
-    return { type: 'pdf_unlock', amountJpy: Number(b.amountJpy ?? Number.NaN) };
-  }
-  throw new InvalidAmountError('type must be ai_credits or pdf_unlock');
+  throw new InvalidAmountError('type must be ai_credits');
 }
 
 /** redirect URL を組み立てる。session_id プレースホルダは Stripe が置換する。 */
@@ -44,46 +35,27 @@ function checkoutUrls(): { success_url: string; cancel_url: string } {
 }
 
 /**
- * 価格/数量を検証して Stripe Checkout Session パラメータを構築する (純関数、UT-BL-CS01〜CS05)。
- * ai_credits: ¥100 × qty / 20 回付与。pdf_unlock: PWYW custom amount。
+ * 価格/数量を検証して Stripe Checkout Session パラメータを構築する (純関数、UT-BL-CS01〜CS03)。
+ * ai_credits: ¥100 × qty / 10 回付与。
  */
 export function buildCheckoutParams(input: CheckoutInput, userId: string): CheckoutSessionParams {
   const urls = checkoutUrls();
-  if (input.type === 'ai_credits') {
-    const amount = aiCreditsAmountJpy(input.quantity); // validateQuantity 内包 (InvalidAmountError)
-    return {
-      mode: 'payment',
-      line_items: [
-        {
-          price_data: {
-            currency: 'jpy',
-            product_data: {
-              name: `AI 同定クレジット ${input.quantity * AI_CREDITS_PER_UNIT} 回分`,
-            },
-            unit_amount: amount,
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: { userId, type: 'ai_credits', quantity: String(input.quantity) },
-      client_reference_id: userId,
-      ...urls,
-    };
-  }
-  const amount = validatePwywAmount(input.amountJpy); // InvalidAmountError
+  const amount = aiCreditsAmountJpy(input.quantity); // validateQuantity 内包 (InvalidAmountError)
   return {
     mode: 'payment',
     line_items: [
       {
         price_data: {
           currency: 'jpy',
-          product_data: { name: '図鑑 PDF 出力アンロック' },
+          product_data: {
+            name: `AI 同定クレジット ${input.quantity * AI_CREDITS_PER_UNIT} 回分`,
+          },
           unit_amount: amount,
         },
         quantity: 1,
       },
     ],
-    metadata: { userId, type: 'pdf_unlock' },
+    metadata: { userId, type: 'ai_credits', quantity: String(input.quantity) },
     client_reference_id: userId,
     ...urls,
   };

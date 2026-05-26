@@ -81,9 +81,6 @@ async function createDrizzleStore(): Promise<BillingStore> {
         .set({ aiCreditsRemaining: sql`${users.aiCreditsRemaining} + ${credits}` })
         .where(eq(users.id, userId));
     },
-    async setPdfUnlocked(userId) {
-      await db.update(users).set({ pdfUnlocked: true }).where(eq(users.id, userId));
-    },
   };
 }
 

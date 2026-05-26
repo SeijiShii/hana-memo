@@ -10,29 +10,18 @@ import { BillingPage } from './BillingPage';
 import type { BillingStatus, CheckoutInput } from '../api';
 
 function status(over: Partial<BillingStatus> = {}): BillingStatus {
-  return { aiCreditsRemaining: 0, pdfUnlocked: false, ...over };
+  return { aiCreditsRemaining: 0, ...over };
 }
 
 describe('BillingPage', () => {
-  it('ステータス (残クレジット / PDF unlock) を表示する (UC4)', () => {
+  it('ステータス (残クレジット) を表示する (UC4)', () => {
     render(<BillingPage status={status({ aiCreditsRemaining: 40 })} onCheckout={vi.fn()} />);
     expect(screen.getByText(/残 40 回/)).toBeTruthy();
-    expect(screen.getByText(/未アンロック/)).toBeTruthy();
   });
 
-  it('購入種別タブ (AI 識別クレジット / PDF アンロック) を表示する', () => {
+  it('AI 識別クレジット購入の数量入力を表示する', () => {
     render(<BillingPage status={status()} onCheckout={vi.fn()} />);
-    expect(screen.getByRole('button', { name: 'AI 識別クレジット' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'PDF アンロック' })).toBeTruthy();
-  });
-
-  it('既定は AI 識別クレジットタブ (aria-pressed) + PWYW セレクタ非表示', () => {
-    render(<BillingPage status={status()} onCheckout={vi.fn()} />);
-    expect(
-      screen.getByRole('button', { name: 'AI 識別クレジット' }).getAttribute('aria-pressed'),
-    ).toBe('true');
     expect(screen.getByLabelText('数量')).toBeTruthy();
-    expect(screen.queryByLabelText('カスタム金額 (円)')).toBeNull();
   });
 
   it('E-BL-1: 「購入する」押下で onCheckout に ai_credits + 数量を渡す (実 redirect しない)', async () => {
@@ -53,37 +42,6 @@ describe('BillingPage', () => {
     render(<BillingPage status={status()} onCheckout={vi.fn()} />);
     fireEvent.change(screen.getByLabelText('数量'), { target: { value: '11' } });
     expect(screen.getByRole('alert').textContent).toContain('数量');
-    expect((screen.getByRole('button', { name: '購入する' }) as HTMLButtonElement).disabled).toBe(
-      true,
-    );
-  });
-
-  it('E-BL-2: PDF タブ → PWYW セレクタ表示 + 「購入する」で pdf_unlock + 金額を渡す', async () => {
-    const onCheckout = vi.fn<(i: CheckoutInput) => void>();
-    render(<BillingPage status={status()} onCheckout={onCheckout} />);
-    fireEvent.click(screen.getByRole('button', { name: 'PDF アンロック' }));
-    expect(screen.getByLabelText('カスタム金額 (円)')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: '購入する' }));
-    await waitFor(() =>
-      expect(onCheckout).toHaveBeenCalledWith({ type: 'pdf_unlock', amountJpy: 500 }),
-    );
-  });
-
-  it('E-BL-3: PDF タブで最低額未満 (¥50) → 購入不可 + onCheckout 未起動', async () => {
-    const onCheckout = vi.fn();
-    render(<BillingPage status={status()} onCheckout={onCheckout} />);
-    fireEvent.click(screen.getByRole('button', { name: 'PDF アンロック' }));
-    fireEvent.change(screen.getByLabelText('カスタム金額 (円)'), { target: { value: '50' } });
-    const buy = screen.getByRole('button', { name: '購入する' }) as HTMLButtonElement;
-    expect(buy.disabled).toBe(true);
-    fireEvent.click(buy);
-    expect(onCheckout).not.toHaveBeenCalled();
-  });
-
-  it('E-BL-007: PDF が unlock 済 → 二重課金させず「アンロック済み」表示 + 購入不可', () => {
-    render(<BillingPage status={status({ pdfUnlocked: true })} onCheckout={vi.fn()} />);
-    fireEvent.click(screen.getByRole('button', { name: 'PDF アンロック' }));
-    expect(screen.getByText('すでにアンロック済みです')).toBeTruthy();
     expect((screen.getByRole('button', { name: '購入する' }) as HTMLButtonElement).disabled).toBe(
       true,
     );

@@ -20,11 +20,10 @@ describe('parseCheckoutBody', () => {
       quantity: 3,
     });
   });
-  it('pdf_unlock を正規化', () => {
-    expect(parseCheckoutBody({ type: 'pdf_unlock', amountJpy: 500 })).toEqual({
-      type: 'pdf_unlock',
-      amountJpy: 500,
-    });
+  it('pdf_unlock は InvalidAmountError (撤去済み)', () => {
+    expect(() => parseCheckoutBody({ type: 'pdf_unlock', amountJpy: 500 })).toThrow(
+      InvalidAmountError,
+    );
   });
   it('未知 type は InvalidAmountError', () => {
     expect(() => parseCheckoutBody({ type: 'foo' })).toThrow(InvalidAmountError);
@@ -50,21 +49,6 @@ describe('buildCheckoutParams', () => {
       InvalidAmountError,
     );
     expect(() => buildCheckoutParams({ type: 'ai_credits', quantity: 1.5 }, 'u1')).toThrow(
-      InvalidAmountError,
-    );
-  });
-
-  it('UT-BL-CS04: pdf_unlock custom amount → unit_amount = PWYW 金額', () => {
-    const p = buildCheckoutParams({ type: 'pdf_unlock', amountJpy: 800 }, 'u1');
-    expect(p.line_items[0]?.price_data.unit_amount).toBe(800);
-    expect(p.metadata).toMatchObject({ userId: 'u1', type: 'pdf_unlock' });
-  });
-
-  it('UT-BL-CS05: PWYW 範囲外 (¥99/¥10001) は InvalidAmountError', () => {
-    expect(() => buildCheckoutParams({ type: 'pdf_unlock', amountJpy: 99 }, 'u1')).toThrow(
-      InvalidAmountError,
-    );
-    expect(() => buildCheckoutParams({ type: 'pdf_unlock', amountJpy: 10001 }, 'u1')).toThrow(
       InvalidAmountError,
     );
   });

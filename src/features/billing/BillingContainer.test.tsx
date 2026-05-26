@@ -27,7 +27,7 @@ beforeEach(() => {
   createCheckoutMock.mockReset();
   useCurrentUserMock.mockReset();
   useBillingStatusMock.mockReturnValue({
-    status: { aiCreditsRemaining: 10, pdfUnlocked: false },
+    status: { aiCreditsRemaining: 10 },
     loading: false,
     error: null,
   });

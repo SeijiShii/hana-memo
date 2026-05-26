@@ -35,17 +35,6 @@ describe('createCheckout', () => {
     expect(JSON.parse(String(init?.body))).toEqual({ type: 'ai_credits', quantity: 1 });
   });
 
-  it('UT-BL-A02: pdf_unlock → custom amount を送る', async () => {
-    const fetchFn = vi.fn<typeof fetch>(async () =>
-      jsonRes({ url: 'https://checkout/cs_2', sessionId: 'cs_2' }),
-    );
-    await createCheckout({ type: 'pdf_unlock', amountJpy: 500 }, { token: 't', fetchFn });
-    expect(JSON.parse(String(fetchFn.mock.calls[0]![1]?.body))).toEqual({
-      type: 'pdf_unlock',
-      amountJpy: 500,
-    });
-  });
-
   it('UT-BL-A03: network err → CheckoutFailedError', async () => {
     const fetchFn = vi.fn<typeof fetch>(async () => {
       throw new Error('offline');
@@ -64,12 +53,10 @@ describe('createCheckout', () => {
 });
 
 describe('fetchBillingStatus', () => {
-  it('GET → ai_credits_remaining / pdf_unlocked', async () => {
-    const fetchFn = vi.fn<typeof fetch>(async () =>
-      jsonRes({ aiCreditsRemaining: 40, pdfUnlocked: true }),
-    );
+  it('GET → ai_credits_remaining', async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => jsonRes({ aiCreditsRemaining: 40 }));
     const out = await fetchBillingStatus({ token: 't', fetchFn });
-    expect(out).toEqual({ aiCreditsRemaining: 40, pdfUnlocked: true });
+    expect(out).toEqual({ aiCreditsRemaining: 40 });
   });
 
   it('5xx → CheckoutFailedError', async () => {
@@ -85,7 +72,7 @@ describe('confirmCheckout', () => {
 
   it('UT-BL-SC01: 反映済 → 即 resolve', async () => {
     const fetchFn = vi.fn<typeof fetch>(async () =>
-      jsonRes({ found: true, type: 'ai_credits', aiCreditsRemaining: 40, pdfUnlocked: false }),
+      jsonRes({ found: true, type: 'ai_credits', aiCreditsRemaining: 40 }),
     );
     const out = await confirmCheckout('cs_1', { token: 't', fetchFn, sleep: noSleep });
     expect(out.found).toBe(true);
@@ -97,9 +84,7 @@ describe('confirmCheckout', () => {
     const fetchFn = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(jsonRes({ found: false }))
-      .mockResolvedValueOnce(
-        jsonRes({ found: true, type: 'ai_credits', aiCreditsRemaining: 60, pdfUnlocked: false }),
-      );
+      .mockResolvedValueOnce(jsonRes({ found: true, type: 'ai_credits', aiCreditsRemaining: 60 }));
     const out = await confirmCheckout('cs_1', {
       token: 't',
       fetchFn,

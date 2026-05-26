@@ -25,7 +25,6 @@ const aiConfirmed: Extract<ConfirmResult, { found: true }> = {
   found: true,
   type: 'ai_credits',
   aiCreditsRemaining: 20,
-  pdfUnlocked: false,
 };
 
 describe('BillingSuccessPage', () => {
@@ -41,17 +40,6 @@ describe('BillingSuccessPage', () => {
     await waitFor(() => expect(screen.getByText('購入が完了しました')).toBeTruthy());
     expect(onConfirm).toHaveBeenCalledWith('cs_test_123');
     expect(screen.getByText(/20 回になりました/)).toBeTruthy();
-  });
-
-  it('PDF unlock 確認 → アンロックメッセージを表示する', async () => {
-    const onConfirm = vi.fn().mockResolvedValue({
-      found: true,
-      type: 'pdf_unlock',
-      aiCreditsRemaining: 0,
-      pdfUnlocked: true,
-    } satisfies Extract<ConfirmResult, { found: true }>);
-    renderSuccess({ onConfirm });
-    await waitFor(() => expect(screen.getByText(/PDF エクスポートをアンロック/)).toBeTruthy());
   });
 
   it('E-BL-005: poll が reject (timeout) → 「処理中です」フォールバック表示', async () => {

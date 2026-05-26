@@ -12,7 +12,6 @@ function makeStore(overrides: Partial<BillingStore> = {}): BillingStore {
     recordEvent: vi.fn(async () => {}),
     insertUnlock: vi.fn(async () => {}),
     grantCredits: vi.fn(async () => {}),
-    setPdfUnlocked: vi.fn(async () => {}),
     ...overrides,
   };
 }

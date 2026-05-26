@@ -1,8 +1,8 @@
 /**
  * 課金ステータス取得エンドポイント (GET /api/billing/status)
  *
- * Clerk JWT 検証 → Neon users.id 解決 → ai_credits_remaining / pdf_unlocked を返す。
- * frontend の useAiCredits / usePdfUnlocked が mount 時 + refresh 時に叩く。
+ * Clerk JWT 検証 → Neon users.id 解決 → ai_credits_remaining を返す。
+ * frontend の useAiCredits が mount 時 + refresh 時に叩く。
  *
  * 関連: docs/billing/001_billing_SPEC.md §1 UC3, 002_billing_PLAN.md Phase 3 (UT-BL-H01〜H03)
  */
@@ -12,7 +12,6 @@ import { fetchEffectiveQuota } from '../_lib/quota';
 
 export type BillingStatus = {
   aiCreditsRemaining: number;
-  pdfUnlocked: boolean;
   /** identify に使える実効残数 (匿名 trial / 登録 月次無料+credits)。フロント quota ゲート用 (fix_001)。 */
   quotaRemaining: number;
   /** 匿名で無料枠を使い切った = Google リンク誘導。 */
@@ -33,7 +32,7 @@ async function fetchStatus(userId: string): Promise<BillingStatus> {
     import('drizzle-orm'),
   ]);
   const rows = await db
-    .select({ aiCreditsRemaining: users.aiCreditsRemaining, pdfUnlocked: users.pdfUnlocked })
+    .select({ aiCreditsRemaining: users.aiCreditsRemaining })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
@@ -41,7 +40,6 @@ async function fetchStatus(userId: string): Promise<BillingStatus> {
   const quota = await fetchEffectiveQuota(userId);
   return {
     aiCreditsRemaining: row?.aiCreditsRemaining ?? 0,
-    pdfUnlocked: row?.pdfUnlocked ?? false,
     quotaRemaining: quota.remaining,
     mustLink: quota.mustLink,
   };

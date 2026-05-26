@@ -1,5 +1,5 @@
 /**
- * 課金 React hooks — users.ai_credits_remaining / pdf_unlocked を監視する。
+ * 課金 React hooks — users.ai_credits_remaining を監視する。
  *
  * 元 PLAN は Supabase Realtime 購読を想定していたが、Vercel+Neon 構成に Realtime が無いため
  * 「mount 時 fetch + 明示 refresh()」で代替する (決済確定 poll や手動更新で呼ぶ)。
@@ -75,15 +75,4 @@ export function useIdentifyQuota(opts: BillingApiOptions): {
     error,
     refresh,
   };
-}
-
-/** PDF unlock 状態を監視する (UT-BL-H03)。 */
-export function usePdfUnlocked(opts: BillingApiOptions): {
-  unlocked: boolean | null;
-  loading: boolean;
-  error: Error | null;
-  refresh: () => Promise<void>;
-} {
-  const { status, loading, error, refresh } = useBillingStatus(opts);
-  return { unlocked: status?.pdfUnlocked ?? null, loading, error, refresh };
 }

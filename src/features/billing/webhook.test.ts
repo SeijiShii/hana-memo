@@ -42,10 +42,6 @@ describe('mapStripeEvent', () => {
       credits: 10,
     });
   });
-  it('WH02: pdf_unlock → unlockPdf', () => {
-    const op = mapStripeEvent(event({ metadata: { userId: 'user_1', type: 'pdf_unlock' } }));
-    expect(op).toMatchObject({ op: 'unlockPdf', userId: 'user_1' });
-  });
   it('WH05: 不明 event type → ignore', () => {
     expect(mapStripeEvent(event({ type: 'payment_intent.created' })).op).toBe('ignore');
   });
@@ -68,11 +64,11 @@ describe('mapStripeEvent', () => {
       event({
         amount_total: null,
         payment_intent: null,
-        metadata: { userId: 'user_1', type: 'pdf_unlock' },
+        metadata: { userId: 'user_1', type: 'ai_credits', quantity: '1' },
       }),
     );
     expect(op).toMatchObject({
-      op: 'unlockPdf',
+      op: 'grantCredits',
       amountJpy: 0,
       paymentIntent: null,
     });
@@ -94,7 +90,6 @@ function makeStore(processed = false) {
     recordEvent: vi.fn(() => Promise.resolve()),
     insertUnlock: vi.fn(() => Promise.resolve()),
     grantCredits: vi.fn(() => Promise.resolve()),
-    setPdfUnlocked: vi.fn(() => Promise.resolve()),
   };
   return { store: spies as unknown as BillingStore, spies };
 }
@@ -113,13 +108,6 @@ describe('applyBillingWebhook', () => {
     );
     expect(spies.grantCredits).toHaveBeenCalledWith('user_1', 10);
     expect(spies.recordEvent).toHaveBeenCalledWith('evt_1', 'stripe');
-  });
-
-  it('WH02: pdf_unlock → setPdfUnlocked', async () => {
-    const { store, spies } = makeStore();
-    await applyBillingWebhook(store, event({ metadata: { userId: 'user_1', type: 'pdf_unlock' } }));
-    expect(spies.setPdfUnlocked).toHaveBeenCalledWith('user_1');
-    expect(spies.grantCredits).not.toHaveBeenCalled();
   });
 
   it('UT-BL-WH03: 処理済み event → applied=false (べき等性)', async () => {

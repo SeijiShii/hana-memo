@@ -3,15 +3,8 @@
  * 由来: 003_billing_UNIT_TEST.md §1.1 (CS01〜CS06) + §1.6 (ER03/ER05)
  */
 import { describe, it, expect } from 'vitest';
-import {
-  validateQuantity,
-  aiCreditsAmountJpy,
-  aiCreditsGranted,
-  validatePwywAmount,
-  requireLinked,
-} from './pricing';
+import { validateQuantity, aiCreditsAmountJpy, aiCreditsGranted } from './pricing';
 import { InvalidAmountError } from './errors';
-import { LinkRequiredError } from '../../shared/auth';
 import { grossMargin, buildRevenueCsv, REVENUE_CSV_COLUMNS } from './revenue';
 
 describe('AI クレジット価格', () => {
@@ -24,27 +17,6 @@ describe('AI クレジット価格', () => {
     expect(() => validateQuantity(2)).toThrow(InvalidAmountError);
     expect(() => validateQuantity(0)).toThrow(InvalidAmountError);
     expect(() => validateQuantity(1.5)).toThrow(InvalidAmountError);
-  });
-});
-
-describe('PWYW 金額', () => {
-  it('UT-BL-CS04: 100-10000 OK', () => {
-    expect(validatePwywAmount(100)).toBe(100);
-    expect(validatePwywAmount(500)).toBe(500);
-    expect(validatePwywAmount(10000)).toBe(10000);
-  });
-  it('UT-BL-CS05: 50 / 10001 → InvalidAmountError', () => {
-    expect(() => validatePwywAmount(50)).toThrow(InvalidAmountError);
-    expect(() => validatePwywAmount(10001)).toThrow(InvalidAmountError);
-  });
-});
-
-describe('requireLinked', () => {
-  it('UT-BL-CS06: 匿名 (false) → LinkRequiredError', () => {
-    expect(() => requireLinked(false)).toThrow(LinkRequiredError);
-  });
-  it('linked → throw しない', () => {
-    expect(() => requireLinked(true)).not.toThrow();
   });
 });
 

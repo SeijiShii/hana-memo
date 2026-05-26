@@ -11,7 +11,7 @@ import { resolveUserId, UserNotFoundError } from '../_lib/user';
 
 export type ConfirmResult =
   | { found: false }
-  | { found: true; type: 'ai_credits' | 'pdf_unlock'; aiCreditsRemaining: number; pdfUnlocked: boolean };
+  | { found: true; type: 'ai_credits'; aiCreditsRemaining: number };
 
 function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
@@ -41,16 +41,15 @@ async function lookupUnlock(userId: string, sessionId: string): Promise<ConfirmR
     return { found: false };
   }
   const rows = await db
-    .select({ aiCreditsRemaining: users.aiCreditsRemaining, pdfUnlocked: users.pdfUnlocked })
+    .select({ aiCreditsRemaining: users.aiCreditsRemaining })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
   const row = rows[0];
   return {
     found: true,
-    type: unlock.type,
+    type: 'ai_credits',
     aiCreditsRemaining: row?.aiCreditsRemaining ?? 0,
-    pdfUnlocked: row?.pdfUnlocked ?? false,
   };
 }
 
@@ -69,7 +68,10 @@ async function handler(req: Request): Promise<Response> {
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
   } catch (err) {
-    return jsonResponse({ error: 'unauthorized' }, err instanceof UnauthorizedError ? err.status : 500);
+    return jsonResponse(
+      { error: 'unauthorized' },
+      err instanceof UnauthorizedError ? err.status : 500,
+    );
   }
   try {
     const userId = await resolveUserId(clerkUserId);
