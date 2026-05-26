@@ -83,4 +83,39 @@
     P4.5 E2E gate: billing unit 完了(101相当 revise report) + 004_REVISE_E2E_TEST 存在 + per-feature 103 不在。
     no-key/Class-A 変種 (E2E-R-01 quota枯渇→購入導線モーダル、route-mock status) を local headless smoke に実装 = freshly-changed UI の回帰検出。
     実 Stripe Checkout(R-02/03)/OAuth(R-04)/migration apply(M1) は Class B として gate (E2E_GATE_STATUS と整合)。
+
+- id: D20260526-029
+  timestamp: 2026-05-26T19:05:00+09:00
+  command: /flow:auto
+  phase: 反復2完了確認 + 反復3 §4.5.1#0 no-key 枯渇再検証
+  question: billing E2E 完了後、no-key 作業が残るか / release へ進むか
+  options: [no-key 継続, P4.7 Release gate へ]
+  recommended: P4.7 Release gate へ
+  chosen: P4.7 Release gate へ
+  chosen_type: auto-recommended
+  depends_on: [D20260526-024]
+  context: |
+    反復2 (#070 /flow:e2e billing) = 状態:完了 (no-key E2E 11 green、環境起因 [E2E-ENV-001] 修正、commit ec80499/2ee4202)。
+    §4.5.1#0 残 gated item の no-key 変種を列挙:
+      - 実 Stripe Checkout / Clerk guest sign-in+OAuth / R2+OpenAI 撮影→識別→保存 E2E = 実 keys + Vercel preview (Class B)。no-key 表面は smoke+billing でカバー済。
+      - QuotaModal 実トリガ = identify 402 (auth 必須)、keyless 到達不能。
+      - billing migration apply = SQL(0003) 生成+commit 済 (Class A done)、apply のみ Class B。
+      - §1.5.8 runtime verification = アプリは一度も実 keys で起動していない (genuine frontier、keys+browser 必須)。
+    高価値 no-key 検証 (freshly-changed billing E2E) は反復2 で完了し実バグも捕捉。残る genuine progress は実 keys 必須。
+    → no-key/Class-A meaningful work 枯渇。.env.local に実キーあり (VITE_CLERK_PUBLISHABLE_KEY=pk_test… + 朝の release 準備で投入)。
+    §4.5.1#0 step4: 停止せず /flow:release を dispatch (Phase1 キー検証/FILL → Phase2 ローカルスマホ動作確認 → Phase3 デプロイ)。
+
+- id: D20260526-030
+  timestamp: 2026-05-26T19:06:00+09:00
+  command: /flow:auto
+  phase: 反復3 auto-pick
+  question: 反復3の dispatch 先
+  options: [/flow:release, /flow:secure billing (再), no-key E2E 追加]
+  recommended: /flow:release
+  chosen: /flow:release
+  chosen_type: auto-recommended
+  depends_on: [D20260526-029]
+  context: |
+    P4.7 Release gate。dispatch 自体は Class A (router)。release 内部で Class C (キー FILL/検証) + 人手スマホ動作確認 + Class B (デプロイ) を 1問1答で扱う。
+    secure/no-key E2E 追加は re-confirmation 寄りで genuine progress 薄 (billing は spec-review+secure+880 unit 済)。release が真の frontier。
 ```
