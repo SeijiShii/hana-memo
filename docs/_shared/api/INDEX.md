@@ -10,6 +10,11 @@
 |---|---|---|---|---|
 | 001 | vercel-handler-signature | critical | 修正済+検証済 | 2026-05-25 |
 
+## 改修
+| id | slug | 種別 | 状態 | 実施日 |
+|---|---|---|---|---|
+| 001 | function-consolidation | リファクタ (deploy可能性) | 設計完了→実装待ち | 2026-05-26 |
+
 <!-- AUTO-GENERATED:END status -->
 
 ## handler 規約 (fix_001 由来)
