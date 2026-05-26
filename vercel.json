@@ -1,8 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "vite",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "node scripts/vercel-build.mjs",
   "installCommand": "npm install",
   "crons": [
     { "path": "/api/cron/refresh-matview", "schedule": "0 3 * * *" },
