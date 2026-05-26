@@ -12,11 +12,9 @@ import { resolveUserId, UserNotFoundError } from '../_lib/user';
 import {
   aiCreditsAmountJpy,
   validatePwywAmount,
-  requireLinked,
   AI_CREDITS_PER_UNIT,
 } from '../../src/features/billing/pricing';
 import { InvalidAmountError } from '../../src/features/billing/errors';
-import { LinkRequiredError } from '../../src/shared/auth/errors';
 import type { CheckoutSessionParams, CreateCheckoutFn } from './_lib/stripe';
 
 /** Checkout 発行のリクエスト入力 (type で分岐)。 */
@@ -59,7 +57,9 @@ export function buildCheckoutParams(input: CheckoutInput, userId: string): Check
         {
           price_data: {
             currency: 'jpy',
-            product_data: { name: `AI 同定クレジット ${input.quantity * AI_CREDITS_PER_UNIT} 回分` },
+            product_data: {
+              name: `AI 同定クレジット ${input.quantity * AI_CREDITS_PER_UNIT} 回分`,
+            },
             unit_amount: amount,
           },
           quantity: 1,
@@ -93,14 +93,15 @@ export type CreateCheckoutDeps = {
   create: CreateCheckoutFn;
 };
 
-/** Checkout 発行のオーケストレーション (副作用は deps 注入)。 */
+/**
+ * Checkout 発行のオーケストレーション (副作用は deps 注入)。
+ * revise_001: 匿名(ゲスト)でも購入可。OAuth リンク必須ガード (requireLinked/E-BL-002) は撤廃。
+ */
 export async function runCreateCheckout(
   userId: string,
-  isLinked: boolean,
   input: CheckoutInput,
   deps: CreateCheckoutDeps,
 ): Promise<{ url: string; sessionId: string }> {
-  requireLinked(isLinked); // LinkRequiredError (E-BL-002)
   const params = buildCheckoutParams(input, userId);
   const session = await deps.create(params);
   if (!session.url) {
@@ -118,9 +119,6 @@ function jsonResponse(body: unknown, status: number): Response {
 
 /** runCreateCheckout / 認証で throw した例外を HTTP ステータスにマップする。 */
 function mapError(err: unknown): Response {
-  if (err instanceof LinkRequiredError) {
-    return jsonResponse({ error: 'link_required' }, 401); // 匿名 user は購入不可
-  }
   if (err instanceof InvalidAmountError) {
     return jsonResponse({ error: 'invalid_amount' }, 400);
   }
@@ -128,21 +126,6 @@ function mapError(err: unknown): Response {
     return jsonResponse({ error: 'user_not_found' }, err.status);
   }
   return jsonResponse({ error: 'checkout_failed' }, 500); // Stripe 失敗 (UT-BL-CS07)
-}
-
-/** Neon users から OAuth リンク済か (= 非匿名) を判定する。 */
-async function fetchIsLinked(userId: string): Promise<boolean> {
-  const [{ db }, { users }, { eq }] = await Promise.all([
-    import('../../src/shared/db/client'),
-    import('../../src/shared/db/schema'),
-    import('drizzle-orm'),
-  ]);
-  const rows = await db
-    .select({ isAnonymous: users.isAnonymous })
-    .from(users)
-    .where(eq(users.id, userId))
-    .limit(1);
-  return rows[0] ? !rows[0].isAnonymous : false;
 }
 
 export const config = { runtime: 'nodejs' };
@@ -157,7 +140,10 @@ async function handler(req: Request): Promise<Response> {
   try {
     ({ clerkUserId } = await verifyClerkSession(req));
   } catch (err) {
-    return jsonResponse({ error: 'unauthorized' }, err instanceof UnauthorizedError ? err.status : 500);
+    return jsonResponse(
+      { error: 'unauthorized' },
+      err instanceof UnauthorizedError ? err.status : 500,
+    );
   }
 
   let input: CheckoutInput;
@@ -169,9 +155,8 @@ async function handler(req: Request): Promise<Response> {
 
   try {
     const userId = await resolveUserId(clerkUserId);
-    const isLinked = await fetchIsLinked(userId);
     const { createStripeCheckoutFn } = await import('./_lib/stripe');
-    const result = await runCreateCheckout(userId, isLinked, input, {
+    const result = await runCreateCheckout(userId, input, {
       create: createStripeCheckoutFn(),
     });
     return jsonResponse(result, 200);

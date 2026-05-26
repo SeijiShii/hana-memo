@@ -44,11 +44,9 @@ describe('BillingPage', () => {
     );
   });
 
-  it('AI 数量を変更すると合計金額・付与回数が更新される', () => {
+  it('AI クレジットは ¥100 = 10 回追加 を表示 (revise_001: 1 回上限 ¥100)', () => {
     render(<BillingPage status={status()} onCheckout={vi.fn()} />);
-    fireEvent.change(screen.getByLabelText('数量'), { target: { value: '3' } });
-    expect(screen.getByText(/合計 ¥300/)).toBeTruthy();
-    expect(screen.getByText(/60 回追加/)).toBeTruthy();
+    expect(screen.getByText(/合計 ¥100（10 回追加）/)).toBeTruthy();
   });
 
   it('AI 数量が範囲外 (11) → エラー + 購入不可', () => {
@@ -126,7 +124,13 @@ describe('BillingPage', () => {
   });
 
   it('E-BL-001: checkoutError → 決済失敗フィードバック表示', () => {
-    render(<BillingPage status={status()} checkoutError={new Error('stripe down')} onCheckout={vi.fn()} />);
+    render(
+      <BillingPage
+        status={status()}
+        checkoutError={new Error('stripe down')}
+        onCheckout={vi.fn()}
+      />,
+    );
     expect(screen.getByRole('alert').textContent).toContain('決済システムが応答しません');
   });
 

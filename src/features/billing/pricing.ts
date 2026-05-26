@@ -5,11 +5,12 @@
 import { InvalidAmountError } from './errors';
 import { LinkRequiredError } from '../../shared/auth';
 
-/** AI クレジット: 1 ユニット = 20 回 / ¥100 */
-export const AI_CREDITS_PER_UNIT = 20;
+/** AI クレジット: 1 ユニット = 10 回 / ¥100 (revise_001: 旧 20回→10回)。 */
+export const AI_CREDITS_PER_UNIT = 10;
 export const AI_CREDIT_UNIT_PRICE_JPY = 100;
 export const AI_QTY_MIN = 1;
-export const AI_QTY_MAX = 10;
+/** revise_001: 1 回の購入上限を ¥100 (qty=1) に縛る (O46 ユーザーリスク上限)。 */
+export const AI_QTY_MAX = 1;
 
 /** PDF PWYW: 最低 ¥100 / 推奨 ¥500 / 最大 ¥10000 */
 export const PWYW_MIN_JPY = 100;
@@ -29,7 +30,7 @@ export function aiCreditsAmountJpy(qty: number): number {
   return validateQuantity(qty) * AI_CREDIT_UNIT_PRICE_JPY;
 }
 
-/** 付与クレジット (20 × qty)。 */
+/** 付与クレジット (10 × qty、revise_001)。 */
 export function aiCreditsGranted(qty: number): number {
   return validateQuantity(qty) * AI_CREDITS_PER_UNIT;
 }

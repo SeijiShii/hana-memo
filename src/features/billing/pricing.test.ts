@@ -15,14 +15,13 @@ import { LinkRequiredError } from '../../shared/auth';
 import { grossMargin, buildRevenueCsv, REVENUE_CSV_COLUMNS } from './revenue';
 
 describe('AI クレジット価格', () => {
-  it('UT-BL-CS01/CS02: qty 1-10 OK、金額/付与計算', () => {
+  it('UT-BL-CS01/CS02: qty 1 のみ OK、¥100 = 10 回付与 (revise_001)', () => {
     expect(validateQuantity(1)).toBe(1);
-    expect(validateQuantity(10)).toBe(10);
-    expect(aiCreditsAmountJpy(2)).toBe(200);
-    expect(aiCreditsGranted(2)).toBe(40);
+    expect(aiCreditsAmountJpy(1)).toBe(100);
+    expect(aiCreditsGranted(1)).toBe(10);
   });
-  it('UT-BL-CS03: qty 11 / 0 / 小数 → InvalidAmountError', () => {
-    expect(() => validateQuantity(11)).toThrow(InvalidAmountError);
+  it('UT-BL-CS03: qty 2 (上限超) / 0 / 小数 → InvalidAmountError (revise_001: 上限 ¥100)', () => {
+    expect(() => validateQuantity(2)).toThrow(InvalidAmountError);
     expect(() => validateQuantity(0)).toThrow(InvalidAmountError);
     expect(() => validateQuantity(1.5)).toThrow(InvalidAmountError);
   });
@@ -56,7 +55,13 @@ describe('revenue', () => {
   });
   it('UT-BL-ER03: CSV 列順 + 行整形', () => {
     const csv = buildRevenueCsv([
-      { date: '2026-04', paidUsers: 3, newSignups: 10, netRevenueJpy: 1000, externalApiCostJpy: 200 },
+      {
+        date: '2026-04',
+        paidUsers: 3,
+        newSignups: 10,
+        netRevenueJpy: 1000,
+        externalApiCostJpy: 200,
+      },
     ]);
     const [header, row] = csv.split('\n');
     expect(header).toBe(REVENUE_CSV_COLUMNS.join(','));

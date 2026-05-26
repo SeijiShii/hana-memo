@@ -24,8 +24,8 @@ const creditsEvent: StripeCheckoutEvent = {
     object: {
       id: 'cs_1',
       payment_intent: 'pi_1',
-      amount_total: 200,
-      metadata: { userId: 'u1', type: 'ai_credits', quantity: '2' },
+      amount_total: 100,
+      metadata: { userId: 'u1', type: 'ai_credits', quantity: '1' },
     },
   },
 };
@@ -57,7 +57,7 @@ describe('processStripeWebhook', () => {
     expect(res.status).toBe(200);
     expect(res.body.applied).toBe(true);
     expect(store.insertUnlock).toHaveBeenCalledOnce();
-    expect(store.grantCredits).toHaveBeenCalledWith('u1', 40); // 20 × 2
+    expect(store.grantCredits).toHaveBeenCalledWith('u1', 10); // 10 × 1 (revise_001)
     expect(store.recordEvent).toHaveBeenCalledWith('evt_1', 'stripe');
   });
 
