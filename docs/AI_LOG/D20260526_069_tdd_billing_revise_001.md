@@ -4,7 +4,7 @@
 - **コマンド**: /flow:tdd (revise モード、/flow:auto 反復1 から dispatch)
 - **対象**: billing revise_001 (guest-billing)
 - **実行者**: seiji + Claude
-- **状態**: 進行中 (Phase 1 完了、Phase 2-6 残)
+- **状態**: 完了 (Phase 1-6 実装完了、unit 880 green / typecheck clean。残: db:migrate apply (Class B、未実施) + spec-review R2 spam-check guest-provision 一元化 (任意 cleanup、TrialQuota.mustLink は不変更で abuse 制御維持中))
 - **含まれる decision 範囲**: R3 解決 / Phase 1 (quota core + identify) TDD
 
 ## 主要決定サマリ

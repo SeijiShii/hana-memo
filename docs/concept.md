@@ -21,7 +21,7 @@
 ### 1.1 主要ユースケース
 1. **UC1 発見の記録**: 散歩中に草花を撮影 → AI が名前を 1-3 候補で提示 → ユーザーが選択 / 訂正 / 「分からないまま保存」も可
 2. **UC2 ノートを見返す**: 月次 / 季節別 / 場所別に記録を振り返り (タイムライン / 地図 / 図鑑モード)
-3. **UC3 図鑑化**: 蓄積した発見を PDF 図鑑として書き出し (PWYW 課金で高解像度・カスタムレイアウト)
+3. ~~**UC3 図鑑化**: 蓄積した発見を PDF 図鑑として書き出し (PWYW 課金で高解像度・カスタムレイアウト)~~ **(撤去: billing revise_001、2026-05-26 — PDF エクスポート / PWYW / pdf_unlock を全廃。課金は AI クレジット ¥100=10回 のみ)**
 4. **UC4 親子学習**: 親子で散歩しながら撮影、家に帰って一緒に名前を確認 (教育用途)
 5. **UC5 季節レコメンド**: 「去年の今頃に見た花」を自動レコメンド (年比較)
 
@@ -29,7 +29,7 @@
 **含むもの**:
 - 撮影 → AI 同定 → 保存の中核フロー
 - 個人のノート閲覧 (タイムライン / 地図 / 図鑑)
-- 図鑑 PDF 出力 (PWYW)
+- ~~図鑑 PDF 出力 (PWYW)~~ (撤去: billing revise_001、2026-05-26)
 - 季節レコメンド (アプリ内バッジ)
 - **認証**: 起動時に Clerk Guest Users (β) で自動 UUID 発行 → 撮影・保存・無料枠まで匿名で完結。「他端末で見たい」「課金したい」となった時に Google OAuth で**後リンク** (linkIdentity、同 uid 維持) して永続化
 - 法務書類 (プラポリ / 利用規約 / 特商法表記)
@@ -53,9 +53,9 @@
 | `docs/account/` | サインアップ / ログイン / 設定 / オプトアウト管理 | サインアップ画面・ログイン画面・設定画面 | `_shared/auth` | 3 | ❌ |
 | `docs/capture/` | 撮影 → AI 同定 → 保存の中核フロー (UC1) | カメラ画面・同定結果画面・保存ダイアログ | `_shared/storage`, `_shared/ai`, `_shared/db`, `account` | 4 | ❌ |
 | `docs/notebook/` | ノート閲覧 (タイムライン / 地図 / 図鑑モード) (UC2) | タイムライン画面・地図画面・図鑑画面・詳細画面 | `_shared/db`, `_shared/storage`, `account` | 4 | ❌ |
-| `docs/export/` | 図鑑 PDF 出力 (UC3) | PDF プレビュー画面・課金導線・ダウンロード | `notebook`, `_shared/storage`, `billing` | 5 | ❌ |
+| ~~`docs/export/`~~ | ~~図鑑 PDF 出力 (UC3)~~ **(撤去: billing revise_001、2026-05-26 — 機能全廃。export→billing 依存も解消)** | — | — | — | ❌ |
 | `docs/memory/` | 季節レコメンド「去年の今頃」(UC5) | アプリ内バッジ・レコメンドフィード | `notebook` | 5 | ❌ |
-| `docs/billing/` | PWYW + content-unlock 課金 (AI 同定追加枠 / PDF 出力) | 課金画面・履歴 | `account`, `_shared/ai` (使用量参照) | 4 | ❌ |
+| `docs/billing/` | 低価格単発課金 (AI 同定追加枠 ¥100=10回、ゲスト可) | 課金画面 | `_shared/ai` (使用量参照) | 4 | ❌ |
 | `docs/legal/` | プラポリ / 利用規約 / 特商法表記 / 同意 UI / Cookie バナー | `/legal/*` 配下静的ページ・同意 UI | (なし) | 1 | ❌ |
 
 #### 1.3.2 横断フォルダ（機能をまたぐ技術設計）
@@ -394,8 +394,7 @@ public/               # PWA manifest / icons
 
 | 指標 | 計測元 | 備考 |
 |---|---|---|
-| 単発課金件数 (AI 追加枠) | Stripe API | 月 11 回目以降の 100 円 × 20 回追加 |
-| 単発課金件数 (図鑑 PDF) | Stripe API | 500 円 × 件数 |
+| 単発課金件数 (AI 追加枠) | Stripe API | 100 円 × 10 回追加 (ゲスト可、revise_001) |
 | ARPU | 売上 / 課金ユーザー数 | スモール商用以降 |
 | 課金ユーザー数 | Stripe API | 新規 + 既存 |
 | Churn (60 日無アクティブ率) | アプリ DB | サブスクなしのため churn は「離脱」近似 |
@@ -660,7 +659,7 @@ public/               # PWA manifest / icons
 
 > **2026-05-22 更新**: BaaS Pivot により、auth.users は Clerk 管理、public.users (Neon) はアプリ拡張テーブル。Clerk Webhook で同期。
 
-- **users** (Neon `public.users`): Clerk から Webhook 同期 (`clerk_user_id`, `email?`, `is_anonymous: bool`, `linked_at: timestamp?`, `deleted_at?`, `deletion_reason?`, `fingerprint_hash?`, `trial_used_count int default 0`, `ai_credits_remaining int default 0`, `pdf_unlocked bool default false`, `created_at`)
+- **users** (Neon `public.users`): Clerk から Webhook 同期 (`clerk_user_id`, `email?`, `is_anonymous: bool`, `linked_at: timestamp?`, `deleted_at?`, `deletion_reason?`, `fingerprint_hash?`, `trial_used_count int default 0`, `ai_credits_remaining int default 0`, `created_at`) — `pdf_unlocked` 列は billing revise_001 (2026-05-26、migration 0003) で削除済
   - 起動時に Clerk Guest Users (β) で `is_anonymous=true` の sign-in 完了 → Clerk Webhook (`user.created`) → Vercel Function → Neon `users` に行作成
   - Google OAuth リンク後は Clerk Webhook (`user.updated`) で `linked_at` set、`is_anonymous=false`
   - 匿名 user の SPAM 抑止 (D20260522-057): trial 3 回 + fingerprint hard cap
@@ -668,7 +667,8 @@ public/               # PWA manifest / icons
 - **plants**: 植物マスタ (id, scientific_name, common_name_ja, family, season_months[], care_info, image_ref) — AI 同定結果をキャッシュして再利用 (将来用、MVP は discoveries に直接保存)
 - **images**: 画像メタ (id, user_id, discovery_id, r2_object_key, original_size_bytes, mime, exif_stripped bool, created_at)
 - **api_usage**: AI 呼び出しログ (id, user_id, service, endpoint, input_tokens, output_tokens, image_count, success, latency_ms, created_at) — §4.6.2 コスト集計の源泉
-- **billing_unlocks**: 課金履歴 (id, user_id, type enum, amount_jpy, stripe_checkout_session_id UNIQUE, stripe_payment_intent_id, stripe_receipt_url, created_at)
+- **billing_unlocks**: 課金履歴 (id, user_id, type enum, amount_jpy, stripe_checkout_session_id UNIQUE, stripe_payment_intent_id, stripe_receipt_url, created_at) — `type` enum の `pdf_unlock` 値は履歴行互換のため残置 (revise_001 以降 `ai_credits` のみ生成)
+
 - **user_settings**: ユーザー設定 (user_id, location_precision enum, ai_consent_revoked_at?, analytics_opt_in bool default false, updated_at)
 - **consent_logs**: 同意ログ (id, user_id, doc_type enum, doc_version, agreed_at, ip_hash) — 法務改訂時の再同意トレース、append-only
 - **discovery_edits**: 編集履歴 (id, discovery_id, user_id, edited_at, field_name enum, before_value, after_value) — UC2 audit-like、append-only
@@ -925,8 +925,7 @@ public/               # PWA manifest / icons
 - **所在地**: バーチャルオフィス利用検討 (個人住所開示回避)、開業確定後に決定
 - **連絡先**: 公開用メールアドレス (Gmail / 独自ドメイン)、電話は「請求あれば遅滞なく開示」
 - **販売価格・支払方法・引渡時期・返品条件**:
-  - 単発課金 (AI 同定追加枠): 100 円 (税込) / 20 回追加 / Stripe Checkout / 即時付与 / デジタルコンテンツのため返品不可 (購入前に説明)
-  - 単発課金 (図鑑 PDF): 500 円 (PWYW で 100/300/500/1000 円選択可) / 即時ダウンロード / 同上
+  - 単発課金 (AI 同定追加枠): 100 円 (税込) / 10 回追加 / Stripe Checkout / 即時付与 / デジタルコンテンツのため返品不可 (購入前に説明)。ゲスト (未連携) でも購入可 (revise_001)
 - **動作環境**: 主要ブラウザ最新 (Chrome / Safari / Edge)、モバイル iOS Safari 15+ / Android Chrome 100+
 
 ---
