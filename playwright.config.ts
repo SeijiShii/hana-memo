@@ -26,7 +26,12 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
     // 自己完結: 最新ソースをビルドして preview 配信。ローカルでは既存 preview を再利用する。
-    command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
+    //
+    // keyless 決定性: 本 E2E は no-key ジャーニー専用 (Class A)。ビルドは必ず keyless で行う。
+    // `.env.local` に実 Clerk キー (VITE_CLERK_PUBLISHABLE_KEY) が入っていても (リリース準備等)、
+    // Vite は process.env の VITE_* を最優先するため、空値で上書きして keyless 起動を強制する。
+    // これがないと ambient な実キーがビルドに inline され keyless graceful 回帰テストが揺れる。
+    command: `VITE_CLERK_PUBLISHABLE_KEY= npm run build && npm run preview -- --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,
