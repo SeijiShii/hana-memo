@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { parseDeleteBody } from './delete';
-import { ValidationError } from '../../src/shared/helpers/url';
+import { ValidationError } from '../../../src/shared/helpers/url';
 
 describe('parseDeleteBody', () => {
   it('objectKey を正規化する', () => {

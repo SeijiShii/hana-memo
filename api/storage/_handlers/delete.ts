@@ -5,10 +5,10 @@
  *
  * 関連: docs/_shared/storage/001_storage_SPEC.md §1.1/§4.1, 002_storage_PLAN.md Phase 3
  */
-import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
-import { resolveUserId, UserNotFoundError } from '../_lib/user';
-import { deleteObject } from '../../src/shared/storage/presign';
-import { ValidationError } from '../../src/shared/helpers/url';
+import { verifyClerkSession, UnauthorizedError } from '../../_lib/clerk';
+import { resolveUserId, UserNotFoundError } from '../../_lib/user';
+import { deleteObject } from '../../../src/shared/storage/presign';
+import { ValidationError } from '../../../src/shared/helpers/url';
 
 export type DeleteBody = { objectKey: string };
 
@@ -52,7 +52,7 @@ async function handler(req: Request): Promise<Response> {
 
   try {
     const userId = await resolveUserId(clerkUserId);
-    const { createR2PresignClient } = await import('./_lib/r2');
+    const { createR2PresignClient } = await import('../_lib/r2');
     await deleteObject(createR2PresignClient(), { objectKey: body.objectKey, userId });
     return jsonResponse({ ok: true }, 200);
   } catch (err) {

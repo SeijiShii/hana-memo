@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { parseMetaBody } from './meta';
-import { ValidationError } from '../../src/shared/helpers/url';
+import { ValidationError } from '../../../src/shared/helpers/url';
 
 describe('parseMetaBody', () => {
   it('head + objectKey を正規化する', () => {

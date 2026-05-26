@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { parseSignedUrlBody } from './signed-url';
-import { ValidationError } from '../../src/shared/helpers/url';
+import { ValidationError } from '../../../src/shared/helpers/url';
 
 describe('parseSignedUrlBody', () => {
   it('single objectKey を正規化する', () => {

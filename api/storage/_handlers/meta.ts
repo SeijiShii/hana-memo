@@ -9,9 +9,9 @@
  *
  * 関連: docs/_shared/storage/001_storage_SPEC.md §1.3/§3.3, 002_storage_PLAN.md Phase 3
  */
-import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
-import { resolveUserId, UserNotFoundError } from '../_lib/user';
-import { validateObjectKey, ValidationError } from '../../src/shared/helpers/url';
+import { verifyClerkSession, UnauthorizedError } from '../../_lib/clerk';
+import { resolveUserId, UserNotFoundError } from '../../_lib/user';
+import { validateObjectKey, ValidationError } from '../../../src/shared/helpers/url';
 
 export type MetaBody = { action: 'head'; objectKey: string } | { action: 'list' };
 
@@ -58,7 +58,7 @@ async function handler(req: Request): Promise<Response> {
 
   try {
     const userId = await resolveUserId(clerkUserId);
-    const { createR2MetaClient } = await import('./_lib/r2');
+    const { createR2MetaClient } = await import('../_lib/r2');
     const meta = createR2MetaClient();
     if (body.action === 'head') {
       validateObjectKey(body.objectKey, userId); // 所有確認 (先頭 segment = user_id)

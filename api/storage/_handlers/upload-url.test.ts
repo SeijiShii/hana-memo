@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { parseUploadUrlBody } from './upload-url';
-import { InvalidImageError } from '../../src/shared/storage/errors';
+import { InvalidImageError } from '../../../src/shared/storage/errors';
 
 describe('parseUploadUrlBody', () => {
   it('正常 body を正規化する', () => {

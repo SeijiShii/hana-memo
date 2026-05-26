@@ -8,10 +8,10 @@
  * 関連: docs/_shared/storage/001_storage_SPEC.md §1.1/§4.1, 002_storage_PLAN.md Phase 1
  */
 import { randomUUID } from 'node:crypto';
-import { verifyClerkSession, UnauthorizedError } from '../_lib/clerk';
-import { resolveUserId, UserNotFoundError } from '../_lib/user';
-import { createUploadUrl } from '../../src/shared/storage/presign';
-import { InvalidImageError } from '../../src/shared/storage/errors';
+import { verifyClerkSession, UnauthorizedError } from '../../_lib/clerk';
+import { resolveUserId, UserNotFoundError } from '../../_lib/user';
+import { createUploadUrl } from '../../../src/shared/storage/presign';
+import { InvalidImageError } from '../../../src/shared/storage/errors';
 
 export type UploadUrlBody = { discoveryId: string; contentType: string; sizeBytes: number };
 
@@ -58,7 +58,7 @@ async function handler(req: Request): Promise<Response> {
 
   try {
     const userId = await resolveUserId(clerkUserId);
-    const { createR2PresignClient } = await import('./_lib/r2');
+    const { createR2PresignClient } = await import('../_lib/r2');
     const result = await createUploadUrl(createR2PresignClient(), {
       userId,
       discoveryId: body.discoveryId,
