@@ -13,7 +13,7 @@
 ## 改修
 | id | slug | 種別 | 状態 | 実施日 |
 |---|---|---|---|---|
-| 001 | function-consolidation | リファクタ (deploy可能性) | 設計完了→実装待ち | 2026-05-26 |
+| 001 | function-consolidation | リファクタ (deploy可能性) | 実装完了 (24→11 関数) | 2026-05-26 |
 
 <!-- AUTO-GENERATED:END status -->
 

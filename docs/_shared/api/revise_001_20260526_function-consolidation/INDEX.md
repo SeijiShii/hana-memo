@@ -2,7 +2,7 @@
 
 **issue / slug**: revise_001 / function-consolidation
 **実施日**: 2026-05-26
-**状態**: 設計完了 (実装は /flow:tdd 待ち)
+**状態**: 実装完了 (2026-05-26、24→11 関数、unit 894 green / typecheck clean / build OK / runtime routing 検証済)
 
 <!-- auto-generated-start -->
 
@@ -14,6 +14,8 @@
 | 002 | 002_REVISE_PLAN.md | 変更計画 (catch-all router / vercel.json / Phase 分割) | 2026-05-26 |
 | 003 | 003_REVISE_UNIT_TEST.md | 単体テスト計画 (router 層 + 既存維持) | 2026-05-26 |
 | 004 | 004_REVISE_E2E_TEST.md | E2E/検証計画 (回帰 + 関数数≤12 + deploy 再試行) | 2026-05-26 |
+| 101 | 101_REVISE_IMPL_REPORT.md | 実装レポート (24→11、runtime 検証) | 2026-05-26 |
+| 102 | 102_REVISE_UNIT_TEST_REPORT.md | 単体テストレポート (894 green) | 2026-05-26 |
 
 ## 関連
 - 親 INDEX: `../INDEX.md`

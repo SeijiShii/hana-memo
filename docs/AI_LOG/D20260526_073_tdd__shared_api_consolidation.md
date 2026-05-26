@@ -4,7 +4,7 @@
 - **コマンド**: /flow:tdd (_shared/api revise_001、/flow:auto #068 反復5 から dispatch)
 - **対象**: api/ function 統合 (24→11) の実装
 - **実行者**: seiji + Claude
-- **状態**: 中断 (設計確認 + Phase 抽出 + 実装制約調査まで。実装は未着手 = クリーンな再開ポイント)
+- **状態**: 完了 (ユーザー指示で再開し全 Phase 実装。24→11 関数、unit 894 green / typecheck clean / build OK / runtime routing 検証済。commit d4bea83 + 7ce10fc)
 
 ## 主要決定サマリ
 
@@ -60,3 +60,49 @@
     実 keys で end-to-end 検証済の billing/payment 経路を超長セッション末尾でリファクタするのはリスク。設計 ready のため fresh 再開が安全。
     再開: `/flow:tdd _shared/api revise_001` (本セッションが復帰検知される)。
 ```
+
+## 実装完了ログ (ユーザー指示「何をするか」で再開、本セッション内)
+
+```yaml
+- id: D20260526-042
+  timestamp: 2026-05-26T21:05:00+09:00
+  command: /flow:tdd
+  phase: Phase1 storage 試作
+  question: catch-all パターンの確証
+  chosen: router.ts + storage catch-all + _handlers 移設 → build/storage unit/contract green (commit d4bea83)
+  chosen_type: explicit-choice
+  context: money-path 非依存の storage で先に確証。routes 24→21。
+
+- id: D20260526-043
+  timestamp: 2026-05-26T21:12:00+09:00
+  command: /flow:tdd
+  phase: Phase2 import 修正
+  question: batch sed が dynamic import を取りこぼした件の修正方法
+  chosen: tsc が報告した 40 件を起点に quote-anchored sed で精密修正 (group-local _lib 誤変換を回避)
+  chosen_type: explicit-choice
+  context: |
+    batch sed は static `from` のみ修正、dynamic `import('../../src/...)` と shared `../_lib/{clerk,user,ratelimit}` を取りこぼし。
+    `../_lib/` は group-local (billing/stripe 等) と shared (api/_lib) で曖昧 → blanket sed 不可。
+    typecheck で broken path を列挙 → quote-anchored + module 名指定で安全分離。0 errors 達成。
+
+- id: D20260526-044
+  timestamp: 2026-05-26T21:16:00+09:00
+  command: /flow:tdd
+  phase: Phase3 runtime 検証
+  question: build/unit 通過で十分か (REL-OPS-001 教訓)
+  chosen: dev.sh で全 catch-all の実 HTTP dispatch を確認 (build≠runtime のため必須)
+  chosen_type: explicit-choice
+  context: 全 catch-all がハンドラ到達 (auth/guest=200、他 401/405)、未知 action=404、singles OK。11 関数 ≤12。
+
+- id: D20260526-045
+  timestamp: 2026-05-26T21:17:00+09:00
+  command: /flow:tdd
+  phase: Phase3 仕上げ
+  question: contract test の count assertion 最終化
+  chosen: ≤12 上限を恒久ガード化 (>=9 && <=12) — O49 の regression guard
+  chosen_type: auto-recommended
+  context: 将来 13 個目追加で test fail → group catch-all 集約を促す。
+```
+
+## 次ステップ
+- **/flow:release Phase3 再開**: 11 fn ≤ 12 で preview deploy が通る想定。Vercel env 反映 (inline --env) → deploy → 公開 URL スモーク。deploy 時に Clerk webhook URL を `/api/auth/clerk-webhook` に更新。
