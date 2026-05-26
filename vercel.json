@@ -5,8 +5,8 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "crons": [
-    { "path": "/api/refresh-matview", "schedule": "0 3 * * *" },
-    { "path": "/api/check-quota", "schedule": "0 4 * * *" },
-    { "path": "/api/export-revenue", "schedule": "0 5 1 * *" }
+    { "path": "/api/cron/refresh-matview", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/check-quota", "schedule": "0 4 * * *" },
+    { "path": "/api/cron/export-revenue", "schedule": "0 5 1 * *" }
   ]
 }

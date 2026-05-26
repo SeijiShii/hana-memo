@@ -38,10 +38,12 @@ function isSubHandler(path: string): boolean {
 describe('Vercel Function handler export contract', () => {
   const endpoints = Object.keys(modules).filter(isEndpoint).sort();
 
-  it('discovers the /api endpoints', () => {
-    // revise_001 function-consolidation 進行中: 24 → 最終 11 関数へ集約 (Vercel Hobby 12-fn 上限)。
-    // 集約途中は 11〜24 の範囲。下限 10 は glob 破損 (near 0) の検知用。Phase3 で最終値に締める。
-    expect(endpoints.length).toBeGreaterThanOrEqual(10);
+  it('stays within the Vercel Hobby 12-Serverless-Function limit (revise_001 / O49)', () => {
+    // function-consolidation 後は 11 関数 (group catch-all 9 + health + identify-plant)。
+    // 上限 12 を恒久ガード: 新 endpoint 追加で 13 になったら group catch-all への集約を促す (perspectives O49)。
+    // 下限 9 は glob 破損 (near 0) の検知用。
+    expect(endpoints.length).toBeGreaterThanOrEqual(9);
+    expect(endpoints.length).toBeLessThanOrEqual(12);
   });
 
   for (const path of endpoints) {
