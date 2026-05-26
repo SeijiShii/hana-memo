@@ -90,7 +90,13 @@ const apiRouteRules = catchAllGroups.map((g) => ({
   dest: `/api/${g}/[...path]`,
 }));
 
-const vercelJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+// crons は Build Output API の config.json が唯一の真実 (vercel.json と二重定義すると
+// "duplicated cron job" で deploy 失敗する)。ここを cron スケジュールの SoT とする。
+const crons = [
+  { path: '/api/cron/refresh-matview', schedule: '0 3 * * *' },
+  { path: '/api/cron/check-quota', schedule: '0 4 * * *' },
+  { path: '/api/cron/export-revenue', schedule: '0 5 1 * *' },
+];
 const config = {
   version: 3,
   routes: [
@@ -98,7 +104,7 @@ const config = {
     { handle: 'filesystem' }, // 単体関数 (health / identify-plant) + static 資産
     { src: '/(.*)', dest: '/index.html' }, // SPA フォールバック (クライアントルート)
   ],
-  ...(vercelJson.crons ? { crons: vercelJson.crons } : {}),
+  crons,
 };
 fs.writeFileSync(path.join(OUT, 'config.json'), JSON.stringify(config, null, 2));
 
