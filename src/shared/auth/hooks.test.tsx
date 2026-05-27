@@ -61,12 +61,30 @@ describe('useCurrentUser', () => {
     });
   });
 
-  it('email/external 無し (Guest) → isAnonymous=true', () => {
+  it('Guest (snapshot.isAnonymous=true) → isAnonymous=true', () => {
     const { result } = renderHook(() => useCurrentUser(), {
-      wrapper: wrapper(snap({ isLoaded: true, isSignedIn: true, userId: 'guest_1' })),
+      wrapper: wrapper(
+        snap({ isLoaded: true, isSignedIn: true, userId: 'guest_1', isAnonymous: true }),
+      ),
     });
     expect(result.current.isAnonymous).toBe(true);
-    expect(result.current.email).toBeNull();
+  });
+
+  it('fix_001 回帰: Guest が合成 email を持っても isAnonymous=true (email で誤判定しない)', () => {
+    // guest は Clerk instance 要件で合成 email (guest_*@guest.hana-memo.app) を持つ。
+    // email 有無でなく publicMetadata 由来の snapshot.isAnonymous を権威ソースにする。
+    const { result } = renderHook(() => useCurrentUser(), {
+      wrapper: wrapper(
+        snap({
+          isLoaded: true,
+          isSignedIn: true,
+          userId: 'guest_1',
+          email: 'guest_be3a5bf1@guest.hana-memo.app',
+          isAnonymous: true,
+        }),
+      ),
+    });
+    expect(result.current.isAnonymous).toBe(true);
   });
 
   it('user 未確立 (userId なし) は isAnonymous=false', () => {

@@ -79,3 +79,4 @@
 | 日付 | 変更 | 由来 |
 |---|---|---|
 | 2026-05-25 | 初版。concept §1 提供価値から「植物フィールドノート」方向を導出（seiji 承認）。トークン/コンポーネント/イラスト/コピー(O38) を SoT 化。foundation + Home + 下部ナビに適用 | seiji「デザインが最低限すぎる」+ 方向確定 + イラスト戦略 + O38 |
+| 2026-05-25 | **視覚レビュー (`--review-only`)**: 6 画面 (home/capture/notebook/billing/settings/legal) を headless スクショ → SoT 適合。視覚=PASS、O38 コピー=PASS (UI に技術用語なし、Settings は「品質改善への協力（エラー情報の送信）」等で Sentry/OAuth を回避)。修正: notebook タブ「タイムライン」のモバイル幅 2 行折返し → `whitespace-nowrap` + 余白/字詰め調整で 1 行化。defer: legal 文書見出しの「PII スクラブ / opt-in」(本文プレースホルダ + 法務レビュー時に平易化)、billing「ステータス未取得」(keyless seam 表示) | /flow:design --review-only (D20260525_055) |

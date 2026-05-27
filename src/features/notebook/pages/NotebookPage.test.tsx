@@ -112,26 +112,8 @@ describe('NotebookPage', () => {
     expect(onSelectMemory).toHaveBeenCalledWith(m);
   });
 
-  it('exportProps 未指定 → 書き出しボタン非表示 (後方互換)', () => {
+  it('書き出しボタンは表示しない (export 機能撤去済み)', () => {
     render(<NotebookPage discoveries={[disc()]} />);
     expect(screen.queryByRole('button', { name: /書き出す/ })).toBeNull();
-  });
-
-  it('exportProps ありで書き出しボタンを表示し、押下で ExportDialog を開く', () => {
-    render(<NotebookPage discoveries={[disc()]} exportProps={{ onExportCsv: vi.fn() }} />);
-    const trigger = screen.getByRole('button', { name: /書き出す/ });
-    expect(trigger).toBeTruthy();
-    expect(screen.queryByRole('dialog')).toBeNull();
-    fireEvent.click(trigger);
-    expect(screen.getByRole('dialog', { name: 'データを書き出す' })).toBeTruthy();
-  });
-
-  it('exportDisabled=true (削除予約 user) → 書き出しボタン disabled (SPEC §6.1)', () => {
-    render(
-      <NotebookPage discoveries={[disc()]} exportProps={{ onExportCsv: vi.fn() }} exportDisabled />,
-    );
-    expect((screen.getByRole('button', { name: /書き出す/ }) as HTMLButtonElement).disabled).toBe(
-      true,
-    );
   });
 });

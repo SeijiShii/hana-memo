@@ -21,7 +21,6 @@ import { CalendarView } from '../components/CalendarView';
 import { MapView } from '../components/MapView';
 import { FigureView } from '../components/FigureView';
 import { MemoryBadge, MemorySection, type MemoryDiscovery } from '../../memory';
-import { ExportButton, ExportDialog, type ExportDialogProps } from '../../export';
 import { SproutSpot } from '../../../components/illustrations/Botanical';
 import type { NotebookDiscovery } from '../types';
 
@@ -58,14 +57,6 @@ export type NotebookPageProps = {
   resolveMemoryThumbnail?: (m: MemoryDiscovery) => string | null;
   /** memory カード押下時 (詳細遷移をアプリ層で配線)。 */
   onSelectMemory?: (m: MemoryDiscovery) => void;
-  /**
-   * エクスポート配線 (export 機能、UC1/UC2/UC4)。ExportDialog の props から open/onClose を除いた値を
-   * アプリ層 (useExport + billing unlock 由来) で渡す。未指定なら書き出しボタン + ダイアログとも非表示
-   * (後方互換 / memory 統合と同パターン)。open/onClose は本画面が内部 state で制御する。
-   */
-  exportProps?: Omit<ExportDialogProps, 'open' | 'onClose'>;
-  /** 削除予約中など書き出し不可のとき true (SPEC §6.1)。既定 false。 */
-  exportDisabled?: boolean;
 };
 
 /** 発見ノート画面。モードタブで 4 view を切り替える。 */
@@ -80,11 +71,8 @@ export function NotebookPage({
   memoriesLoading = false,
   resolveMemoryThumbnail,
   onSelectMemory,
-  exportProps,
-  exportDisabled = false,
 }: NotebookPageProps) {
   const [mode, setMode] = useState<NotebookViewMode>(initialMode);
-  const [exportOpen, setExportOpen] = useState(false);
 
   const renderBody = () => {
     // 取得中かつ未取得 → ローディング。取得済みでの追加ロード中は一覧を出し続ける。
@@ -132,9 +120,6 @@ export function NotebookPage({
         <h1 className="text-xl font-bold text-moss-dark">発見ノート</h1>
         <div className="flex items-center gap-2">
           <MemoryBadge count={memories.length} />
-          {exportProps ? (
-            <ExportButton onClick={() => setExportOpen(true)} disabled={exportDisabled} />
-          ) : null}
         </div>
       </div>
       <MemorySection
@@ -151,7 +136,7 @@ export function NotebookPage({
             onClick={() => setMode(tab.mode)}
             aria-pressed={mode === tab.mode}
             className={cn(
-              'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold',
+              'flex-1 whitespace-nowrap rounded-lg px-1 py-1.5 text-[11px] font-semibold',
               mode === tab.mode
                 ? 'bg-surface text-moss-dark shadow-sm'
                 : 'text-ink-faint hover:text-ink-soft',
@@ -162,9 +147,6 @@ export function NotebookPage({
         ))}
       </nav>
       <div>{renderBody()}</div>
-      {exportProps ? (
-        <ExportDialog open={exportOpen} onClose={() => setExportOpen(false)} {...exportProps} />
-      ) : null}
     </main>
   );
 }

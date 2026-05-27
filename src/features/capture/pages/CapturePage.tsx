@@ -17,15 +17,12 @@ export type CapturePageProps = {
   aiConsentActive?: boolean;
   /** 残 quota (AI クレジット)。既定は十分量。 */
   quotaRemaining?: number;
-  /** 匿名 trial 超過で OAuth 連携が必要なとき true。 */
-  linkRequired?: boolean;
 };
 
 /** 撮影画面。撮影 → プレビューへ遷移。同意 revoke 時は設定誘導。 */
 export function CapturePage({
   aiConsentActive = true,
   quotaRemaining = Number.POSITIVE_INFINITY,
-  linkRequired = false,
 }: CapturePageProps) {
   const navigate = useNavigate();
 
@@ -41,11 +38,7 @@ export function CapturePage({
           <p className="max-w-sm text-center text-sm text-ink-faint">
             草花を 1 枚撮ると AI が名前を推定します。
           </p>
-          <CaptureButton
-            quotaRemaining={quotaRemaining}
-            linkRequired={linkRequired}
-            onCapture={handleCapture}
-          />
+          <CaptureButton quotaRemaining={quotaRemaining} onCapture={handleCapture} />
         </>
       ) : (
         <div className="flex max-w-sm flex-col items-center gap-3 text-center">

@@ -15,7 +15,11 @@ const input: CapturePipelineInput = {
   userNote: 'white flower',
 };
 
-function makeDeps(over: Partial<CaptureDeps> = {}): { deps: CaptureDeps; calls: string[]; spies: Record<string, ReturnType<typeof vi.fn>> } {
+function makeDeps(over: Partial<CaptureDeps> = {}): {
+  deps: CaptureDeps;
+  calls: string[];
+  spies: Record<string, ReturnType<typeof vi.fn>>;
+} {
   const calls: string[] = [];
   const track = (name: string, fn: (...a: never[]) => unknown) =>
     vi.fn((...a: never[]) => {
@@ -48,6 +52,13 @@ describe('runCapturePipeline', () => {
     const res = await runCapturePipeline(deps, input);
     expect(res.discoveryId).toBe('disc_1');
     expect(calls).toEqual(['createDiscovery', 'uploadImage', 'attachImage', 'triggerIdentify']);
+  });
+
+  it('O45: onStage を uploading→identifying の順で通知する (進捗 UX)', async () => {
+    const stages: string[] = [];
+    const { deps } = makeDeps({ onStage: (s) => stages.push(s) });
+    await runCapturePipeline(deps, input);
+    expect(stages).toEqual(['uploading', 'identifying']);
   });
 
   it('AI 同意 OFF → AiConsentRequiredError (discovery 作成しない)', async () => {

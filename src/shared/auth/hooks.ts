@@ -26,12 +26,14 @@ export function useClerkUserId(): string | null {
 
 /** 認証スナップショットをドメイン形に正規化して返す (keyless でも throw しない)。 */
 export function useCurrentUser(): CurrentUser {
-  const { isLoaded, isSignedIn, userId, email, hasExternalAccount } = useAuthSnapshot();
+  const { isLoaded, isSignedIn, userId, email, isAnonymous } = useAuthSnapshot();
   return {
     isLoaded,
     isSignedIn,
     clerkUserId: userId,
     email,
-    isAnonymous: Boolean(userId) && !email && !hasExternalAccount,
+    // 権威ソース = publicMetadata.isAnonymous (ClerkAuthBridge 由来)。guest は合成 email を持つため
+    // email 有無で推測すると「連携済」と誤判定する (fix_001 の回帰)。
+    isAnonymous,
   };
 }

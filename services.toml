@@ -1,0 +1,12 @@
+# サービス公開設定 (/flow:release §3.2 が記録 / /flow:promote が告知 URL に使用 / /flow:sunset が撤退時に参照)
+# 撤退時: ConoHa の A レコード 1 行削除 + `vercel domains rm hana-memo.givers.work` で完結。
+
+[hana-memo]
+subdomain = "hana-memo.givers.work"   # 公開/告知 URL (https://)
+domain = "givers.work"                 # 親ドメイン (ConoHa 管理)
+dns_provider = "ConoHa"
+dns_record = "A hana-memo 76.76.21.21" # Vercel 推奨 (anycast)
+deploy = "vercel"
+project = "hana-memo"
+platform_url = "hana-memo.vercel.app"  # フォールバック (DNS 伝播前 / 撤退後)
+added = "2026-05-27"

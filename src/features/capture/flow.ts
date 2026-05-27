@@ -18,6 +18,12 @@ export type CapturePipelineInput = {
   userNote?: string;
 };
 
+/**
+ * 撮影パイプラインの体感段階 (進捗 UX 用、perspectives O45)。実段階に紐づく誠実な進捗:
+ * preparing=画像変換 (PreviewContainer) / uploading=R2 送信 / identifying=AI 識別 (最長)。
+ */
+export type CaptureStage = 'preparing' | 'uploading' | 'identifying';
+
 /** 撮影パイプラインが必要とする副作用を抽象化 (実体は React hook + DB/Storage/AI を注入)。 */
 export type CaptureDeps = {
   /** ai_consent_revoked_at が null か (account.isAiConsentActive 由来) */
@@ -34,6 +40,8 @@ export type CaptureDeps = {
   triggerIdentify: (discoveryId: string) => Promise<void>;
   /** 失敗時の discoveries ロールバック削除 */
   deleteDiscovery: (discoveryId: string) => Promise<void>;
+  /** 体感段階の通知 (進捗 UX 用、任意、O45)。 */
+  onStage?: (stage: CaptureStage) => void;
 };
 
 /**
@@ -58,6 +66,7 @@ export async function runCapturePipeline(
 
   let objectKey: string;
   try {
+    deps.onStage?.('uploading');
     ({ objectKey } = await deps.uploadImage(discoveryId));
   } catch (err) {
     await deps.deleteDiscovery(discoveryId);
@@ -65,6 +74,7 @@ export async function runCapturePipeline(
   }
 
   await deps.attachImage(discoveryId, objectKey);
+  deps.onStage?.('identifying');
   await deps.triggerIdentify(discoveryId);
 
   return { discoveryId };

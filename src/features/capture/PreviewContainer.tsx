@@ -6,7 +6,7 @@
  * はアプリ層で導出する (userId=Clerk user id、capturedAt=now、season=getCurrentSeason)。
  *
  * checkQuota / isAiConsentActive は pipeline の事前ガード:
- *   - checkQuota: useAiCredits 由来の残クレジット>0 を返す (token 未解決時は通す近似)。
+ *   - checkQuota: useIdentifyQuota 由来の実効残数>0 を返す (token 未解決時は通す近似、fix_001)。
  *   - isAiConsentActive: user_settings 取得 Function が未実装のため既定 true を返す seam
  *     (設定取得 API 配線後 Milestone C に isAiConsentActive を流し込む)。
  *
@@ -22,7 +22,8 @@
  */
 import { PreviewPage } from './pages/PreviewPage';
 import { useCaptureFlow, useImageConvert } from './hooks';
-import { useAiCredits } from '../billing';
+import type { CaptureStage } from './flow';
+import { useIdentifyQuota } from '../billing';
 import { useCurrentUser } from '../../shared/auth/hooks';
 import { useAuthToken } from '../../app/useAuthToken';
 import { getCurrentSeason } from '../../shared/helpers/season';
@@ -37,24 +38,35 @@ export type PreviewContainerProps = {
 /** token がある場合に useCaptureFlow を起動する内部 container。 */
 function AuthedPreview({ token, userId }: { token: string; userId: string }) {
   const { convert } = useImageConvert();
-  const { credits } = useAiCredits({ token });
+  // 実効 quota (匿名 trial / 登録 月次無料+credits) で判定する (fix_001)。ai_credits 単独だと
+  // 新規匿名 user が trial 枠を使えず即ブロックされる claim_001 のバグになる。
+  const { remaining } = useIdentifyQuota({ token });
   const { capture } = useCaptureFlow({
     token,
-    // quota 残あり (>0)。未取得 (null) は通す近似 (pipeline 側でも最終的に Function が enforce)。
-    checkQuota: async () => credits === null || credits > 0,
+    // 実効残あり (>0)。未取得 (null) は通す近似 (pipeline 側で Function が最終 enforce)。
+    checkQuota: async () => remaining === null || remaining > 0,
     // 設定取得 API 未実装のため既定 true (Milestone C で isAiConsentActive 配線)。
     isAiConsentActive: () => true,
   });
 
-  const onConfirm = async (file: File, userNote?: string) => {
+  const onConfirm = async (
+    file: File,
+    userNote?: string,
+    onStage?: (stage: CaptureStage) => void,
+  ) => {
+    onStage?.('preparing'); // 画像変換中 (O45 進捗の最初の段階)
     const blob = await convert(file);
     const now = new Date();
-    await capture(blob, {
-      userId,
-      capturedAt: now.toISOString(),
-      season: getCurrentSeason(now),
-      userNote,
-    });
+    await capture(
+      blob,
+      {
+        userId,
+        capturedAt: now.toISOString(),
+        season: getCurrentSeason(now),
+        userNote,
+      },
+      onStage,
+    );
   };
 
   return <PreviewPage onConfirm={onConfirm} />;

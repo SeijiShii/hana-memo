@@ -60,7 +60,6 @@ describe('User type structure', () => {
       fingerprintHash: null,
       trialUsedCount: 0,
       aiCreditsRemaining: 0,
-      pdfUnlocked: false,
       createdAt: new Date(),
     };
     expect(user.isAnonymous).toBe(true);

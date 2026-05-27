@@ -108,4 +108,22 @@ describe('deriveStatus / IDENTIFY_SCHEMA', () => {
     expect(IDENTIFY_SCHEMA.required).toHaveLength(7);
     expect(IDENTIFY_SCHEMA.additionalProperties).toBe(false);
   });
+
+  // fix_002: OpenAI Structured Outputs (strict) は入れ子も含め全 object に additionalProperties:false 必須。
+  // similar_species.items で欠落 → 400 Invalid schema → identify が全失敗していた。
+  it('IDENTIFY_SCHEMA の全 object ノードが additionalProperties:false を持つ (OpenAI strict 準拠)', () => {
+    const offenders: string[] = [];
+    const walk = (node: unknown, path: string) => {
+      if (!node || typeof node !== 'object') return;
+      const n = node as Record<string, unknown>;
+      if (n.type === 'object') {
+        if (n.additionalProperties !== false) offenders.push(path);
+        const props = (n.properties ?? {}) as Record<string, unknown>;
+        for (const k of Object.keys(props)) walk(props[k], `${path}.${k}`);
+      }
+      if (n.type === 'array') walk(n.items, `${path}[]`);
+    };
+    walk(IDENTIFY_SCHEMA, '$');
+    expect(offenders).toEqual([]);
+  });
 });

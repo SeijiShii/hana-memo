@@ -1,10 +1,11 @@
 /**
- * OAuth リンク必須モーダル — 匿名 (Guest) user が課金画面に入った際に Google 連携を促す。
+ * アカウント連携モーダル — 匿名 (Guest) user に Google 連携を促す。
  *
- * 購入には OAuth リンクが必須 (E-BL-002)。「連携する」押下で onLink を呼ぶ (実体は呼び出し側が
- * _shared/auth.linkGoogleIdentity を渡す)。
+ * 用途は「端末間でのデータ引き継ぎ」(Settings の連携 CTA / アカウント削除前の本人確認)。
+ * 購入は revise_001 でゲストのまま連携不要になったため、本モーダルは課金パスからは使われない。
+ * 「連携する」押下で onLink を呼ぶ (実体は呼び出し側が _shared/auth.linkGoogleIdentity を渡す)。
  *
- * 関連: docs/billing/001_billing_SPEC.md §1 UC4, 002_billing_PLAN.md Phase 3 (UT-BL-OM01/OM02)
+ * 関連: docs/account/001_account_SPEC.md (連携 CTA), docs/billing/revise_001_* (購入の連携必須撤廃)
  */
 import { Link2 } from 'lucide-react';
 
@@ -26,14 +27,13 @@ export function OAuthRequiredModal({ open, onLink, onClose }: OAuthRequiredModal
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="アカウント連携が必要です"
+      aria-label="アカウントを連携する"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
       <div className="w-full max-w-sm rounded-card bg-surface p-6 shadow-lift">
-        <h2 className="text-lg font-bold text-ink">アカウント連携が必要です</h2>
+        <h2 className="text-lg font-bold text-ink">アカウントを連携する</h2>
         <p className="mt-2 text-sm text-ink-soft">
-          購入には Google
-          アカウントの連携が必要です。連携すると購入履歴やクレジットが引き継がれます。
+          Google アカウントと連携すると、別の端末でも同じ発見ノートを使えます。
         </p>
         <div className="mt-5 flex flex-col gap-2">
           <button type="button" onClick={onLink} className="btn-primary">

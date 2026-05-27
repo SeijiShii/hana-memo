@@ -47,8 +47,9 @@ export function SettingsContainer({
     injectedIsLinked !== undefined
       ? injectedIsLinked
       : currentUser.isSignedIn && !currentUser.isAnonymous;
+  // 連携済のときだけ実メールを表示 (guest の合成 email を絶対に出さない、fix_001 回帰対策)。
   const linkedEmail =
-    injectedLinkedEmail !== undefined ? injectedLinkedEmail : currentUser.email;
+    injectedLinkedEmail !== undefined ? injectedLinkedEmail : isLinked ? currentUser.email : null;
 
   return (
     <SettingsPage

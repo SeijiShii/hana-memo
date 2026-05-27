@@ -21,7 +21,7 @@
 ### 1.1 主要ユースケース
 1. **UC1 発見の記録**: 散歩中に草花を撮影 → AI が名前を 1-3 候補で提示 → ユーザーが選択 / 訂正 / 「分からないまま保存」も可
 2. **UC2 ノートを見返す**: 月次 / 季節別 / 場所別に記録を振り返り (タイムライン / 地図 / 図鑑モード)
-3. **UC3 図鑑化**: 蓄積した発見を PDF 図鑑として書き出し (PWYW 課金で高解像度・カスタムレイアウト)
+3. ~~**UC3 図鑑化**: 蓄積した発見を PDF 図鑑として書き出し (PWYW 課金で高解像度・カスタムレイアウト)~~ **(撤去: billing revise_001、2026-05-26 — PDF エクスポート / PWYW / pdf_unlock を全廃。課金は AI クレジット ¥100=10回 のみ)**
 4. **UC4 親子学習**: 親子で散歩しながら撮影、家に帰って一緒に名前を確認 (教育用途)
 5. **UC5 季節レコメンド**: 「去年の今頃に見た花」を自動レコメンド (年比較)
 
@@ -29,7 +29,7 @@
 **含むもの**:
 - 撮影 → AI 同定 → 保存の中核フロー
 - 個人のノート閲覧 (タイムライン / 地図 / 図鑑)
-- 図鑑 PDF 出力 (PWYW)
+- ~~図鑑 PDF 出力 (PWYW)~~ (撤去: billing revise_001、2026-05-26)
 - 季節レコメンド (アプリ内バッジ)
 - **認証**: 起動時に Clerk Guest Users (β) で自動 UUID 発行 → 撮影・保存・無料枠まで匿名で完結。「他端末で見たい」「課金したい」となった時に Google OAuth で**後リンク** (linkIdentity、同 uid 維持) して永続化
 - 法務書類 (プラポリ / 利用規約 / 特商法表記)
@@ -53,9 +53,9 @@
 | `docs/account/` | サインアップ / ログイン / 設定 / オプトアウト管理 | サインアップ画面・ログイン画面・設定画面 | `_shared/auth` | 3 | ❌ |
 | `docs/capture/` | 撮影 → AI 同定 → 保存の中核フロー (UC1) | カメラ画面・同定結果画面・保存ダイアログ | `_shared/storage`, `_shared/ai`, `_shared/db`, `account` | 4 | ❌ |
 | `docs/notebook/` | ノート閲覧 (タイムライン / 地図 / 図鑑モード) (UC2) | タイムライン画面・地図画面・図鑑画面・詳細画面 | `_shared/db`, `_shared/storage`, `account` | 4 | ❌ |
-| `docs/export/` | 図鑑 PDF 出力 (UC3) | PDF プレビュー画面・課金導線・ダウンロード | `notebook`, `_shared/storage`, `billing` | 5 | ❌ |
+| ~~`docs/export/`~~ | ~~図鑑 PDF 出力 (UC3)~~ **(撤去: billing revise_001、2026-05-26 — 機能全廃。export→billing 依存も解消)** | — | — | — | ❌ |
 | `docs/memory/` | 季節レコメンド「去年の今頃」(UC5) | アプリ内バッジ・レコメンドフィード | `notebook` | 5 | ❌ |
-| `docs/billing/` | PWYW + content-unlock 課金 (AI 同定追加枠 / PDF 出力) | 課金画面・履歴 | `account`, `_shared/ai` (使用量参照) | 4 | ❌ |
+| `docs/billing/` | 低価格単発課金 (AI 同定追加枠 ¥100=10回、ゲスト可) | 課金画面 | `_shared/ai` (使用量参照) | 4 | ❌ |
 | `docs/legal/` | プラポリ / 利用規約 / 特商法表記 / 同意 UI / Cookie バナー | `/legal/*` 配下静的ページ・同意 UI | (なし) | 1 | ❌ |
 
 #### 1.3.2 横断フォルダ（機能をまたぐ技術設計）
@@ -90,7 +90,7 @@
 src/
   app/                # ルート統合・AppShell・Provider・Container (実 hook/SDK 配線)
   features/           # 機能単位（§1.3.1 と命名統一、各 pages/ + components/）
-    account/ capture/ notebook/ export/ memory/ billing/ legal/
+    account/ capture/ notebook/ memory/ billing/ legal/   # (export は billing revise_001 で全廃)
   shared/             # 横断（§1.3.2 と命名統一）
     db/               # Drizzle スキーマ + Neon クライアント
     types/            # 共通型 (Drizzle スキーマ由来 + DTO)
@@ -102,10 +102,10 @@ src/
   components/         # 共通 UI 部品 (shadcn/ui ベース) + illustrations/
   lib/                # cn 等 UI ユーティリティ
   main.tsx / App.tsx
-api/                  # Vercel Functions (Node 20、旧 Supabase Edge Fn 相当)
-  _lib/               # 共通 (clerk / ratelimit / cron)
-  identify-plant.ts / health.ts / clerk-webhook.ts / check-quota.ts / export-revenue.ts ...
-  account/ auth/ billing/ capture/ export/ legal/ memory/ notebook/ storage/
+api/                  # Vercel Functions (Node、group catch-all 統合 24→11、Hobby 12-fn 上限対応)
+  _lib/               # 共通 router (createGroupRouter) + clerk / ratelimit / cron / user
+  health.ts           # smoke
+  <group>/[...path].ts + <group>/_handlers/*   # 9 群: storage/billing/capture/notebook/auth/cron/legal/account/memory (export 群は撤去)
 drizzle/              # Drizzle migration (旧 supabase/migrations 相当)
   migrations/         # drizzle-kit generate 出力 SQL
 drizzle.config.ts
@@ -394,8 +394,7 @@ public/               # PWA manifest / icons
 
 | 指標 | 計測元 | 備考 |
 |---|---|---|
-| 単発課金件数 (AI 追加枠) | Stripe API | 月 11 回目以降の 100 円 × 20 回追加 |
-| 単発課金件数 (図鑑 PDF) | Stripe API | 500 円 × 件数 |
+| 単発課金件数 (AI 追加枠) | Stripe API | 100 円 × 10 回追加 (ゲスト可、revise_001) |
 | ARPU | 売上 / 課金ユーザー数 | スモール商用以降 |
 | 課金ユーザー数 | Stripe API | 新規 + 既存 |
 | Churn (60 日無アクティブ率) | アプリ DB | サブスクなしのため churn は「離脱」近似 |
@@ -457,10 +456,11 @@ public/               # PWA manifest / icons
 > マイクロサービスの**撤退リスク最小化**を主軸。「閉じる前提でも違和感ない」構成。
 
 #### 4.7.1 ドメイン情報
-- **既存ドメイン**: なし (新規取得検討)
-- **MVP 公開 URL**: `hana-memo.vercel.app` (Vercel 提供デフォルトドメイン、撤退時 = プロジェクト削除のみ)
-- **正式運用時の取得計画**: 将来 `hana-memo.app` (お名前.com or Cloudflare Registrar、$10-15/年) を検討。MVP では取得しない (撤退リスク回避)
-- **理由**: charter §1.1「無料で触り始められる」と整合、αフェーズで「使う人がいる」確証取れてからドメイン取得
+- **公開 URL (告知 URL)**: `https://hana-memo.givers.work` (2026-05-27 当て、release_002 サブドメイン設定)。既存の `givers.work` (ConoHa 管理) のサブドメインを使用 = 新規ドメイン取得コストなし・撤退は DNS 1 行削除 + Vercel domain rm で完結 (撤退リスク極小)。記録: `services.toml`
+- **フォールバック URL**: `hana-memo.vercel.app` (Vercel デフォルト、DNS 伝播前 / 撤退後)
+- **DNS**: ConoHa の `givers.work` ゾーンに `A hana-memo 76.76.21.21` (Vercel anycast)
+- **将来**: 独自 apex (`hana-memo.app` 等) は正式運用拡大時に再検討 (現状サブドメインで十分)
+- **旧方針 (〜2026-05-27)**: MVP は `hana-memo.vercel.app` で独自ドメイン取得せず、の方針だったが、既存 `givers.work` のサブドメインなら取得コストゼロ・撤退容易のため告知前に当てた (告知 URL を後から変えると周知やり直しになるため)
 
 #### 4.7.2 公開構成パターン
 - **採用パターン**: **(A) PaaS 完結 (Vercel + Neon + Clerk + R2)** — 運用負担ゼロ、最推奨
@@ -485,7 +485,7 @@ public/               # PWA manifest / icons
 
 #### 4.7.5 撤退時の手順 (撤退コスト最小化、§4.6.7 連携)
 1. ユーザーに事前通知 (アプリ内バナー + Email 通知、最低 30 日前)
-2. データエクスポート機能 (`/export` 機能の CSV + JSON + 画像 ZIP) を強くアナウンス
+2. データ持ち出し案内 (図鑑データ CSV/JSON/画像) — ⚠️ 専用 `/export` 機能は billing revise_001 で全廃。撤退時はアドホック出力 or account 削除前ダウンロードで対応 (要・撤退前に takeout 手段の再設計)
 3. 課金停止 (Stripe: 新規 Checkout 受付停止、過去購入の unlock は保持)
 4. **Vercel プロジェクト削除** (デフォルトドメインも同時失効)
 5. Neon DB / Clerk App / Cloudflare R2 Bucket を削除 (法務トレース性確保のため consent_logs 等は user_id null 化のみで保持、削除は告知期間終了後)
@@ -660,7 +660,7 @@ public/               # PWA manifest / icons
 
 > **2026-05-22 更新**: BaaS Pivot により、auth.users は Clerk 管理、public.users (Neon) はアプリ拡張テーブル。Clerk Webhook で同期。
 
-- **users** (Neon `public.users`): Clerk から Webhook 同期 (`clerk_user_id`, `email?`, `is_anonymous: bool`, `linked_at: timestamp?`, `deleted_at?`, `deletion_reason?`, `fingerprint_hash?`, `trial_used_count int default 0`, `ai_credits_remaining int default 0`, `pdf_unlocked bool default false`, `created_at`)
+- **users** (Neon `public.users`): Clerk から Webhook 同期 (`clerk_user_id`, `email?`, `is_anonymous: bool`, `linked_at: timestamp?`, `deleted_at?`, `deletion_reason?`, `fingerprint_hash?`, `trial_used_count int default 0`, `ai_credits_remaining int default 0`, `created_at`) — `pdf_unlocked` 列は billing revise_001 (2026-05-26、migration 0003) で削除済
   - 起動時に Clerk Guest Users (β) で `is_anonymous=true` の sign-in 完了 → Clerk Webhook (`user.created`) → Vercel Function → Neon `users` に行作成
   - Google OAuth リンク後は Clerk Webhook (`user.updated`) で `linked_at` set、`is_anonymous=false`
   - 匿名 user の SPAM 抑止 (D20260522-057): trial 3 回 + fingerprint hard cap
@@ -668,7 +668,8 @@ public/               # PWA manifest / icons
 - **plants**: 植物マスタ (id, scientific_name, common_name_ja, family, season_months[], care_info, image_ref) — AI 同定結果をキャッシュして再利用 (将来用、MVP は discoveries に直接保存)
 - **images**: 画像メタ (id, user_id, discovery_id, r2_object_key, original_size_bytes, mime, exif_stripped bool, created_at)
 - **api_usage**: AI 呼び出しログ (id, user_id, service, endpoint, input_tokens, output_tokens, image_count, success, latency_ms, created_at) — §4.6.2 コスト集計の源泉
-- **billing_unlocks**: 課金履歴 (id, user_id, type enum, amount_jpy, stripe_checkout_session_id UNIQUE, stripe_payment_intent_id, stripe_receipt_url, created_at)
+- **billing_unlocks**: 課金履歴 (id, user_id, type enum, amount_jpy, stripe_checkout_session_id UNIQUE, stripe_payment_intent_id, stripe_receipt_url, created_at) — `type` enum の `pdf_unlock` 値は履歴行互換のため残置 (revise_001 以降 `ai_credits` のみ生成)
+
 - **user_settings**: ユーザー設定 (user_id, location_precision enum, ai_consent_revoked_at?, analytics_opt_in bool default false, updated_at)
 - **consent_logs**: 同意ログ (id, user_id, doc_type enum, doc_version, agreed_at, ip_hash) — 法務改訂時の再同意トレース、append-only
 - **discovery_edits**: 編集履歴 (id, discovery_id, user_id, edited_at, field_name enum, before_value, after_value) — UC2 audit-like、append-only
@@ -828,12 +829,12 @@ public/               # PWA manifest / icons
 
 ### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
 
-- **status**: `dispatched-to-revise` (scrub core + 実 Sentry beforeSend wiring 完了。closure 残 = legal プラポリ TDD (Phase 4) + α 前 smoke)
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass) → 2026-05-24 14:04 **実 Sentry beforeSend wiring 完了** (`/flow:auto` 反復3 D20260524_050: `sentry-client.ts` `initBrowserSentry` が `@sentry/browser` を `scrubBeforeSend` 付きで init、unit 検証。Slack scrub は check-quota cron が消費)
+- **status**: `impl-complete / α前-smoke-pending` (scrub core + 実 Sentry beforeSend wiring + **legal 開示実装済**。closure 残 = α 前 実 Sentry 1 件投げ目視のみ)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass) → 2026-05-24 14:04 **実 Sentry beforeSend wiring 完了** (`/flow:auto` 反復3 D20260524_050: `sentry-client.ts` `initBrowserSentry` が `@sentry/browser` を `scrubBeforeSend` 付きで init、unit 検証。Slack scrub は check-quota cron が消費) → 2026-05-24 **legal 開示実装完了** (revise D20260524_046: `privacy_policy.md` §4 に Sentry スクラブ開示追記 + `versions.ts` privacy_policy=v1.1.0、公開済) → **2026-05-27 status 前進** (`/flow:audit` AUDIT-issue-001 reconcile: legal 開示が実装済なのに status が `dispatched-to-revise` のままだった drift を解消。closure 残は α 前 smoke のみ)
 - **dispatch 先**: `docs/_shared/analytics/revise_sec_004_sentry_pii_scrub_20260523/` (4 文書完了、scrubber.ts + beforeSend + 7 パターン定義 + Slack 通知統合)
 - **seed**: `docs/_pending_archive/sec_004_sentry_pii_scrub/000_TRIGGER.md` (revise 完了で archive 移動)
 - **対応 commit**: revise (D20260523_024) + scrub core (D20260523_029) + 実 Sentry wiring (D20260524_050 反復3、`feat(analytics): Phase 3.5 Milestone B`)。**closure 残**: legal プラポリ TDD (`/flow:tdd legal sentry-disclosure`、Phase 4) + 実 Sentry/Slack への 1 件投げ目視 (PII 混入ゼロ、α 公開前)
-- **法務 TODO**: プラポリ §4 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記。**設計完了** (`docs/legal/revise_sentry_disclosure_20260524/` D20260524_046、v1.0.0→v1.1.0)、実装 = `/flow:tdd legal sentry-disclosure` 待機 (α 公開前必須)
+- **法務 TODO**: プラポリ §4 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記。**✅ 実装済** (`docs/legal/revise_sentry_disclosure_20260524/` D20260524_046、`privacy_policy.md` 本文に開示文 + `versions.ts` v1.0.0→v1.1.0 公開済)。残 = α 公開前の実 Sentry 1 件目視 (PII 混入ゼロ確認) のみ
 - **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
 - **観点 ID**: O26_pii_logging (legal_required=true)
 - **severity**: High (法令必須、severity-threshold 除外不可)
@@ -925,8 +926,7 @@ public/               # PWA manifest / icons
 - **所在地**: バーチャルオフィス利用検討 (個人住所開示回避)、開業確定後に決定
 - **連絡先**: 公開用メールアドレス (Gmail / 独自ドメイン)、電話は「請求あれば遅滞なく開示」
 - **販売価格・支払方法・引渡時期・返品条件**:
-  - 単発課金 (AI 同定追加枠): 100 円 (税込) / 20 回追加 / Stripe Checkout / 即時付与 / デジタルコンテンツのため返品不可 (購入前に説明)
-  - 単発課金 (図鑑 PDF): 500 円 (PWYW で 100/300/500/1000 円選択可) / 即時ダウンロード / 同上
+  - 単発課金 (AI 同定追加枠): 100 円 (税込) / 10 回追加 / Stripe Checkout / 即時付与 / デジタルコンテンツのため返品不可 (購入前に説明)。ゲスト (未連携) でも購入可 (revise_001)
 - **動作環境**: 主要ブラウザ最新 (Chrome / Safari / Edge)、モバイル iOS Safari 15+ / Android Chrome 100+
 
 ---

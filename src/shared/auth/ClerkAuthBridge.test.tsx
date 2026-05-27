@@ -78,6 +78,45 @@ describe('ClerkAuthBridge', () => {
     expect(result.current.userId).toBe('guest_1');
   });
 
+  it('fix_001 回帰: publicMetadata.isAnonymous=true + 合成 email → isAnonymous=true', () => {
+    useAuthMock.mockReturnValue({
+      isLoaded: true,
+      isSignedIn: true,
+      userId: 'guest_1',
+      getToken: async () => null,
+    });
+    // guest は Clerk instance 要件で合成 email を持つが、権威ソースは publicMetadata.isAnonymous。
+    useUserMock.mockReturnValue({
+      user: {
+        id: 'guest_1',
+        externalAccounts: [],
+        publicMetadata: { isAnonymous: true },
+        primaryEmailAddress: { emailAddress: 'guest_x@guest.hana-memo.app' },
+      },
+    });
+    const { result } = renderHook(() => useAuthSnapshot(), {
+      wrapper: ({ children }) => bridge(children),
+    });
+    expect(result.current.isAnonymous).toBe(true);
+    expect(result.current.email).toBe('guest_x@guest.hana-memo.app');
+  });
+
+  it('OAuth user (publicMetadata なし) → isAnonymous=false', () => {
+    useAuthMock.mockReturnValue({
+      isLoaded: true,
+      isSignedIn: true,
+      userId: 'user_1',
+      getToken: async () => null,
+    });
+    useUserMock.mockReturnValue({
+      user: { id: 'user_1', externalAccounts: [{ provider: 'google' }] },
+    });
+    const { result } = renderHook(() => useAuthSnapshot(), {
+      wrapper: ({ children }) => bridge(children),
+    });
+    expect(result.current.isAnonymous).toBe(false);
+  });
+
   it('getToken が null を返しても snapshot.getToken は null に正規化', async () => {
     useAuthMock.mockReturnValue({
       isLoaded: true,

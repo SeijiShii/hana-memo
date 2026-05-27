@@ -4,7 +4,7 @@ import { AppShell } from './app/AppShell';
 import { SproutingNote } from './components/illustrations/Botanical';
 import { AppConsentGate } from './app/AppConsentGate';
 import { CaptureContainer, PreviewContainer } from './features/capture';
-import { NotebookContainer } from './features/notebook';
+import { NotebookContainer, DiscoveryDetailContainer } from './features/notebook';
 import { BillingContainer, BillingSuccessContainer } from './features/billing';
 import { LegalPage } from './features/legal';
 import { SettingsContainer } from './features/account';
@@ -49,6 +49,7 @@ export default function App() {
           <Route path="/capture" element={<CaptureContainer />} />
           <Route path="/capture/preview" element={<PreviewContainer />} />
           <Route path="/notebook" element={<NotebookContainer />} />
+          <Route path="/notebook/:id" element={<DiscoveryDetailContainer />} />
           <Route path="/billing" element={<BillingContainer />} />
           <Route path="/settings" element={<SettingsContainer />} />
           <Route path="/account/settings" element={<SettingsContainer />} />

@@ -1,8 +1,8 @@
 # AI_LOG インデックス — hana-memo
 
-**最終更新**: 2026-05-25 (+09:00)
-**総セッション数**: 53
-**総 decision 数**: 313
+**最終更新**: 2026-05-27 (+09:00)
+**総セッション数**: 75 (ファイル実数。067→075 = 068-073 + 527 audit/scenario を backfill 済 [AUDIT-ai-log-001]。※ 056〜064 は依然 一覧表未反映の drift あり、要 backfill — AUDIT-structure-001)
+**総 decision 数**: 316+ (056 以降未集計)
 
 > 補足: `/flow:estimate` (2026-05-23) は AI_LOG セッション化対象外。生成物は `docs/estimates/全体_20260523_hana-memo-mvp.md` 参照
 
@@ -16,6 +16,20 @@
 
 | ファイル | 実行日 | コマンド | 対象 | decision 範囲 | 状態 |
 |---|---|---|---|---|---|
+| [D20260527_001_scenario_update.md](./D20260527_001_scenario_update.md) | 2026-05-27 | /flow:scenario --update | §2/§5 を現実同期 (AUDIT-scenario-001 reconcile): Phase 3/3.5→完了・Phase 4→進行中、billing revise/関数統合/デプロイ preview 検証を §5 記録 | D20260527-001 | 完了 |
+| [D20260527_001_audit_light.md](./D20260527_001_audit_light.md) | 2026-05-27 | /flow:audit (light) | #1-#3 監査。追跡 drift 5件 (High3): SCENARIO §5 stale / SEC-004 status未前進 / AI_LOG INDEX stale / export全廃未反映 / #068未close。機能は健全。AUDIT_20260527_1208.md | D20260527-001 | 完了 |
+| [D20260526_073_tdd__shared_api_consolidation.md](./D20260526_073_tdd__shared_api_consolidation.md) | 2026-05-26 | /flow:tdd (_shared/api revise_001) | api 24→11 group catch-all 統合実装。unit 894 green / build OK / runtime routing 検証済。Hobby 12-fn 上限解消。commit d4bea83+7ce10fc | — | 完了 |
+| [D20260526_072_revise__shared_api_001.md](./D20260526_072_revise__shared_api_001.md) | 2026-05-26 | /flow:revise (_shared/api) | 関数統合の REVISE 4文書生成 (24→11 catch-all router 設計)。実装は tdd 073 | — | 完了 |
+| [D20260526_071_release_hana-memo.md](./D20260526_071_release_hana-memo.md) | 2026-05-26 | /flow:release | Phase1 FILL + Phase2 課金系 GREEN。Phase3 deploy が Hobby 12-fn 上限で BLOCK → ユーザー選択で関数統合へ転換 | — | 完了 |
+| [D20260526_070_e2e_billing.md](./D20260526_070_e2e_billing.md) | 2026-05-26 | /flow:e2e (billing) | no-key billing E2E 11 green。実サービス E2E + migration apply は Class B gated | — | 完了 |
+| [D20260526_069_tdd_billing_revise_001.md](./D20260526_069_tdd_billing_revise_001.md) | 2026-05-26 | /flow:tdd (billing revise_001) | billing 改修 Phase1-6 実装、unit 880 green / typecheck clean。残=db:migrate apply (Class B) | — | 完了 |
+| [D20260526_068_auto_continuous.md](./D20260526_068_auto_continuous.md) | 2026-05-26 | /flow:auto continuous | 反復1-N: billing revise (069)→e2e (070)→release (071, 12-fn BLOCK)→関数統合 revise (072)+tdd (073)。05-27 audit/scenario へ継続し close | — | 完了 |
+| [D20260526_067_spec-review_billing.md](./D20260526_067_spec-review_billing.md) | 2026-05-26 | /flow:spec-review (auto-pick) | billing revise_001 実装前レビュー。High2(consumer列挙漏れ/論点-R001未解決)/Med2/Low2/Info1。905_SPEC_REVIEW + 001/002 反映。P29 追加 | D20260526-015〜018 | 完了 |
+| [D20260526_066_audit_light.md](./D20260526_066_audit_light.md) | 2026-05-26 | /flow:audit (light) | プロダクト全体 #1-#3 整合性監査。Critical0/High0/Medium2/Low3/Info2。AI_LOG/INDEX 056-064 欠落 (M) + 論点-006 が revise_001/O46/O47 と要整合 (M)。AUDIT_20260526_0828.md | D20260526-011〜014 | 完了 |
+| [D20260526_065_revise_billing_001.md](./D20260526_065_revise_billing_001.md) | 2026-05-26 | /flow:revise billing guest-billing | ゲストのまま ¥100=AI10回 単発課金 (ログイン不要)、quota 匿名 credits 対応 + mustLink 廃止、pricing ¥100=10、pdf_unlock/PWYW/export 全廃。O46/O47 適用 | D20260526-001/002/007/009/010 | 完了 (設計) |
+| (056〜064 未反映: handoff/auto/fix/claim/revise notebook — backfill 待ち) | — | — | — | — | drift |
+| [D20260525_055_design_review.md](./D20260525_055_design_review.md) | 2026-05-25 | /flow:design --review-only | 6 画面 headless 視覚レビュー: 視覚 PASS / O38 コピー PASS。notebook タブ折返し修正 (865 green)、legal 見出し jargon は法務時 defer。/flow:auto 反復1 から dispatch | D20260525-056 | 完了 |
+| [D20260525_054_auto_continuous.md](./D20260525_054_auto_continuous.md) | 2026-05-25 | /flow:auto continuous | 反復1 = P4.4(b) Design gate → /flow:design --review-only。concept 修正 main FF マージ後 main ベースで実行 | D20260525-054〜055 | 進行中 |
 | [D20260525_053_concept_drift_fix.md](./D20260525_053_concept_drift_fix.md) | 2026-05-25 | /flow:concept (再実行) | 整合性チェック: BaaS Pivot (D20260522-114) 伝播漏れ ~13 箇所修正 (§1.2/§1.3.2/§1.4/§2/§4.6.5-7/§4.7/[論点-001] の Supabase→Neon+Clerk+R2)。Step 2 全 Q skip | D20260525-053 | 完了 |
 | [D20260525_052_auto_continuous.md](./D20260525_052_auto_continuous.md) | 2026-05-25 | /flow:auto continuous | 反復1-4 = Phase 3.5 MS-C 残 Class-A backend seam: `api/legal/consents` (GET/POST) + `api/account/settings` (GET/PATCH) + notebook/memory discovery `imageObjectKey` (images leftJoin)。810→853 green。残 runtime/Class-B gated で停止 | D20260525-052-001〜006 | 完了 |
 | [D20260524_051_auto_continuous.md](./D20260524_051_auto_continuous.md) | 2026-05-24 | /flow:auto continuous | 反復1-9 = Milestone C presentation: 全 7 feature 画面 + app 統合配線 + nav shell。607→810 green。§1.5.8 verification checkpoint で pause | D20260524-051-001〜018 | 完了 |

@@ -15,7 +15,12 @@ import { uploadPlantImage } from '../../shared/storage/upload';
 import { identifyPlant } from '../../shared/ai/identify';
 import type { Season } from '../../shared/types/domain';
 import type { DiscoveryStatus } from '../../shared/types/domain';
-import { runCapturePipeline, type CaptureDeps, type CapturePipelineInput } from './flow';
+import {
+  runCapturePipeline,
+  type CaptureDeps,
+  type CapturePipelineInput,
+  type CaptureStage,
+} from './flow';
 import { isTerminalStatus } from './status';
 import {
   createDiscovery,
@@ -92,6 +97,7 @@ export function useCaptureFlow(opts: CaptureFlowOptions): {
   capture: (
     blob: Blob,
     input: Omit<CapturePipelineInput, 'location'> & { location?: LatLng },
+    onStage?: (stage: CaptureStage) => void,
   ) => Promise<{ discoveryId: string }>;
   running: boolean;
   error: Error | null;
@@ -101,7 +107,11 @@ export function useCaptureFlow(opts: CaptureFlowOptions): {
   const { token, fetchFn, isAiConsentActive, checkQuota, sleep } = opts;
 
   const capture = useCallback(
-    async (blob: Blob, input: Omit<CapturePipelineInput, 'location'> & { location?: LatLng }) => {
+    async (
+      blob: Blob,
+      input: Omit<CapturePipelineInput, 'location'> & { location?: LatLng },
+      onStage?: (stage: CaptureStage) => void,
+    ) => {
       setRunning(true);
       setError(null);
       const api: CaptureApiOptions = { token, fetchFn };
@@ -138,6 +148,7 @@ export function useCaptureFlow(opts: CaptureFlowOptions): {
             { token, fetchFn },
           ).then(() => undefined),
         deleteDiscovery: (discoveryId) => deleteDiscovery(discoveryId, api),
+        onStage,
       };
       try {
         return await runCapturePipeline(deps, { ...input });

@@ -33,7 +33,6 @@ describe('BillingSuccessContainer', () => {
       found: true,
       type: 'ai_credits',
       aiCreditsRemaining: 50,
-      pdfUnlocked: false,
     });
     renderAt('tok');
     await waitFor(() =>

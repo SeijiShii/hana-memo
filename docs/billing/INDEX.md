@@ -22,7 +22,7 @@ PWYW + content-unlock 課金 (Stripe Checkout) — AI 枠 ¥100/20 回 + PDF unl
 ## サブフォルダ
 | パス | 種別 | issue/slug | 状態 | 概要 | INDEX |
 |---|---|---|---|---|---|
-| (なし) |
+| [revise_001_20260526_guest-billing/](./revise_001_20260526_guest-billing/) | revise | revise_001 / guest-billing | 実装完了 (2026-05-26) | ゲストのまま ¥100=AI10回 単発課金 (ログイン不要)、pdf_unlock/PWYW/export 全廃、quota 匿名 credits 対応 | [INDEX](./revise_001_20260526_guest-billing/INDEX.md) |
 
 ## 関連
 - 親 concept: `../concept.md` §1.1 UC3, §1.3.1 billing 行, §4.6.4, §4.6.4.1, charter §1

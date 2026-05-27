@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 /**
  * CaptureButton 単体テスト
- * 由来: docs/capture/001_capture_SPEC.md §1 UC1 代替フロー / §4.2 E-CA-004/005
+ * 由来: docs/capture/001_capture_SPEC.md §1 UC1 代替フロー / §4.2 E-CA-004 (revise_001: 購入導線へ一本化)
  */
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -31,19 +31,13 @@ describe('CaptureButton', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('quota 0 → 撮影せず QuotaModal(reason=quota) を開く', () => {
+  it('quota 0 → 撮影せず QuotaModal (購入導線) を開く', () => {
     const { onCapture } = renderButton({ quotaRemaining: 0 });
     // CameraCapture の input は出ない。
     expect(screen.queryByLabelText('植物を撮影 / 画像を選択')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: '撮影する' }));
     expect(onCapture).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: '課金画面へ' })).toBeTruthy();
-  });
-
-  it('linkRequired → QuotaModal(reason=link_required) を開く', () => {
-    renderButton({ quotaRemaining: 5, linkRequired: true });
-    fireEvent.click(screen.getByRole('button', { name: '撮影する' }));
-    expect(screen.getByRole('button', { name: 'アカウント連携へ' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'クレジットを追加' })).toBeTruthy();
   });
 
   it('disabled で撮影 input を無効化', () => {

@@ -35,15 +35,19 @@ describe('parseIdentifyBody', () => {
   });
 
   it('location / userNote を任意で取り込む', () => {
-    const out = parseIdentifyBody({ ...validBody, location: { lat: 35.6, lng: 139.7 }, userNote: 'メモ' });
+    const out = parseIdentifyBody({
+      ...validBody,
+      location: { lat: 35.6, lng: 139.7 },
+      userNote: 'メモ',
+    });
     expect(out.location).toEqual({ lat: 35.6, lng: 139.7 });
     expect(out.userNote).toBe('メモ');
   });
 
   it('必須欠落 / 不正 season は ValidationError', () => {
-    expect(() => parseIdentifyBody({ imageObjectKey: 'k', capturedAt: 'c', season: 'spring' })).toThrow(
-      ValidationError,
-    );
+    expect(() =>
+      parseIdentifyBody({ imageObjectKey: 'k', capturedAt: 'c', season: 'spring' }),
+    ).toThrow(ValidationError);
     expect(() => parseIdentifyBody({ ...validBody, season: 'monsoon' })).toThrow(ValidationError);
   });
 });
@@ -62,10 +66,14 @@ describe('runIdentify', () => {
 
   function makeDeps(overrides: Partial<IdentifyDeps> = {}): IdentifyDeps {
     return {
-      rateLimiter: { limit: vi.fn().mockResolvedValue({ success: true, remaining: 9, resetAtMs: 0 }) },
+      rateLimiter: {
+        limit: vi.fn().mockResolvedValue({ success: true, remaining: 9, resetAtMs: 0 }),
+      },
       presign: presignMock(),
-      complete: vi.fn().mockResolvedValue({ choices: [{ message: { content: JSON.stringify(MODEL_JSON) } }] }),
-      getQuotaRemaining: vi.fn().mockResolvedValue(5),
+      complete: vi
+        .fn()
+        .mockResolvedValue({ choices: [{ message: { content: JSON.stringify(MODEL_JSON) } }] }),
+      getQuota: vi.fn().mockResolvedValue({ remaining: 5, consume: 'monthly' }),
       persist: vi.fn().mockResolvedValue(undefined),
       sleep: async () => {},
       ...overrides,
@@ -82,30 +90,60 @@ describe('runIdentify', () => {
     expect(deps.persist).toHaveBeenCalledWith({
       discoveryId: 'd1',
       result: expect.objectContaining({ commonName: 'タンポポ', status: 'identified' }),
-      quotaRemaining: 4,
+      consume: 'monthly',
     });
   });
 
   it('[SEC-001] レート制限超過 → RateLimitedError (presign/OpenAI 不実行)', async () => {
     const deps = makeDeps({
-      rateLimiter: { limit: vi.fn().mockResolvedValue({ success: false, remaining: 0, resetAtMs: 123 }) },
+      rateLimiter: {
+        limit: vi.fn().mockResolvedValue({ success: false, remaining: 0, resetAtMs: 123 }),
+      },
     });
     await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(RateLimitedError);
     expect(deps.complete).not.toHaveBeenCalled();
-    expect(deps.getQuotaRemaining).not.toHaveBeenCalled();
+    expect(deps.getQuota).not.toHaveBeenCalled();
   });
 
   it('他 user の objectKey → ValidationError (quota 消費前に拒否)', async () => {
     const otherInput = parseIdentifyBody({ ...validBody, imageObjectKey: 'other-user/d1/i1.webp' });
     const deps = makeDeps();
     await expect(runIdentify(userId, otherInput, deps)).rejects.toBeInstanceOf(ValidationError);
-    expect(deps.getQuotaRemaining).not.toHaveBeenCalled();
+    expect(deps.getQuota).not.toHaveBeenCalled();
   });
 
-  it('quota 0 → QuotaExceededError (OpenAI 不実行)', async () => {
-    const deps = makeDeps({ getQuotaRemaining: vi.fn().mockResolvedValue(0) });
+  it('登録ユーザー quota 0 → QuotaExceededError 402 (OpenAI 不実行)', async () => {
+    const deps = makeDeps({
+      getQuota: vi.fn().mockResolvedValue({ remaining: 0, consume: 'none' }),
+    });
     await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(QuotaExceededError);
     expect(deps.complete).not.toHaveBeenCalled();
+    expect(deps.persist).not.toHaveBeenCalled();
+  });
+
+  it('匿名 trial+credits 使い切り → QuotaExceededError 402 (購入導線、revise_001、リンク強制廃止)', async () => {
+    const deps = makeDeps({
+      getQuota: vi.fn().mockResolvedValue({ remaining: 0, consume: 'none' }),
+    });
+    await expect(runIdentify(userId, input, deps)).rejects.toBeInstanceOf(QuotaExceededError);
+    expect(deps.complete).not.toHaveBeenCalled();
+    expect(deps.persist).not.toHaveBeenCalled();
+  });
+
+  it('匿名 trial 使い切り + 購入クレジット → consume=credits で persist (revise_001、ゲスト課金)', async () => {
+    const deps = makeDeps({
+      getQuota: vi.fn().mockResolvedValue({ remaining: 10, consume: 'credits' }),
+    });
+    await runIdentify(userId, input, deps);
+    expect(deps.persist).toHaveBeenCalledWith(expect.objectContaining({ consume: 'credits' }));
+  });
+
+  it('匿名 trial 残あり → consume=trial で persist (fix_001)', async () => {
+    const deps = makeDeps({
+      getQuota: vi.fn().mockResolvedValue({ remaining: 3, consume: 'trial' }),
+    });
+    await runIdentify(userId, input, deps);
+    expect(deps.persist).toHaveBeenCalledWith(expect.objectContaining({ consume: 'trial' }));
   });
 
   it('OpenAI 失敗 → retry 後に throw (persist せず)', async () => {

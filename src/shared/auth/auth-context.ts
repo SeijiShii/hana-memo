@@ -16,6 +16,12 @@ export type AuthSnapshot = {
   userId: string | null;
   email: string | null;
   hasExternalAccount: boolean;
+  /**
+   * 匿名 (Guest) user か。**権威ソース = Clerk publicMetadata.isAnonymous** (guest 発行時に設定、
+   * OAuth リンクで false に更新)。email 有無で推測しない (guest は合成 email を持つため、fix_001 で
+   * 「連携済」と誤判定する不具合があった)。
+   */
+  isAnonymous: boolean;
   /** Clerk session JWT を取得する (未 sign-in / keyless は null)。 */
   getToken: () => Promise<string | null>;
 };
@@ -27,6 +33,7 @@ export const KEYLESS_AUTH: AuthSnapshot = {
   userId: null,
   email: null,
   hasExternalAccount: false,
+  isAnonymous: false,
   getToken: async () => null,
 };
 

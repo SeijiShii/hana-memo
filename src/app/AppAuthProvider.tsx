@@ -15,6 +15,7 @@
 import type { ReactNode } from 'react';
 import { AuthProvider } from '../shared/auth/provider';
 import { ClerkAuthBridge } from '../shared/auth/ClerkAuthBridge';
+import { GuestSessionGate } from '../shared/auth/GuestSessionGate';
 
 export type AppAuthProviderProps = {
   children: ReactNode;
@@ -46,9 +47,13 @@ export function AppAuthProvider({ children, publishableKey }: AppAuthProviderPro
     );
   }
   // キーあり: ClerkProvider 内に bridge を挿し、Clerk → AuthSnapshot を context へ供給する。
+  // GuestSessionGate は bridge 内 (Clerk hooks 利用可 + AuthSnapshot 読取可) で起動時匿名 sign-in を駆動。
   return (
     <AuthProvider publishableKey={key}>
-      <ClerkAuthBridge>{children}</ClerkAuthBridge>
+      <ClerkAuthBridge>
+        <GuestSessionGate />
+        {children}
+      </ClerkAuthBridge>
     </AuthProvider>
   );
 }

@@ -2,7 +2,7 @@
  * billing frontend API ラッパ (Vercel Function を叩く純粋関数群)
  *
  * - `createCheckout`: POST /api/billing/create-checkout-session → redirect URL
- * - `fetchBillingStatus`: GET /api/billing/status → ai_credits_remaining / pdf_unlocked
+ * - `fetchBillingStatus`: GET /api/billing/status → ai_credits_remaining
  * - `confirmCheckout`: GET /api/billing/confirm を poll し Webhook 反映を待つ (SC01〜SC03)
  *
  * 注: 元 PLAN の Supabase Realtime は Vercel+Neon 構成に無いため、status は明示 fetch / poll で代替。
@@ -11,9 +11,7 @@
 import { LinkRequiredError } from '../../shared/auth/errors';
 import { CheckoutFailedError, CheckoutPendingError } from './errors';
 
-export type CheckoutInput =
-  | { type: 'ai_credits'; quantity: number }
-  | { type: 'pdf_unlock'; amountJpy: number };
+export type CheckoutInput = { type: 'ai_credits'; quantity: number };
 
 export type BillingApiOptions = {
   token: string;
@@ -54,9 +52,13 @@ export async function createCheckout(
   throw new CheckoutFailedError(`checkout failed: ${res.status}`);
 }
 
-export type BillingStatus = { aiCreditsRemaining: number; pdfUnlocked: boolean };
+export type BillingStatus = {
+  aiCreditsRemaining: number;
+  /** identify 実効残数 (匿名 trial / 登録 月次無料+credits)。fix_001。旧 server 互換のため optional。 */
+  quotaRemaining?: number;
+};
 
-/** 課金ステータス (残クレジット / PDF unlock) を取得する (UT-BL-H01)。 */
+/** 課金ステータス (残クレジット) を取得する (UT-BL-H01)。 */
 export async function fetchBillingStatus(opts: BillingApiOptions): Promise<BillingStatus> {
   const fetchFn = opts.fetchFn ?? fetch;
   const res = await fetchFn(opts.endpoint ?? STATUS_ENDPOINT, {
@@ -71,7 +73,11 @@ export async function fetchBillingStatus(opts: BillingApiOptions): Promise<Billi
 
 export type ConfirmResult =
   | { found: false }
-  | { found: true; type: 'ai_credits' | 'pdf_unlock'; aiCreditsRemaining: number; pdfUnlocked: boolean };
+  | {
+      found: true;
+      type: 'ai_credits';
+      aiCreditsRemaining: number;
+    };
 
 export type ConfirmOptions = BillingApiOptions & {
   /** poll 間隔 (既定 1000ms)。 */
