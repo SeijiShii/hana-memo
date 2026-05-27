@@ -27,13 +27,7 @@
  */
 import { useState } from 'react';
 import { CreditCard } from 'lucide-react';
-import {
-  AI_QTY_MIN,
-  AI_QTY_MAX,
-  AI_CREDITS_PER_UNIT,
-  aiCreditsAmountJpy,
-  aiCreditsGranted,
-} from '../pricing';
+import { AI_CREDITS_PER_UNIT, aiCreditsAmountJpy } from '../pricing';
 import type { CheckoutInput, BillingStatus } from '../api';
 
 /** 円表記に整形する (例: 500 → "¥500")。 */
@@ -71,13 +65,11 @@ export function BillingPage({
   checkoutError = null,
   checkoutComplete = false,
 }: BillingPageProps) {
-  const [qty, setQty] = useState<number>(AI_QTY_MIN);
   // 注入 onCheckout の reject を拾うローカルエラー (アプリ層 checkoutError と OR 表示)。
   const [localError, setLocalError] = useState<Error | null>(null);
 
-  const qtyValid = qty >= AI_QTY_MIN && qty <= AI_QTY_MAX && Number.isInteger(qty);
-
-  const canPurchase = !checkoutPending && qtyValid;
+  // revise_002: AI_QTY_MAX=1 (単発) のため数量入力は撤去。購入は常に quantity=1。
+  const canPurchase = !checkoutPending;
 
   const handlePurchase = async () => {
     if (!canPurchase) {
@@ -86,7 +78,7 @@ export function BillingPage({
     // revise_001: 匿名でも購入可。OAuth リンクゲートは撤廃し直接 Checkout を起動する。
     setLocalError(null);
     try {
-      await onCheckout({ type: 'ai_credits', quantity: qty });
+      await onCheckout({ type: 'ai_credits', quantity: 1 });
     } catch (err) {
       setLocalError(err instanceof Error ? err : new Error(String(err)));
     }
@@ -128,37 +120,12 @@ export function BillingPage({
         </p>
       ) : null}
 
-      {/* AI 識別クレジット購入 */}
-      <section aria-label="AI 識別クレジット購入" className="flex flex-col gap-3">
-        <p className="text-sm text-ink-soft">
-          1 セット {formatJpy(aiCreditsAmountJpy(1))} で AI 識別が {AI_CREDITS_PER_UNIT}{' '}
-          回追加されます。
+      {/* AI 識別クレジット購入 (revise_002: 単発・固定価格、数量入力なし) */}
+      <section aria-label="AI 識別クレジット購入" className="flex flex-col gap-2">
+        <p className="text-base font-semibold text-ink">
+          {formatJpy(aiCreditsAmountJpy(1))} で AI 識別が {AI_CREDITS_PER_UNIT} 回ふえます
         </p>
-        <label className="flex flex-col gap-1 text-sm text-ink-soft">
-          数量 ({AI_QTY_MIN}〜{AI_QTY_MAX} セット)
-          <input
-            type="number"
-            inputMode="numeric"
-            min={AI_QTY_MIN}
-            max={AI_QTY_MAX}
-            value={qty}
-            onChange={(e) => {
-              const next = Number(e.target.value);
-              setQty(Number.isNaN(next) ? AI_QTY_MIN : next);
-            }}
-            aria-label="数量"
-            className="rounded-lg border border-line px-3 py-2 text-base text-ink focus:border-moss focus:outline-none"
-          />
-        </label>
-        {qtyValid ? (
-          <p className="text-sm font-semibold text-ink-soft">
-            合計 {formatJpy(aiCreditsAmountJpy(qty))}（{aiCreditsGranted(qty)} 回追加）
-          </p>
-        ) : (
-          <p role="alert" className="text-sm text-red-500">
-            数量は {AI_QTY_MIN}〜{AI_QTY_MAX} の整数で入力してください
-          </p>
-        )}
+        <p className="text-sm text-ink-faint">使い切ったら、また同じだけ追加できます。</p>
       </section>
 
       {shownError ? (
@@ -176,7 +143,7 @@ export function BillingPage({
         className="btn-primary"
       >
         <CreditCard size={18} aria-hidden />
-        {checkoutPending ? '処理中…' : '購入する'}
+        {checkoutPending ? '処理中…' : `${formatJpy(aiCreditsAmountJpy(1))} で購入する`}
       </button>
     </main>
   );

@@ -2,7 +2,7 @@
 
 **issue / slug**: 002 / remove-qty-input
 **実施日**: 2026-05-27
-**状態**: 設計完了 (実装待ち)
+**状態**: 実装完了 (unit green、prod 反映待ち)
 
 <!-- auto-generated-start -->
 
@@ -13,6 +13,7 @@
 | 002 | 002_REVISE_PLAN.md | 変更計画 (BillingPage + test、migration 不要) | 2026-05-27 |
 | 003 | 003_REVISE_UNIT_TEST.md | 単体テスト計画 | 2026-05-27 |
 | 004 | 004_REVISE_E2E_TEST.md | E2E (数量入力非表示 + quantity=1 回帰ガード) | 2026-05-27 |
+| 101 | 101_REVISE_IMPL_REPORT.md | 実装レポート (TDD、898 unit green) | 2026-05-27 |
 
 ## 関連
 - 親機能 INDEX: `../INDEX.md`

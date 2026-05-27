@@ -42,7 +42,7 @@ describe('BillingContainer', () => {
     });
     const redirect = vi.fn();
     render(<BillingContainer token="tok" redirect={redirect} />);
-    fireEvent.click(screen.getByRole('button', { name: '購入する' }));
+    fireEvent.click(screen.getByRole('button', { name: '¥100 で購入する' }));
     await waitFor(() => expect(createCheckoutMock).toHaveBeenCalledTimes(1));
     // AI クレジット (初期タブ) の CheckoutInput を渡している。
     expect(createCheckoutMock).toHaveBeenCalledWith(
@@ -58,7 +58,7 @@ describe('BillingContainer', () => {
       sessionId: 's1',
     });
     render(<BillingContainer token="tok" redirect={vi.fn()} />);
-    fireEvent.click(screen.getByRole('button', { name: '購入する' }));
+    fireEvent.click(screen.getByRole('button', { name: '¥100 で購入する' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     await waitFor(() => expect(createCheckoutMock).toHaveBeenCalledTimes(1));
   });
@@ -66,6 +66,6 @@ describe('BillingContainer', () => {
   it('token なし → status を取得せず no-op onCheckout の BillingPage を描画する', () => {
     render(<BillingContainer token={null} />);
     expect(useBillingStatusMock).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: '購入する' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '¥100 で購入する' })).toBeTruthy();
   });
 });

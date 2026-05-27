@@ -60,6 +60,10 @@ test.describe('billing 購入導線 (guest-billing、keyless = Class A)', () => 
     // PWYW の任意金額スライダは廃止 (単発固定価格のみ)。
     await expect(page.getByRole('slider')).toHaveCount(0);
 
+    // revise_002: 数量入力 (AI_QTY_MAX=1 で選択肢ゼロ) は撤去 (E2E-R2-01)。
+    await expect(page.getByLabel('数量')).toHaveCount(0);
+    await expect(page.getByText(/合計/)).toHaveCount(0);
+
     // PDF unlock / 書き出し (export) の導線は全廃。
     await expect(page.getByText(/PDF/)).toHaveCount(0);
     await expect(page.getByText(/書き出し|エクスポート/)).toHaveCount(0);
