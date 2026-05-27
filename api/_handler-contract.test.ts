@@ -39,8 +39,9 @@ describe('Vercel Function handler export contract', () => {
   const endpoints = Object.keys(modules).filter(isEndpoint).sort();
 
   it('stays within the Vercel Hobby 12-Serverless-Function limit (revise_001 / O49)', () => {
-    // function-consolidation 後は 11 関数 (group catch-all 9 + health + identify-plant)。
-    // 上限 12 を恒久ガード: 新 endpoint 追加で 13 になったら group catch-all への集約を促す (perspectives O49)。
+    // function-consolidation 後 11 → hub group 追加で 12 関数 (group catch-all 10 + health + identify-plant)。
+    // ⚠️ 上限 12 に到達 (zero headroom)。次の新 endpoint は新 flat function でなく既存 group catch-all
+    //   の action へ集約すること (13 になると Hobby 上限超過でデプロイ不可、perspectives O49)。
     // 下限 9 は glob 破損 (near 0) の検知用。
     expect(endpoints.length).toBeGreaterThanOrEqual(9);
     expect(endpoints.length).toBeLessThanOrEqual(12);

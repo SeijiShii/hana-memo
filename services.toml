@@ -9,4 +9,5 @@ dns_record = "A hana-memo 76.76.21.21" # Vercel 推奨 (anycast)
 deploy = "vercel"
 project = "hana-memo"
 platform_url = "hana-memo.vercel.app"  # フォールバック (DNS 伝播前 / 撤退後)
+endpoint = "https://hana-memo.givers.work/api/hub/service-info"  # service-hub が pull (O48、認証=env HUB_SHARED_SECRET)
 added = "2026-05-27"
