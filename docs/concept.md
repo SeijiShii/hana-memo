@@ -90,7 +90,7 @@
 src/
   app/                # ルート統合・AppShell・Provider・Container (実 hook/SDK 配線)
   features/           # 機能単位（§1.3.1 と命名統一、各 pages/ + components/）
-    account/ capture/ notebook/ export/ memory/ billing/ legal/
+    account/ capture/ notebook/ memory/ billing/ legal/   # (export は billing revise_001 で全廃)
   shared/             # 横断（§1.3.2 と命名統一）
     db/               # Drizzle スキーマ + Neon クライアント
     types/            # 共通型 (Drizzle スキーマ由来 + DTO)
@@ -102,10 +102,10 @@ src/
   components/         # 共通 UI 部品 (shadcn/ui ベース) + illustrations/
   lib/                # cn 等 UI ユーティリティ
   main.tsx / App.tsx
-api/                  # Vercel Functions (Node 20、旧 Supabase Edge Fn 相当)
-  _lib/               # 共通 (clerk / ratelimit / cron)
-  identify-plant.ts / health.ts / clerk-webhook.ts / check-quota.ts / export-revenue.ts ...
-  account/ auth/ billing/ capture/ export/ legal/ memory/ notebook/ storage/
+api/                  # Vercel Functions (Node、group catch-all 統合 24→11、Hobby 12-fn 上限対応)
+  _lib/               # 共通 router (createGroupRouter) + clerk / ratelimit / cron / user
+  health.ts           # smoke
+  <group>/[...path].ts + <group>/_handlers/*   # 9 群: storage/billing/capture/notebook/auth/cron/legal/account/memory (export 群は撤去)
 drizzle/              # Drizzle migration (旧 supabase/migrations 相当)
   migrations/         # drizzle-kit generate 出力 SQL
 drizzle.config.ts
@@ -484,7 +484,7 @@ public/               # PWA manifest / icons
 
 #### 4.7.5 撤退時の手順 (撤退コスト最小化、§4.6.7 連携)
 1. ユーザーに事前通知 (アプリ内バナー + Email 通知、最低 30 日前)
-2. データエクスポート機能 (`/export` 機能の CSV + JSON + 画像 ZIP) を強くアナウンス
+2. データ持ち出し案内 (図鑑データ CSV/JSON/画像) — ⚠️ 専用 `/export` 機能は billing revise_001 で全廃。撤退時はアドホック出力 or account 削除前ダウンロードで対応 (要・撤退前に takeout 手段の再設計)
 3. 課金停止 (Stripe: 新規 Checkout 受付停止、過去購入の unlock は保持)
 4. **Vercel プロジェクト削除** (デフォルトドメインも同時失効)
 5. Neon DB / Clerk App / Cloudflare R2 Bucket を削除 (法務トレース性確保のため consent_logs 等は user_id null 化のみで保持、削除は告知期間終了後)
@@ -828,12 +828,12 @@ public/               # PWA manifest / icons
 
 ### [論点-014] Sentry beforeSend PII スクラブ実装 (SEC-004、High / 法令必須)
 
-- **status**: `dispatched-to-revise` (scrub core + 実 Sentry beforeSend wiring 完了。closure 残 = legal プラポリ TDD (Phase 4) + α 前 smoke)
-- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass) → 2026-05-24 14:04 **実 Sentry beforeSend wiring 完了** (`/flow:auto` 反復3 D20260524_050: `sentry-client.ts` `initBrowserSentry` が `@sentry/browser` を `scrubBeforeSend` 付きで init、unit 検証。Slack scrub は check-quota cron が消費)
+- **status**: `impl-complete / α前-smoke-pending` (scrub core + 実 Sentry beforeSend wiring + **legal 開示実装済**。closure 残 = α 前 実 Sentry 1 件投げ目視のみ)
+- **status 履歴**: 2026-05-23 09:07 open → 2026-05-23 09:33 dispatched-to-revise → 2026-05-23 10:10 revise 設計反映完了 (TDD 待機中) → 2026-05-23 17:40 **TDD scrub core 実装完了** (`/flow:tdd _shared/analytics` D20260523_029: `scrubber.ts` 7 パターン 行 100%、`sentry.ts` beforeSend/beforeBreadcrumb + uid hash 100%、`slack.ts` buildSlackPayload。50 tests pass) → 2026-05-24 14:04 **実 Sentry beforeSend wiring 完了** (`/flow:auto` 反復3 D20260524_050: `sentry-client.ts` `initBrowserSentry` が `@sentry/browser` を `scrubBeforeSend` 付きで init、unit 検証。Slack scrub は check-quota cron が消費) → 2026-05-24 **legal 開示実装完了** (revise D20260524_046: `privacy_policy.md` §4 に Sentry スクラブ開示追記 + `versions.ts` privacy_policy=v1.1.0、公開済) → **2026-05-27 status 前進** (`/flow:audit` AUDIT-issue-001 reconcile: legal 開示が実装済なのに status が `dispatched-to-revise` のままだった drift を解消。closure 残は α 前 smoke のみ)
 - **dispatch 先**: `docs/_shared/analytics/revise_sec_004_sentry_pii_scrub_20260523/` (4 文書完了、scrubber.ts + beforeSend + 7 パターン定義 + Slack 通知統合)
 - **seed**: `docs/_pending_archive/sec_004_sentry_pii_scrub/000_TRIGGER.md` (revise 完了で archive 移動)
 - **対応 commit**: revise (D20260523_024) + scrub core (D20260523_029) + 実 Sentry wiring (D20260524_050 反復3、`feat(analytics): Phase 3.5 Milestone B`)。**closure 残**: legal プラポリ TDD (`/flow:tdd legal sentry-disclosure`、Phase 4) + 実 Sentry/Slack への 1 件投げ目視 (PII 混入ゼロ、α 公開前)
-- **法務 TODO**: プラポリ §4 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記。**設計完了** (`docs/legal/revise_sentry_disclosure_20260524/` D20260524_046、v1.0.0→v1.1.0)、実装 = `/flow:tdd legal sentry-disclosure` 待機 (α 公開前必須)
+- **法務 TODO**: プラポリ §4 に「Sentry エラー追跡委託先利用、PII はスクラブ後送信」追記。**✅ 実装済** (`docs/legal/revise_sentry_disclosure_20260524/` D20260524_046、`privacy_policy.md` 本文に開示文 + `versions.ts` v1.0.0→v1.1.0 公開済)。残 = α 公開前の実 Sentry 1 件目視 (PII 混入ゼロ確認) のみ
 - **影響範囲**: §3 NFR / §9.1 / §9.2 / `_shared/analytics`
 - **観点 ID**: O26_pii_logging (legal_required=true)
 - **severity**: High (法令必須、severity-threshold 除外不可)

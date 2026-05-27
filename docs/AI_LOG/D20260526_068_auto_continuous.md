@@ -4,7 +4,7 @@
 - **コマンド**: /flow:auto (引数なし → continuous loop)
 - **対象**: hana-memo 全体 (next-step router)
 - **実行者**: seiji + Claude
-- **状態**: 進行中
+- **状態**: 完了 (2026-05-27 close — `/flow:audit` AUDIT-ai-log-002 reconcile。05-26 反復 1-N = billing revise (069) → e2e (070) → release (071、Hobby 12-fn で BLOCK) → 関数統合 revise (072) + tdd (073) を完遂。以降の作業は 05-27 セッション群 [audit/scenario] に継続したため本セッションは close)
 - **含まれる decision 範囲**: 入力収集 / 優先度判定 / no-key 枯渇再検証 / 反復 auto-pick
 
 ## 主要決定サマリ
