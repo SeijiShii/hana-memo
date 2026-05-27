@@ -456,10 +456,11 @@ public/               # PWA manifest / icons
 > マイクロサービスの**撤退リスク最小化**を主軸。「閉じる前提でも違和感ない」構成。
 
 #### 4.7.1 ドメイン情報
-- **既存ドメイン**: なし (新規取得検討)
-- **MVP 公開 URL**: `hana-memo.vercel.app` (Vercel 提供デフォルトドメイン、撤退時 = プロジェクト削除のみ)
-- **正式運用時の取得計画**: 将来 `hana-memo.app` (お名前.com or Cloudflare Registrar、$10-15/年) を検討。MVP では取得しない (撤退リスク回避)
-- **理由**: charter §1.1「無料で触り始められる」と整合、αフェーズで「使う人がいる」確証取れてからドメイン取得
+- **公開 URL (告知 URL)**: `https://hana-memo.givers.work` (2026-05-27 当て、release_002 サブドメイン設定)。既存の `givers.work` (ConoHa 管理) のサブドメインを使用 = 新規ドメイン取得コストなし・撤退は DNS 1 行削除 + Vercel domain rm で完結 (撤退リスク極小)。記録: `services.toml`
+- **フォールバック URL**: `hana-memo.vercel.app` (Vercel デフォルト、DNS 伝播前 / 撤退後)
+- **DNS**: ConoHa の `givers.work` ゾーンに `A hana-memo 76.76.21.21` (Vercel anycast)
+- **将来**: 独自 apex (`hana-memo.app` 等) は正式運用拡大時に再検討 (現状サブドメインで十分)
+- **旧方針 (〜2026-05-27)**: MVP は `hana-memo.vercel.app` で独自ドメイン取得せず、の方針だったが、既存 `givers.work` のサブドメインなら取得コストゼロ・撤退容易のため告知前に当てた (告知 URL を後から変えると周知やり直しになるため)
 
 #### 4.7.2 公開構成パターン
 - **採用パターン**: **(A) PaaS 完結 (Vercel + Neon + Clerk + R2)** — 運用負担ゼロ、最推奨
