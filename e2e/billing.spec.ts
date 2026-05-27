@@ -40,14 +40,16 @@ test.describe('billing 購入導線 (guest-billing、keyless = Class A)', () => 
     expect(errors, `pageerrors: ${errors.join(' | ')}`).toHaveLength(0);
   });
 
-  test('/billing は OAuth 連携必須ゲートを出さない (mustLink 撤廃、購入導線のみ)', async ({ page }) => {
+  test('/billing は OAuth 連携必須ゲートを出さない (mustLink 撤廃、購入導線のみ)', async ({
+    page,
+  }) => {
     await page.goto('/billing');
 
     // 購入ボタンが連携ゲートに隠されず直接表示される。
     await expect(page.getByRole('button', { name: /購入する/ })).toBeVisible();
 
-    // 旧 OAuthRequiredModal の「アカウント連携が必要です」は描画されない (E2E-R-01: 連携要求は出ない)。
-    await expect(page.getByText('アカウント連携が必要です')).toHaveCount(0);
+    // 連携モーダル (OAuthRequiredModal「アカウントを連携する」) は billing パスに出ない (E2E-R-01: 購入は連携不要)。
+    await expect(page.getByText('アカウントを連携する')).toHaveCount(0);
   });
 
   test('/billing に廃止機能 (PWYW スライダ / PDF unlock / 書き出し) が残っていない (回帰ガード)', async ({

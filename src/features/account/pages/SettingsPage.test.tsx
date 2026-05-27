@@ -23,7 +23,9 @@ describe('SettingsPage', () => {
   });
 
   it('現在の位置情報精度がラジオに反映される', () => {
-    render(<SettingsPage settings={view({ locationPrecision: 'precise' })} onUpdateSettings={vi.fn()} />);
+    render(
+      <SettingsPage settings={view({ locationPrecision: 'precise' })} onUpdateSettings={vi.fn()} />,
+    );
     expect((screen.getByRole('radio', { name: /精細/ }) as HTMLInputElement).checked).toBe(true);
     expect((screen.getByRole('radio', { name: '記録しない' }) as HTMLInputElement).checked).toBe(
       false,
@@ -40,7 +42,9 @@ describe('SettingsPage', () => {
   });
 
   it('AI 同意 ON のときスイッチが aria-checked=true', () => {
-    render(<SettingsPage settings={view({ aiConsentRevokedAt: null })} onUpdateSettings={vi.fn()} />);
+    render(
+      <SettingsPage settings={view({ aiConsentRevokedAt: null })} onUpdateSettings={vi.fn()} />,
+    );
     expect(screen.getByRole('switch', { name: 'AI 利用同意' }).getAttribute('aria-checked')).toBe(
       'true',
     );
@@ -48,7 +52,12 @@ describe('SettingsPage', () => {
 
   it('E-AC-4: AI 同意を ON→OFF すると revoked 時刻を渡し注意書きを表示する (UC4)', async () => {
     const onUpdateSettings = vi.fn<(p: { aiConsentRevokedAt?: Date | null }) => void>();
-    render(<SettingsPage settings={view({ aiConsentRevokedAt: null })} onUpdateSettings={onUpdateSettings} />);
+    render(
+      <SettingsPage
+        settings={view({ aiConsentRevokedAt: null })}
+        onUpdateSettings={onUpdateSettings}
+      />,
+    );
     fireEvent.click(screen.getByRole('switch', { name: 'AI 利用同意' }));
     await waitFor(() => expect(onUpdateSettings).toHaveBeenCalledOnce());
     const patch = onUpdateSettings.mock.calls[0]?.[0];
@@ -75,7 +84,12 @@ describe('SettingsPage', () => {
 
   it('UC7: 品質改善スイッチで analytics_opt_in を更新する', async () => {
     const onUpdateSettings = vi.fn();
-    render(<SettingsPage settings={view({ analyticsOptIn: false })} onUpdateSettings={onUpdateSettings} />);
+    render(
+      <SettingsPage
+        settings={view({ analyticsOptIn: false })}
+        onUpdateSettings={onUpdateSettings}
+      />,
+    );
     fireEvent.click(screen.getByRole('switch', { name: '品質改善への協力' }));
     await waitFor(() => expect(onUpdateSettings).toHaveBeenCalledWith({ analyticsOptIn: true }));
   });
@@ -90,9 +104,16 @@ describe('SettingsPage', () => {
 
   it('E-BL-002 流用: 連携 CTA 押下で OAuth ゲートを開き、「連携する」で onLink を起動', () => {
     const onLink = vi.fn();
-    render(<SettingsPage settings={view()} isLinked={false} onLink={onLink} onUpdateSettings={vi.fn()} />);
+    render(
+      <SettingsPage
+        settings={view()}
+        isLinked={false}
+        onLink={onLink}
+        onUpdateSettings={vi.fn()}
+      />,
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Google で連携する' }));
-    expect(screen.getByRole('dialog', { name: 'アカウント連携が必要です' })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: 'アカウントを連携する' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '連携する' }));
     expect(onLink).toHaveBeenCalledOnce();
   });
@@ -142,12 +163,16 @@ describe('SettingsPage', () => {
   });
 
   it('settingsError → 設定取得エラー表示', () => {
-    render(<SettingsPage settings={null} settingsError={new Error('boom')} onUpdateSettings={vi.fn()} />);
+    render(
+      <SettingsPage settings={null} settingsError={new Error('boom')} onUpdateSettings={vi.fn()} />,
+    );
     expect(screen.getByRole('alert').textContent).toContain('設定の取得に失敗しました');
   });
 
   it('saveError (E-AC-004) → 保存失敗フィードバックを表示する', () => {
-    render(<SettingsPage settings={view()} saveError={new Error('upsert')} onUpdateSettings={vi.fn()} />);
+    render(
+      <SettingsPage settings={view()} saveError={new Error('upsert')} onUpdateSettings={vi.fn()} />,
+    );
     expect(screen.getByRole('alert').textContent).toContain('保存できませんでした');
   });
 
