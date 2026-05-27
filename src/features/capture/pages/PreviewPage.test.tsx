@@ -18,16 +18,16 @@ beforeAll(() => {
 
 const file = new File(['photo'], 'plant.webp', { type: 'image/webp' });
 
-function renderPreview(opts: {
-  withFile?: boolean;
-  onConfirm?: (file: File, note?: string) => void | Promise<void>;
-} = {}) {
+function renderPreview(
+  opts: {
+    withFile?: boolean;
+    onConfirm?: (file: File, note?: string) => void | Promise<void>;
+  } = {},
+) {
   const { withFile = true, onConfirm } = opts;
   render(
     <MemoryRouter
-      initialEntries={[
-        { pathname: '/capture/preview', state: withFile ? { file } : null },
-      ]}
+      initialEntries={[{ pathname: '/capture/preview', state: withFile ? { file } : null }]}
     >
       <Routes>
         <Route path="/capture/preview" element={<PreviewPage onConfirm={onConfirm} />} />
@@ -64,6 +64,20 @@ describe('PreviewPage', () => {
     expect(onConfirm.mock.calls[0]![0]).toBe(file);
     // sanitizeUserNote で trim 済み。
     expect(onConfirm.mock.calls[0]![1]).toBe('道端のタンポポ');
+  });
+
+  it('claim C20260527-001: onConfirm が reject → エラー表示 + /notebook へ遷移しない (無言ループ回帰ガード)', async () => {
+    const onConfirm = vi.fn().mockRejectedValue(new Error('R2 CORS / upload failed'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    renderPreview({ onConfirm });
+    fireEvent.click(screen.getByRole('button', { name: 'これでよい' }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert').textContent).toContain('保存できませんでした'),
+    );
+    // navigate されず、プレビュー画面 (これでよい) に留まる (NOTEBOOK へ飛ばない)。
+    expect(screen.queryByText('NOTEBOOK_SCREEN')).toBeNull();
+    expect(screen.getByRole('button', { name: 'これでよい' })).toBeTruthy();
+    errSpy.mockRestore();
   });
 
   it('撮り直し → /capture へ遷移', () => {

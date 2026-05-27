@@ -43,6 +43,8 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
   const [note, setNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [stage, setStage] = useState<CaptureStage | null>(null);
+  // 保存失敗時のフィードバック。catch せず握り潰すと「これでよい」に無言で戻る不具合になる (claim C20260527-001)。
+  const [error, setError] = useState<string | null>(null);
 
   // File からプレビュー URL を生成 (File が無い場合は使われない)。
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
@@ -55,9 +57,15 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
   const handleConfirm = async () => {
     setSubmitting(true);
     setStage('preparing');
+    setError(null);
     try {
       await onConfirm?.(file, sanitizeUserNote(note), setStage);
       navigate('/notebook');
+    } catch (e) {
+      // 握り潰さない (claim C20260527-001: navigate スキップ → 無言でプレビューに戻る不具合)。
+      // 失敗を可視化し、ユーザーが撮り直し/再試行できるよう画面に留める。
+      console.error('[capture] 保存に失敗しました', e);
+      setError('保存できませんでした。通信状態を確認して、もう一度お試しください。');
     } finally {
       setSubmitting(false);
       setStage(null);
@@ -89,6 +97,11 @@ export function PreviewPage({ onConfirm }: PreviewPageProps) {
           {note.length} / {MAX_USER_NOTE}
         </span>
       </label>
+      {error ? (
+        <p role="alert" className="w-full max-w-sm text-sm text-red-500">
+          {error}
+        </p>
+      ) : null}
       <div className="flex w-full max-w-sm flex-col gap-2">
         <button type="button" disabled={submitting} onClick={handleConfirm} className="btn-primary">
           <Check size={18} aria-hidden />
