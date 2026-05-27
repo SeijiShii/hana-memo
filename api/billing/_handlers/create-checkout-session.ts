@@ -26,8 +26,8 @@ export function parseCheckoutBody(raw: unknown): CheckoutInput {
 }
 
 /** redirect URL を組み立てる。session_id プレースホルダは Stripe が置換する。 */
-function checkoutUrls(): { success_url: string; cancel_url: string } {
-  const base = (process.env.APP_BASE_URL ?? '').replace(/\/$/, '');
+function checkoutUrls(baseUrl: string): { success_url: string; cancel_url: string } {
+  const base = baseUrl.replace(/\/$/, '');
   return {
     success_url: `${base}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}/billing`,
@@ -35,11 +35,34 @@ function checkoutUrls(): { success_url: string; cancel_url: string } {
 }
 
 /**
+ * Checkout の戻り先 base URL を**リクエスト由来で**決める (fix: deploy 時 localhost に飛ぶ問題)。
+ * フロントは自分の origin から fetch するので `Origin` ヘッダ = アプリの公開 URL。
+ * preview/prod でデプロイ URL が変わっても正しく戻れる。非ブラウザ等で取れなければ
+ * `x-forwarded-*` → `APP_BASE_URL` env の順でフォールバック。
+ */
+export function baseUrlFromRequest(req: Request): string {
+  const origin = req.headers.get('origin');
+  if (origin && /^https?:\/\//.test(origin)) {
+    return origin;
+  }
+  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
+  if (host) {
+    const proto = req.headers.get('x-forwarded-proto') ?? 'https';
+    return `${proto}://${host}`;
+  }
+  return process.env.APP_BASE_URL ?? '';
+}
+
+/**
  * 価格/数量を検証して Stripe Checkout Session パラメータを構築する (純関数、UT-BL-CS01〜CS03)。
  * ai_credits: ¥100 × qty / 10 回付与。
  */
-export function buildCheckoutParams(input: CheckoutInput, userId: string): CheckoutSessionParams {
-  const urls = checkoutUrls();
+export function buildCheckoutParams(
+  input: CheckoutInput,
+  userId: string,
+  baseUrl: string = process.env.APP_BASE_URL ?? '',
+): CheckoutSessionParams {
+  const urls = checkoutUrls(baseUrl);
   const amount = aiCreditsAmountJpy(input.quantity); // validateQuantity 内包 (InvalidAmountError)
   return {
     mode: 'payment',
@@ -73,8 +96,9 @@ export async function runCreateCheckout(
   userId: string,
   input: CheckoutInput,
   deps: CreateCheckoutDeps,
+  baseUrl: string = process.env.APP_BASE_URL ?? '',
 ): Promise<{ url: string; sessionId: string }> {
-  const params = buildCheckoutParams(input, userId);
+  const params = buildCheckoutParams(input, userId, baseUrl);
   const session = await deps.create(params);
   if (!session.url) {
     throw new Error('Stripe Checkout Session has no redirect URL');
@@ -128,9 +152,12 @@ async function handler(req: Request): Promise<Response> {
   try {
     const userId = await resolveUserId(clerkUserId);
     const { createStripeCheckoutFn } = await import('../_lib/stripe');
-    const result = await runCreateCheckout(userId, input, {
-      create: createStripeCheckoutFn(),
-    });
+    const result = await runCreateCheckout(
+      userId,
+      input,
+      { create: createStripeCheckoutFn() },
+      baseUrlFromRequest(req),
+    );
     return jsonResponse(result, 200);
   } catch (err) {
     return mapError(err);

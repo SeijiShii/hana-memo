@@ -7,9 +7,37 @@ import {
   parseCheckoutBody,
   buildCheckoutParams,
   runCreateCheckout,
+  baseUrlFromRequest,
   type CheckoutInput,
 } from './create-checkout-session';
 import { InvalidAmountError } from '../../../src/features/billing/errors';
+
+describe('baseUrlFromRequest (deploy 時 localhost に飛ばない / リクエスト由来)', () => {
+  it('Origin ヘッダがあればそれを base にする (デプロイ URL で正しく戻る)', () => {
+    const req = new Request('https://x/api/billing/create-checkout-session', {
+      method: 'POST',
+      headers: { origin: 'https://hana-memo-abc.vercel.app' },
+    });
+    expect(baseUrlFromRequest(req)).toBe('https://hana-memo-abc.vercel.app');
+  });
+  it('Origin なし → x-forwarded-proto/host から組み立てる', () => {
+    const req = new Request('https://x/api/billing/create-checkout-session', {
+      method: 'POST',
+      headers: { 'x-forwarded-proto': 'https', 'x-forwarded-host': 'hana-memo.example.com' },
+    });
+    expect(baseUrlFromRequest(req)).toBe('https://hana-memo.example.com');
+  });
+  it('success_url がリクエスト origin 基準になる', () => {
+    const p = buildCheckoutParams(
+      { type: 'ai_credits', quantity: 1 },
+      'u1',
+      'https://deployed.app',
+    );
+    expect(p.success_url).toBe(
+      'https://deployed.app/billing/success?session_id={CHECKOUT_SESSION_ID}',
+    );
+  });
+});
 
 const okCreate = vi.fn(async () => ({ id: 'cs_1', url: 'https://checkout.stripe.com/c/cs_1' }));
 
